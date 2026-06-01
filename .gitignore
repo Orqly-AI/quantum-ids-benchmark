@@ -20,6 +20,18 @@ qml-env/
 # Scratch / diagnostic scripts (not part of the released pipeline)
 src/_*.py
 src/_*.sh
+paper/_*.py
+paper/_*.sh
+
+# LaTeX build artifacts (manuscript.pdf is kept; the rest regenerate)
+paper/arxiv_build/
+paper/arxiv.zip
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/page*.png
 
 # OS
 .DS_Store

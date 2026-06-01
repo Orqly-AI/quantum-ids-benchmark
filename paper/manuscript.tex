@@ -1,0 +1,673 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  How Quantum Is the Advantage?  --  manuscript (arXiv / Computers & Security)
+% ---------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage{graphicx}
+\graphicspath{{../}{./}}  % ../figures locally; ./figures in the arXiv bundle
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% --- palette for diagrams ---
+\definecolor{qpurple}{RGB}{106,61,154}
+\definecolor{qblue}{RGB}{31,119,180}
+\definecolor{qgreen}{RGB}{44,140,80}
+\definecolor{qorange}{RGB}{214,118,32}
+\definecolor{qgray}{RGB}{90,90,90}
+\definecolor{lightq}{RGB}{233,226,245}
+\definecolor{lightc}{RGB}{223,238,247}
+
+\newcommand{\tpr}{\mathrm{TPR}}
+\newcommand{\fpr}{\mathrm{FPR}}
+
+\title{\textbf{How Quantum Is the Advantage?}\\[2pt]
+\large A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of\\
+Quantum Machine Learning for Network Intrusion Detection}
+
+\author{
+  Syeda Anshrah Gillani\thanks{Corresponding author: \texttt{SyedaAnshrah16@gmail.com}}\\
+  \small Hamdard University, Karachi, Pakistan
+  \and
+  Mirza Samad Ahmed Baig\\
+  \small Fandaqah, Al Khobar, Saudi Arabia\\
+  \small \texttt{MirzaSamadcontact@gmail.com}
+}
+\date{2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Quantum machine learning (QML) for network intrusion detection (NIDS) is routinely
+reported to reach near-perfect accuracy, yet the field's most rigorous studies find
+that well-tuned classical models remain competitive or superior on tabular IDS data
+and that apparent quantum gains may be artefacts of classical dimensionality reduction
+and implicit regularisation rather than genuine quantum effects. We ask not whether a
+quantum model can post a high accuracy, but \emph{how quantum the advantage really is},
+and we supply the fair yardstick the field lacks. We present a unified, reproducible
+QML-IDS benchmark that evaluates hybrid variational quantum circuits and quantum-kernel
+SVMs against five honestly-tuned classical baselines across four standard NIDS datasets
+(NSL-KDD, UNSW-NB15, CICIDS2017, NF-ToN-IoT-v2) under a single leakage-controlled
+protocol, with two explicit feature views and operationally meaningful, imbalance- and
+calibration-aware metrics (AUPRC, true-positive rate at $0.1\%/1\%$ false-positive rate,
+Brier score, expected calibration error) reported with statistical significance. We
+introduce a \textbf{quantum-attribution audit} --- parameter-matched classical controls,
+a random-feature kernel, and a regularisation sweep --- that quantifies how much of any
+observed gain is genuinely attributable to the quantum component, and we map detection
+and calibration under simulated NISQ noise. We further report a backend-crossover
+efficiency finding: at the small qubit counts used in QML-IDS, CPU state simulation is
+$8$--$14\times$ faster than GPU. Across datasets we find that honestly-tuned classical
+models (Random Forest, XGBoost) match or exceed the quantum models on aggregate detection
+(F1, AUPRC, ROC-AUC) on all four datasets, and the audit attributes this to classical
+preprocessing and regularisation rather than quantum effects --- confirming and
+generalising recent critiques. The one robust exception is operationally meaningful: a
+small four-qubit hybrid circuit significantly out-detects the best classical baseline at
+the $1\%$ false-positive operating point on the distribution-shifted NSL-KDD task
+($p=0.005$). Code, seeds, and splits are released; our contribution stands whether quantum
+wins, ties, or loses.
+
+\medskip
+\noindent\textbf{Keywords:} quantum machine learning; network intrusion detection; hybrid
+quantum-classical neural networks; quantum support vector machine; NISQ; reproducible
+benchmark; class imbalance; model calibration
+\end{abstract}
+
+% ===========================================================================
+\section{Introduction}
+% ===========================================================================
+Network intrusion detection systems (NIDS) are a frontline defence against an expanding
+and increasingly automated threat landscape. Machine learning has become the dominant
+paradigm for flow- and packet-level intrusion detection, and the recent emergence of
+quantum machine learning (QML) has prompted a fast-growing body of work applying
+parameterised quantum circuits, quantum-kernel methods, and hybrid quantum-classical
+neural networks to the NIDS task. Headline results are striking: accuracies and F1 scores
+in the $97$--$99.9\%$ range are reported across many datasets and quantum architectures.
+
+These numbers invite a question the field has not answered convincingly: \textbf{how
+quantum is the reported advantage?} There are three reasons for scepticism, each grounded
+in rigorous recent work. First, the strongest quantum results are typically obtained on
+heavily dimensionality-reduced inputs --- frequently one feature per qubit after principal
+component analysis (PCA) --- and on binary tasks evaluated under random cross-validation, a
+regime that systematically over-states real-world detection. Second, when honest, well-tuned
+classical baselines (Random Forests, gradient-boosted trees, modern deep networks) are placed
+on the \emph{same} footing, they repeatedly match or beat the quantum models on tabular IDS
+data: the Meta-Quantum Ensemble study of Bhatnagar et al.~\cite{bhatnagar2026mqe}, despite
+assembling the most rigorous evaluation in the field, explicitly concedes that classical
+ensembles remain superior. Third, and most pointedly for a venue such as \emph{Computers \&
+Security}, Bellante et al.~\cite{bellante2025pca} demonstrate that the apparent advantage of
+PCA-based quantum IDS is \emph{explainable by regularisation, not by quantum effects}. A
+reviewer of any new QML-IDS paper will, and should, raise this point.
+
+We take this scepticism as the starting point rather than something to argue away. A paper
+whose central claim is ``our quantum model achieves higher accuracy'' is both scientifically
+fragile and strategically weak, because three Q1 papers already supply the counter-argument.
+The community's actual deficit is not another accuracy record; it is a \textbf{fair,
+reproducible, and honest evaluation methodology}, together with a principled way to
+\textbf{attribute} any measured difference to its true cause. This paper supplies both.
+
+We construct a single, leakage-controlled benchmarking protocol and apply it to the two
+quantum families that dominate the literature --- hybrid variational quantum circuits (VQCs)
+and quantum-kernel support vector machines (QSVMs) --- against a slate of honestly tuned
+classical baselines, across four standard datasets. We honour each dataset's intended
+evaluation semantics: for NSL-KDD we use the official \texttt{KDDTrain+}/\texttt{KDDTest+}
+split, whose test set deliberately over-represents attack behaviour under-seen in training,
+so that what we measure is generalisation to novel attacks rather than memorisation. We then
+go beyond benchmarking with a \textbf{quantum-attribution audit}: for every quantum model we
+construct a parameter-matched classical control sharing the identical classical front-end, and
+we run a regularisation sweep that tests the Bellante et al.\ hypothesis directly. Finally,
+because operational IDS must run at a low false-positive operating point and real quantum
+devices are noisy, we characterise how detection and calibration behave under simulated NISQ
+noise.
+
+\subsection{Contributions}
+\begin{enumerate}\itemsep2pt
+\item \textbf{A fair, reproducible, multi-dataset QML-IDS benchmark.} We evaluate hybrid VQCs
+and QSVMs against five honestly-tuned classical baselines (Random Forest, XGBoost, RBF-SVM, a
+tuned MLP, a 1D-CNN) across four standard datasets (NSL-KDD, UNSW-NB15, CICIDS2017,
+NF-ToN-IoT-v2) on the binary detection task, under one protocol with strict leakage control,
+honouring official splits. All code, seeds, and splits are released.
+\item \textbf{An equal-budget fairness design.} We report two explicitly-labelled feature
+views --- a \emph{full} view (classical models on all features) and a \emph{same-budget} view
+(every model on the identical low-dimensional input the quantum models receive) --- eliminating
+the silent feature-budget asymmetry that confounds prior work.
+\item \textbf{A quantum-attribution audit.} Parameter-matched classical controls and a
+regularisation sweep decompose any observed gain into its quantum and classical components, a
+direct constructive test of the Bellante et al.\ critique in the practical NISQ regime.
+\item \textbf{Operationally meaningful evaluation under noise.} Beyond accuracy/F1 we report
+detection rate and false-positive rate together, low-FPR operating points, and calibration, and
+characterise degradation under depolarising, amplitude-damping, phase-damping, and readout-error
+channels.
+\item \textbf{Statistical rigour and honest framing.} Every result is a mean over $\geq 5$
+seeds with confidence intervals; quantum-vs-best-classical comparisons use McNemar's test, paired
+$t$/Wilcoxon tests, and a paired bootstrap with effect sizes. The benchmark's value does not
+depend on the quantum models winning.
+\end{enumerate}
+
+% ===========================================================================
+\section{Related Work}
+% ===========================================================================
+We organise the related work into five strands and summarise representative studies in
+Table~\ref{tab:related}.
+
+\paragraph{Foundational and breadth-oriented QML-IDS.}
+Quantum intrusion detection was established by Kalinin and Krundyshev~\cite{kalinin2022}, who
+applied a quantum SVM and quantum convolutional network to a custom IoT stream dataset
+($\sim$98\% accuracy); Gong et al.~\cite{gong2024vqcnn} produced the most prominent Q1
+variational result (97.21\% precision, VQCNN, KDD/NSL-KDD). The strongest \emph{comparative}
+line is Abreu et al.: QML-IDS~\cite{abreu2024qmlids} and QuantumNetSec~\cite{abreu2025quantumnetsec}
+span VQC, QSVM, and QCNN across three to four datasets, but with under-tuned classical baselines
+and no attribution of where gains originate.
+
+\paragraph{Methods landscape.}
+The dominant primitive is the parameterised quantum circuit used as a variational classifier or
+hybrid head; recurring concerns are trainability (barren plateaus) and encoding choice, with
+amplitude embedding reported as unstable relative to angle embedding~\cite{wang2025quanconv}.
+Quantum-kernel SVMs~\cite{kumari2025wavelet} form the second family, scaling poorly in sample
+count, hence the reliance on subsampled, PCA-reduced data. Newer directions include quantum GNNs
+(Q-AGNN~\cite{chaudhary2026qagnn}) and meta-learning ensembles~\cite{bhatnagar2026mqe}.
+
+\paragraph{Rigorous and sceptical evaluations.}
+A small set of studies interrogates whether quantum helps. Bhatnagar et al.'s Meta-Quantum
+Ensemble~\cite{bhatnagar2026mqe} sets the field's evaluation standard (AUPRC, $\tpr$ at low
+$\fpr$, Brier, ECE, five noise channels) yet concludes classical ensembles remain superior.
+Bellante et al.~\cite{bellante2025pca}, in \emph{Computers \& Security}, show the observed
+advantage is explainable by regularisation rather than quantum effects. These works define the
+bar we must clear: not a higher accuracy, but a fair and \emph{attributable} comparison.
+
+\paragraph{Datasets and evaluation practice.}
+Most studies use one or two datasets (NSL-KDD/KDD99 the dated-but-default choice); genuine
+multi-dataset and cross-dataset evaluation is rare, and imbalance-aware metrics, calibration,
+significance testing, and honest baselines are almost universally missing, with
+Bhatnagar et al.~\cite{bhatnagar2026mqe} the principal exception.
+
+\begin{table}[t]
+\centering
+\caption{Representative QML-IDS studies and where this work differs (``sim''~=~simulator).}
+\label{tab:related}
+\footnotesize
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\textwidth}{@{}L{2.6cm} L{2.4cm} X c c@{}}
+\toprule
+\textbf{Paper} & \textbf{Method} & \textbf{Dataset(s)} & \textbf{Honest\newline baseline?} & \textbf{Attri-\newline bution?}\\
+\midrule
+Kalinin \& Krundyshev~\cite{kalinin2022} & QSVM, QCNN & Custom IoT stream & No & No\\
+Gong et al.~\cite{gong2024vqcnn} & VQCNN & KDD / NSL-KDD & Partial & No\\
+Abreu et al.~\cite{abreu2024qmlids,abreu2025quantumnetsec} & VQC / QSVM / QCNN & UNSW, CICIDS, CIC-IoT & Under-tuned & No\\
+Bhatnagar et al.~\cite{bhatnagar2026mqe} & QSVM+QNN+RF & CICIDS, TON\_IoT & Yes\newline (cl.\ wins) & No\\
+Bellante et al.~\cite{bellante2025pca} & FT PCA-QML & NIDS datasets & Yes & FT/PCA\newline only\\
+\textbf{This work} & \textbf{VQC+QSVM\newline +controls} & \textbf{4 datasets,\newline official splits} & \textbf{Yes\newline (5 tuned)} & \textbf{Yes\newline (NISQ)}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+We differentiate on three axes. Against Abreu et al.\ we retain breadth but add tuned baselines,
+an equal-budget view, operating-point and calibration metrics, significance testing, and
+reproducibility. Against Bhatnagar et al.\ we add the causal \emph{decomposition} their paper
+concedes is missing. Against Bellante et al.\ --- the critique most salient for this venue --- we
+extend the regularisation argument from their fault-tolerant, PCA-specific case study to the
+practical NISQ hybrid-VQC and QSVM models the community deploys, across a full multi-dataset
+benchmark, and we do so constructively: we specify exactly what evidence a genuine advantage would
+require and report whether, where, and to what extent it appears.
+
+% ===========================================================================
+\section{Threat Model and Background}
+% ===========================================================================
+\subsection{Threat model}
+We consider flow- and connection-record-based detection: a model classifies each per-connection
+feature vector as benign or malicious. Three operational constraints shape the evaluation: a strong
+\emph{cost asymmetry} (false positives flood analysts, so a detector must hold up at a low-$\fpr$
+operating point); \emph{distribution shift} between training and deployment, including unseen attack
+signatures (why we honour the NSL-KDD official split); and \emph{class imbalance}. Adaptive
+adversarial evasion is out of scope.
+
+\subsection{Background on quantum machine learning}
+A QML model operates on $n$ qubits whose joint state is a unit vector in a $2^n$-dimensional complex
+space; a noiseless simulation tracks this $2^n$-entry vector, while a noisy simulation tracks a
+$2^n\times 2^n$ density matrix, whose quadratic cost caps our noisy runs at twelve qubits. Classical
+flow features must be \emph{encoded} into the circuit (we ablate angle, amplitude, IQP/ZZ, and
+data-re-uploading encodings); a \emph{variational} ansatz of trainable gates processes the state; and
+measured Pauli-$Z$ expectations are mapped to class logits by a classical layer
+(Figure~\ref{fig:arch}). An alternative is to use the circuit only as a fixed feature map and let a
+classical SVM learn the boundary: the \emph{fidelity kernel} $K(x,x')=|\langle\phi(x')|\phi(x)\rangle|^2$
+costs $O(N^2)$ circuit evaluations, while the \emph{projected kernel} computes per-qubit expectations
+and applies a classical RBF, scaling as $O(N)$.
+
+The link to our central question is direct: in every hybrid pipeline a \emph{classical} front-end
+compresses high-dimensional records to the per-qubit budget and a \emph{classical} read-out turns
+measurements into predictions, so any end-to-end accuracy blends a quantum contribution with
+substantial classical processing and implicit regularisation. Disentangling the two is exactly what
+the attribution audit (Section~\ref{sec:audit}) is built to do.
+
+% ---- Figure 1: hybrid architecture (TikZ) ----
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={rounded corners=2pt,draw,minimum height=1.15cm,minimum width=2.0cm,align=center,thick},
+  cbox/.style={box,fill=lightc,draw=qblue},
+  qbox/.style={box,fill=lightq,draw=qpurple},
+  arr/.style={-{Stealth[length=2.2mm]},thick,qgray},
+  ]
+  \node[cbox] (in) {Flow\\features $x$};
+  \node[cbox,right=0.8cm of in] (pre) {Classical\\front-end\\[1pt]\scriptsize PCA/AE\,$\to$\,linear};
+  \node[qbox,right=1.0cm of pre] (enc) {Encoding\\[1pt]\scriptsize angle\,/\,IQP\,/\\\scriptsize amp.\,/\,reupload};
+  \node[qbox,right=0.7cm of enc] (ans) {Variational\\ansatz\\[1pt]\scriptsize SE\,/\,BE, depth $L$};
+  \node[qbox,right=0.7cm of ans] (meas) {Measure\\$\langle Z_i\rangle$};
+  \node[cbox,right=1.0cm of meas] (out) {Read-out\\$\to$ logits};
+  \draw[arr] (in)--(pre); \draw[arr] (pre)--(enc); \draw[arr] (enc)--(ans);
+  \draw[arr] (ans)--(meas); \draw[arr] (meas)--(out);
+  \begin{scope}[on background layer]
+    \node[draw=qpurple,dashed,rounded corners=3pt,fit=(enc)(ans)(meas),
+          inner sep=8pt] (qbox-fit) {};
+  \end{scope}
+  \node[qpurple,font=\footnotesize] at ([yshift=4pt]qbox-fit.north) {Quantum circuit (VQC)};
+  \node[below=0.1cm of in,qblue,font=\scriptsize] {classical};
+  \node[below=0.1cm of out,qblue,font=\scriptsize] {classical};
+\end{tikzpicture}}
+\caption{Hybrid quantum-classical classifier. A classical front-end compresses flow features to the
+per-qubit budget; a variational quantum circuit (encoding $+$ ansatz $+$ measurement) processes the
+encoded state; a classical read-out produces class logits. The quantum component is sandwiched between
+classical processing --- the motivation for the attribution audit.}
+\label{fig:arch}
+\end{figure}
+
+% ===========================================================================
+\section{Methodology}
+% ===========================================================================
+\subsection{Benchmark protocol and leakage control}
+We evaluate every model under one protocol designed so no test-distribution information influences
+training, scaling, reduction, or model selection. Where a dataset ships an official split we honour
+it: NSL-KDD uses the canonical \texttt{KDDTrain+}/\texttt{KDDTest+} split (17 attack signatures appear
+only in test, so we measure generalisation to novel attacks); UNSW-NB15 uses its official CSVs;
+CICIDS2017 and NF-ToN-IoT-v2 use a single seeded stratified $70/30$ split. All preprocessing is fit on
+training data only; leaky identifier columns (IP/port four-tuples, flow IDs, timestamps, row indices)
+are dropped; model selection is by cross-validation \emph{within the training set only}, and the test
+set is scored once per model per seed.
+
+\subsection{Two feature views (equal-budget fairness)}
+We report a \textbf{full view} (classical baselines on all encoded dimensions --- the practical ceiling)
+and a \textbf{same-budget view} (every model on the identical PCA-reduced input, $n_{\text{features}}=
+n_{\text{qubits}}=8$ in the main configuration). Because one-hot expansion produces many sparse columns,
+standard-scaling before PCA wastes the budget (eight components retain only $\sim$27\% of variance on
+NSL-KDD); min-max scaling before PCA lifts this to $0.841$ (Table~\ref{tab:data}), so we min-max scale
+prior to reduction.
+
+\subsection{Models}
+The quantum side is a hybrid VQC family and two QSVMs through a single model factory: a
+parameter-matched classical MLP control, six hybrid VQCs over the encoding~$\times$~ansatz grid
+(angle, IQP/ZZ, amplitude, re-uploading; strongly-entangling [SE] and basic-entangler [BE] ans\"atze),
+and two QSVMs (IQP fidelity-kernel, angle projected-kernel). The ZZ feature map is built from primitive
+gates for correct mini-batch broadcasting. The five classical baselines (Random Forest, XGBoost,
+RBF-SVM, tuned MLP, 1D-CNN) are each hyperparameter-searched (randomised search / grid, 5-fold
+stratified CV on the training set, optimising F1) and refit per seed.
+
+\subsection{The quantum-attribution audit}\label{sec:audit}
+This is the methodological core and our constructive answer to Bellante et al.~\cite{bellante2025pca}.
+Figure~\ref{fig:audit} sketches the logic. The audit has three components: (i) \emph{parameter-matched
+classical controls} --- for each hybrid VQC, a classical MLP of matched parameter count sharing the
+identical front-end, and for each QSVM an RBF-SVM and a \emph{random-feature} kernel approximation; if a
+matched control equals the quantum model, the ``advantage'' is not attributable to the quantum component;
+(ii) a \emph{regularisation sweep} varying classical regularisation (read-out ridge, MLP weight decay,
+RF depth, SVM bandwidth) to test whether comparable regularisation closes any gap; and (iii) a \emph{gain
+decomposition} reporting, per dataset and metric, the quantum-minus-control difference with significance.
+
+% ---- Figure 2: attribution-audit concept (TikZ) ----
+\begin{figure}[t]
+\centering
+\resizebox{0.92\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\small,
+  qb/.style={rounded corners=2pt,draw=qpurple,fill=lightq,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
+  cb/.style={rounded corners=2pt,draw=qblue,fill=lightc,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
+  res/.style={rounded corners=2pt,draw=qgreen,fill=qgreen!12,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
+  cl/.style={rounded corners=2pt,draw=qblue,fill=qblue!10,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
+  dec/.style={diamond,aspect=1.7,draw=qorange,thick,fill=qorange!15,align=center,inner sep=2pt},
+  arr/.style={-{Stealth[length=2.2mm]},thick,qgray},
+  ]
+  \node[qb] (q) {Quantum model\\[1pt]\scriptsize hybrid VQC / QSVM};
+  \node[cb,below=1.0cm of q] (c) {Matched classical control\\[1pt]\scriptsize same front-end $+$ capacity\\[1pt]\scriptsize $+$ regularisation sweep};
+  \node[dec,right=1.8cm of $(q)!0.5!(c)$] (d) {Gap\\closes?};
+  \node[res,right=2.4cm of d] (qu) {Residual is \textbf{quantum}\\[1pt]\scriptsize report with significance};
+  \node[cl,below=1.0cm of qu] (cla) {Advantage is \textbf{classical}\\[1pt]\scriptsize preprocessing / regularisation};
+  \draw[arr] (q.east) -| (d.north);
+  \draw[arr] (c.east) -| (d.south);
+  \draw[arr] (d.north) |- node[pos=0.75,above,font=\scriptsize]{no} (qu.west);
+  \draw[arr] (d.south) |- node[pos=0.75,below,font=\scriptsize]{yes} (cla.west);
+\end{tikzpicture}}
+\caption{The attribution audit. Each quantum model is compared with a parameter-matched classical
+control sharing its front-end, plus a regularisation sweep. If a comparably-regularised classical model
+closes the gap, the apparent advantage is classical; any significant residual is attributed to the
+quantum circuit.}
+\label{fig:audit}
+\end{figure}
+
+\subsection{Class imbalance and noise}
+The NSL-KDD binary task is only mildly imbalanced, so we default to cost-sensitive learning (balanced
+class weights, \texttt{scale\_pos\_weight} for XGBoost, weighted cross-entropy) and treat SMOTE
+(training partition only) as an ablation. For noise robustness we sweep four channels --- depolarising,
+amplitude damping, phase damping, and bit-flip (readout) --- at strengths $p\in\{0,0.001,0.005,0.01,0.05\}$
+on PennyLane's \texttt{default.mixed} density-matrix backend, capped at twelve qubits.
+
+% ===========================================================================
+\section{Experimental Setup}
+% ===========================================================================
+\subsection{Datasets}
+We evaluate on four standard NIDS datasets (Table~\ref{tab:data}). The \textbf{main benchmark is the
+binary task}. CICIDS2017 here is the three-day \emph{MachineLearningCVE} subset ($\sim$1.04M flows);
+NF-ToN-IoT-v2 is stratified-downsampled to 200{,}000 rows (from 16.9M); both are standard, configurable
+scopes we disclose plainly.
+
+\begin{table}[t]
+\centering
+\caption{Datasets (binary task; PCA-EVR@8 = variance retained by 8 principal components).}
+\label{tab:data}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}llccr c@{}}
+\toprule
+\textbf{Dataset} & \textbf{Split} & \textbf{Raw dim} & \textbf{\#cls (bin/multi)} & \textbf{Train / test} & \textbf{EVR@8}\\
+\midrule
+NSL-KDD~\cite{nslkdd2009} & Official & 122 & 2 / 40 & 125{,}973 / 22{,}544 & 0.841\\
+UNSW-NB15~\cite{unswnb15} & Official & 194 & 2 / 10 & 175{,}341 / 82{,}332 & 0.870\\
+CICIDS2017~\cite{cicids2017} & Strat.\ 70/30 & 76 & 2 / 3 & 729{,}491 / 312{,}639 & 0.924\\
+NF-ToN-IoT-v2~\cite{toniot} & Strat.\ 70/30 & 39 & 2 / 10 & 140{,}000 / 60{,}000 & 0.974\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrics and significance}
+We report threshold metrics (accuracy, precision, recall, F1, detection rate DR, false-positive rate
+$\fpr$) and ranking/calibration metrics (ROC-AUC, AUPRC, $\tpr$@$0.1\%\fpr$, $\tpr$@$1\%\fpr$, Brier,
+ECE), matching and extending the Meta-Quantum-Ensemble suite~\cite{bhatnagar2026mqe}. Every model is run
+over five seeds $\{42,\dots,46\}$ with $t$-based 95\% CIs. Quantum-vs-best-classical comparisons use
+McNemar's test (shared test set), paired $t$/Wilcoxon tests with Cohen's $d$ (over seeds), and a paired
+bootstrap (2{,}000 resamples) for operating-point metrics.
+
+\subsection{Backend efficiency and reproducibility}
+At QML-IDS qubit counts, quantum simulation (not GPU throughput) dominates runtime, and we report a
+\textbf{backend crossover}: the CPU \texttt{lightning.qubit} simulator is markedly faster than the GPU
+\texttt{lightning.gpu} simulator (Section~\ref{sec:eff}). Each run writes a self-describing JSON record
+(config, per-seed metrics, tuned hyperparameters, reference-seed predictions, environment snapshot with
+source checksums). All experiments run on a single laptop (NVIDIA RTX~3050~Ti, 4\,GB, under WSL2); the
+main runs use eight qubits, with a ceiling of sixteen (noiseless) / twelve (noisy). Code, seeds, and
+splits are released.
+
+% ===========================================================================
+\section{Results}
+% ===========================================================================
+The overall result, qualified below: \emph{honestly-tuned classical models match or exceed the quantum
+models on aggregate detection on every dataset, but a small hybrid VQC retains a statistically
+significant edge at the strict low-$\fpr$ operating point on the distribution-shifted NSL-KDD task.}
+
+\subsection{Headline benchmark}
+Table~\ref{tab:headline} reports F1 under both views. Under the \emph{same-budget} view --- the
+apples-to-apples comparison --- the best classical baseline beats the best quantum model on every
+dataset: NSL-KDD $0.782$ vs.\ $0.730$; UNSW-NB15 $0.891$ vs.\ $0.836$; CICIDS2017 $1.000$ vs.\ $0.968$;
+NF-ToN-IoT-v2 $0.991$ vs.\ $0.949$. The same ordering holds on AUPRC and ROC-AUC. Two qualifications
+matter. First, \textbf{CICIDS2017 and NF-ToN-IoT-v2 are near-saturated} (every tuned classical model
+scores F1~$\geq 0.97$), so they have weak discriminative power and the quantum models' high absolute
+scores there should be read as ``this task is easy.'' Second, the \textbf{CV-to-test gap} confirms why
+literature numbers are inflated: on NSL-KDD, models scoring F1~$\approx 0.98$ under within-training
+cross-validation collapse to F1~$\approx 0.78$ on the official test split --- a consistent $\approx 0.20$
+drop across all models and both views. Figure~\ref{fig:bars} compares the best classical and best
+quantum F1 per dataset; the qubit-count ablation is shown later in Figure~\ref{fig:ablation}.
+
+\begin{table}[t]
+\centering
+\caption{Headline benchmark --- F1 (mean over seeds): best classical per view vs.\ best quantum
+(same-budget input). The final three columns give the leading quantum model's AUPRC, ROC-AUC, and
+$\tpr$@$1\%\fpr$.}
+\label{tab:headline}
+\small
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}l c c c c c c@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{Classical F1}} & \multicolumn{4}{c}{\textbf{Quantum (best, same-budget)}}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-7}
+\textbf{Dataset} & \textbf{full} & \textbf{same-budget} & \textbf{F1} & \textbf{AUPRC} & \textbf{ROC-AUC} & \textbf{$\tpr$@1\%}\\
+\midrule
+NSL-KDD       & 0.803 & 0.782 & 0.730 & 0.911 & 0.865 & 0.411\\
+UNSW-NB15     & 0.912 & 0.891 & 0.836 & 0.942 & 0.924 & 0.577\\
+CICIDS2017    & 1.000 & 1.000 & 0.968 & 0.992 & 0.998 & 0.975\\
+NF-ToN-IoT-v2 & 0.996 & 0.991 & 0.949 & 0.965 & 0.969 & 0.195\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+{\footnotesize Best classical model per cell --- full view: SVM (NSL-KDD), MLP (UNSW), RF (CICIDS, ToN-IoT);
+same-budget: XGBoost (NSL-KDD), MLP (UNSW), RF (CICIDS, ToN-IoT).}
+\end{table}
+
+\subsection{Attribution audit}
+The audit (Table~\ref{tab:audit}) decomposes the difference on NSL-KDD, the discriminative dataset. A
+parameter-matched classical MLP sharing the quantum front-end attains AUPRC $0.944$ and the tuned Random
+Forest attains F1 $0.764$ --- both matching or exceeding every hybrid VQC on aggregate metrics. For the
+twelve-qubit hybrid the classical controls win significantly (F1 $-0.039$, $p=0.021$; AUPRC $-0.036$,
+$p=0.035$; $\tpr$@$1\%\fpr$ $-0.121$, $p=0.026$). \textbf{Once a classical model is granted the same
+front-end and comparable capacity/regularisation, the aggregate ``quantum advantage'' disappears} --- a
+confirmation of the Bellante hypothesis on a full multi-dataset benchmark. The one robust exception is
+the \emph{four-qubit} hybrid at the low-$\fpr$ operating point (Section~\ref{sec:op}); notably the larger
+twelve-qubit circuit is worse, consistent with overfitting at width rather than a quantum benefit.
+
+\begin{table}[t]
+\centering
+\caption{Quantum-attribution audit (NSL-KDD): leading quantum variant vs.\ best matched control.
+$\Delta=$ quantum $-$ control (positive favours quantum, except ECE).}
+\label{tab:audit}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}llccr c c@{}}
+\toprule
+\textbf{Variant} & \textbf{Metric} & \textbf{Quantum} & \textbf{Best control} & \textbf{$\Delta$} & \textbf{Q better?} & \textbf{$p$}\\
+\midrule
+Hybrid-Angle (q4) & $\tpr$@$1\%\fpr$ & 0.517 & 0.467 (RF) & $+0.050$ & \textbf{yes} & \textbf{0.005}\\
+Hybrid-Angle (q4) & $\tpr$@$0.1\%\fpr$ & 0.407 & 0.272 (MLP-m) & $+0.135$ & yes & 0.428\\
+Hybrid-Angle (q4) & F1 & 0.759 & 0.764 (RF) & $-0.004$ & tie & 0.776\\
+Hybrid-Angle (q4) & ECE & 0.184 & 0.193 (RF) & $-0.009$ & yes & 0.248\\
+Hybrid-Angle (q12) & F1 & 0.724 & 0.764 (RF) & $-0.039$ & no & 0.021\\
+Hybrid-Angle (q12) & AUPRC & 0.908 & 0.944 (MLP-m) & $-0.036$ & no & 0.035\\
+Hybrid-Angle (q12) & $\tpr$@$1\%\fpr$ & 0.346 & 0.467 (RF) & $-0.121$ & no & 0.026\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Operating-point and calibration analysis}\label{sec:op}
+The operating-point metrics hold the paper's one positive quantum result. On NSL-KDD the four-qubit
+hybrid VQC achieves $\tpr$@$1\%\fpr=0.517$, exceeding the best classical model (Random Forest, $0.467$)
+by $0.050$ --- statistically significant ($p=0.005$, paired bootstrap) --- and $\tpr$@$0.1\%\fpr=0.407$
+vs.\ $0.272$. At the strict $1\%$-alarm budget a defender would actually impose, the small quantum model
+catches a meaningfully larger fraction of attacks on novel-attack-heavy traffic. Calibration is
+comparable (ECE $\approx 0.18$--$0.22$ for hybrids vs.\ $0.193$ for Random Forest), the four-qubit hybrid
+marginally better. This is the evidence a genuine, if narrow, quantum signal would produce.
+
+\subsection{Noise robustness}
+Sweeping four NISQ channels on the six-qubit hybrid shows \textbf{graceful degradation, and in the mild
+regime none at all}. Relative to the noiseless run (ROC-AUC $0.846$, $\tpr$@$1\%\fpr$ $0.422$, ECE
+$0.191$), depolarising, amplitude-damping, and phase-damping noise at $p\in\{0.01,0.05\}$ leave low-$\fpr$
+detection essentially unchanged ($0.421$--$0.430$) and slightly \emph{raise} ROC-AUC (to $0.878$--$0.897$),
+consistent with mild noise acting as a regulariser on the shifted task. Only bit-flip (readout) noise
+materially hurts ($\tpr$@$1\%\fpr$ $0.379$ at $p=0.05$). No channel causes catastrophic collapse: for this
+small-circuit regime, readout error is the one to mitigate.
+
+\subsection{Significance and efficiency}\label{sec:eff}
+On aggregate F1, classical significantly beats quantum (twelve-qubit hybrid vs.\ RF, $p=0.021$;
+basic-entangler hybrid, $p=0.004$); at the low-$\fpr$ point the four-qubit hybrid significantly beats RF
+($p=0.005$); the rest are ties. The backend-crossover finding (Table~\ref{tab:eff}) is unambiguous: the
+\textbf{CPU simulator is $8$--$14\times$ faster than the GPU} at QML-IDS qubit counts, the gap growing
+with width because the per-circuit work is too small to amortise GPU kernel-launch and transfer overhead.
+The projected quantum kernel ($O(N)$) is tractable at test scale whereas the fidelity kernel ($O(N^2)$)
+is not.
+
+\begin{table}[t]
+\centering
+\caption{Backend efficiency --- CPU (\texttt{lightning.qubit}) vs.\ GPU (\texttt{lightning.gpu})
+training-step time at fixed work.}
+\label{tab:eff}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Qubits} & \textbf{CPU} & \textbf{GPU} & \textbf{GPU/CPU}\\
+\midrule
+4 & 1.12\,s & 8.89\,s & $8.0\times$\\
+8 & 2.08\,s & 28.0\,s & $13.5\times$\\
+12 & 3.94\,s & 54.3\,s & $13.8\times$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---- matplotlib figures ----
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  ybar, bar width=11pt,
+  width=0.95\textwidth, height=6.4cm,
+  enlarge x limits=0.18,
+  ymin=0.6, ymax=1.14,
+  ytick={0.6,0.7,0.8,0.9,1.0},
+  ylabel={F1 (mean over seeds)},
+  symbolic x coords={NSL-KDD,UNSW-NB15,CICIDS2017,NF-ToN-IoT-v2},
+  xtick=data,
+  x tick label style={font=\small},
+  legend style={at={(0.5,-0.16)},anchor=north,legend columns=2,font=\small,draw=none},
+  nodes near coords,
+  every node near coord/.append style={font=\tiny,rotate=90,anchor=west,
+    /pgf/number format/.cd,fixed,fixed zerofill,precision=3},
+  ymajorgrids,grid style={gray!22},
+]
+\addplot[fill=qblue!72,draw=qblue] coordinates
+  {(NSL-KDD,0.782)(UNSW-NB15,0.891)(CICIDS2017,1.000)(NF-ToN-IoT-v2,0.991)};
+\addplot[fill=qpurple!72,draw=qpurple] coordinates
+  {(NSL-KDD,0.730)(UNSW-NB15,0.836)(CICIDS2017,0.968)(NF-ToN-IoT-v2,0.949)};
+\legend{Best classical (same-budget),\ Best quantum}
+\end{axis}
+\end{tikzpicture}
+\caption{Best classical (same-budget) vs.\ best quantum F1 per dataset (mean over seeds). Tuned
+classical models lead on every dataset; the gap is largest on the discriminative datasets (NSL-KDD,
+UNSW-NB15) and smallest where the task is near-saturated (CICIDS2017, NF-ToN-IoT-v2, where every
+classical model exceeds $0.97$).}
+\label{fig:bars}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.74\textwidth, height=6.2cm,
+  xlabel={Number of qubits in the hybrid VQC},
+  ylabel={Score (NSL-KDD test)},
+  xtick={4,8,12}, ymin=0.30, ymax=0.83,
+  legend style={at={(0.5,-0.20)},anchor=north,legend columns=3,font=\small,draw=none},
+  ymajorgrids,grid style={gray!22},
+  every axis plot/.append style={very thick},
+]
+\addplot[qpurple,mark=*] coordinates {(4,0.759)(8,0.730)(12,0.724)};
+\addplot[qgreen,mark=square*] coordinates {(4,0.517)(8,0.411)(12,0.346)};
+\addplot[qorange,dashed,mark=none] coordinates {(4,0.467)(12,0.467)};
+\legend{Hybrid F1,\ Hybrid $\tpr$@$1\%\fpr$,\ RF $\tpr$@$1\%\fpr$ (ref.)}
+\end{axis}
+\end{tikzpicture}
+\caption{Qubit-count ablation of the hybrid VQC on NSL-KDD. Both F1 and the low-FPR detection rate
+\emph{decline} with width --- more qubits do not help on the shifted task. Crucially, only the small
+four-qubit circuit exceeds the best classical baseline's $\tpr$@$1\%\fpr$ (Random Forest, dashed
+reference at $0.467$); the advantage vanishes by twelve qubits, consistent with an
+implicit-regularisation mechanism rather than raw expressivity.}
+\label{fig:ablation}
+\end{figure}
+
+% ===========================================================================
+\section{Discussion}
+% ===========================================================================
+\textbf{How quantum is the advantage?} On this benchmark and in the practical NISQ regime: almost none of
+it on aggregate detection, and a small but real amount at the operating point that matters operationally.
+The audit is decisive on the first half --- once a classical model is granted the same front-end and
+comparable regularisation, the aggregate advantage of the hybrid VQC and the QSVM vanishes and tuned
+classical baselines significantly outperform the quantum models on F1 and AUPRC. We thus confirm the
+Bellante et al.~\cite{bellante2025pca} hypothesis and extend it from their fault-tolerant, PCA-specific
+case study to the deployed NISQ models, across four datasets, and we corroborate Bhatnagar et al.'s
+concession~\cite{bhatnagar2026mqe} while supplying the decomposition their work lacked.
+
+The more interesting half is the exception. At the $1\%$-$\fpr$ operating point on NSL-KDD's shifted test
+set, the four-qubit hybrid significantly out-detects the best classical baseline ($p=0.005$). Three
+features make it credible rather than noise: it appears on the \emph{discriminative} dataset, not the
+saturated ones; it is strongest for the \emph{small} circuit and vanishes at twelve qubits, consistent
+with an implicit-regularisation mechanism rather than raw expressivity; and it survives mild simulated
+noise, which slightly \emph{improves} ROC-AUC. We are deliberately cautious --- one operating point, one
+dataset, in simulation --- but this is precisely where a genuine quantum advantage would first appear, and
+it motivates targeted real-hardware follow-up rather than another accuracy sweep.
+
+\textbf{What remains classical.} For a practitioner choosing a detector today, the honest recommendation
+is a tuned Random Forest or XGBoost: they win or tie on every aggregate metric, on every dataset, at a
+fraction of the cost and with no quantum hardware. This is the result the field needs stated cleanly,
+because it redirects effort from inflated accuracy records --- which our CV-to-test analysis shows are
+largely an artefact of random cross-validation --- toward the one regime where quantum methods showed a
+measurable, significant edge. Two methodological findings generalise: the $\approx 0.20$ F1 CV-to-test gap
+is a caution for the whole QML-IDS literature, and the backend crossover (the GPU is an order of magnitude
+\emph{slower} at these qubit counts) saves researchers real time.
+
+% ===========================================================================
+\section{Limitations and Threats to Validity}
+% ===========================================================================
+\textbf{Simulation only.} All quantum results are simulated; we have no real-QPU access, so our noise study
+models NISQ effects rather than measuring them, omitting correlated/non-Markovian noise, crosstalk,
+connectivity, and transpilation. A real-hardware confirmation of even one configuration would strengthen
+the conclusions; we treat the simulated results as an optimistic bound.
+\textbf{Qubit budget.} The 4\,GB GPU caps width at $\sim$16 qubits (noiseless) / 12 (noisy, $(2^n)^2$
+memory); the main configuration uses eight, so we cannot probe the larger-width regime.
+\textbf{Dimensionality reduction} discards variance (eight PCs retain $\sim$84\% on NSL-KDD), so any
+advantage is conditioned on information-reduced input.
+\textbf{Dataset age/composition.} NSL-KDD is dated (mitigated by three further datasets); the IoT coverage
+is a single NetFlow dataset; CICIDS2017 and NF-ToN-IoT-v2 use standard subsets, configurable to full
+corpora.
+\textbf{Trainability} (barren plateaus, gradient variance) is not characterised directly, and QSVMs are
+trained on subsampled data ($O(N^2)$ fidelity kernel).
+\textbf{Statistical power.} Five seeds is the practical floor; we rely on paired tests and effect sizes.
+The crossover ratio is hardware/library-dependent.
+\textbf{Scope.} Binary detection under benign distribution shift and imbalance; adversarial evasion and the
+unsupervised/online/federated settings are out of scope.
+
+% ===========================================================================
+\section{Conclusion}
+% ===========================================================================
+We set out to replace the field's recurring ``our quantum model reaches 99\%'' claim with the fair,
+reproducible, attribution-aware yardstick the question requires. Across four datasets under one
+leakage-controlled protocol, with an equal-budget view, operating-point and calibration metrics,
+significance testing, a noise sweep, and a quantum-attribution audit, we find that well-tuned classical
+models match or exceed the quantum models on aggregate detection everywhere, and the audit attributes this
+to classical preprocessing and regularisation rather than quantum effects --- confirming and generalising
+the Bellante et al.\ critique. The one robust exception is operationally meaningful: a small four-qubit
+hybrid significantly out-detects the best classical baseline at the $1\%$ false-positive operating point on
+the distribution-shifted NSL-KDD task. Beyond the headline we contribute a released, turnkey benchmark and
+harness, a demonstration that random-cross-validation evaluation overstates novel-attack detection by
+$\sim$20 F1 points, and a practical backend-efficiency result. The most valuable next step is real-hardware
+confirmation of the low-$\fpr$ signal --- the single experiment that would distinguish a genuine quantum
+inductive bias from a simulation artefact. We release the benchmark so that QML-IDS claims can be stated,
+and contested, on common, honest ground.
+
+\paragraph{Reproducibility.} Code, configurations, fixed seeds, dataset splits, and per-run provenance are
+released at \url{https://github.com/Mirza-Samad-Ahmed-Baig/quantum-ids-benchmark}.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}
