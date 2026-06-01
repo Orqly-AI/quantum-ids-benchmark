@@ -10,6 +10,7 @@
 \usepackage{array}
 \usepackage{tabularx}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{tikz}
@@ -201,18 +202,18 @@ Bhatnagar et al.~\cite{bhatnagar2026mqe} the principal exception.
 \caption{Representative QML-IDS studies and where this work differs (``sim''~=~simulator).}
 \label{tab:related}
 \footnotesize
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.35}
 \setlength{\tabcolsep}{5pt}
-\begin{tabularx}{\textwidth}{@{}L{2.6cm} L{2.4cm} X c c@{}}
+\begin{tabularx}{\textwidth}{@{}L{2.5cm} L{2.2cm} X C{1.7cm} C{1.7cm}@{}}
 \toprule
-\textbf{Paper} & \textbf{Method} & \textbf{Dataset(s)} & \textbf{Honest\newline baseline?} & \textbf{Attri-\newline bution?}\\
+\textbf{Paper} & \textbf{Method} & \textbf{Dataset(s)} & \textbf{Honest baseline?} & \textbf{Attribution?}\\
 \midrule
 Kalinin \& Krundyshev~\cite{kalinin2022} & QSVM, QCNN & Custom IoT stream & No & No\\
 Gong et al.~\cite{gong2024vqcnn} & VQCNN & KDD / NSL-KDD & Partial & No\\
 Abreu et al.~\cite{abreu2024qmlids,abreu2025quantumnetsec} & VQC / QSVM / QCNN & UNSW, CICIDS, CIC-IoT & Under-tuned & No\\
-Bhatnagar et al.~\cite{bhatnagar2026mqe} & QSVM+QNN+RF & CICIDS, TON\_IoT & Yes\newline (cl.\ wins) & No\\
-Bellante et al.~\cite{bellante2025pca} & FT PCA-QML & NIDS datasets & Yes & FT/PCA\newline only\\
-\textbf{This work} & \textbf{VQC+QSVM\newline +controls} & \textbf{4 datasets,\newline official splits} & \textbf{Yes\newline (5 tuned)} & \textbf{Yes\newline (NISQ)}\\
+Bhatnagar et al.~\cite{bhatnagar2026mqe} & QSVM, QNN, RF & CICIDS, TON\_IoT & Yes (cl.\ wins) & No\\
+Bellante et al.~\cite{bellante2025pca} & FT PCA-QML & NIDS datasets & Yes & FT/PCA only\\
+\textbf{This work} & VQC, QSVM, controls & 4 datasets, official splits & Yes (5 tuned) & Yes (NISQ)\\
 \bottomrule
 \end{tabularx}
 \end{table}
