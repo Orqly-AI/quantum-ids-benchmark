@@ -1,0 +1,14 @@
+# Core quantum + ML stack (installed in conda env "qml", Python 3.10, WSL2 Ubuntu 22.04)
+# PyTorch installed separately via: pip install torch --index-url https://download.pytorch.org/whl/cu121
+pennylane>=0.38
+pennylane-lightning-gpu
+custatevec-cu12
+scikit-learn
+xgboost
+imbalanced-learn
+pandas
+numpy
+matplotlib
+seaborn
+tqdm
+jupyterlab

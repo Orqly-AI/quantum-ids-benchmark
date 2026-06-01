@@ -1,0 +1,33 @@
+# Tiny smoke config for the attribution audit pipeline (fast: 1 epoch, small data).
+# bash run.sh runner.py --config configs/_audit_smoke.yaml --results-dir ../results/_smoke
+defaults:
+  dataset: nslkdd
+  reduction: pca
+  n_features: 4
+  binary: true
+  scale: minmax
+  epochs: 1
+  batch_size: 64
+  lr: 0.01
+  q_subsample: 300
+
+runs:
+  - name: qnn_smoke
+    model_type: hybrid_qnn
+    n_qubits: 4
+    n_layers: 2
+    encoding: angle
+    seeds: [42, 43]
+    extra: { device: cpu }
+  - name: matched_mlp_smoke
+    model_type: matched_mlp
+    n_qubits: 4
+    n_layers: 2
+    seeds: [42, 43]
+    extra: { weight_decay: 0.001 }
+  - name: rf_kernel_smoke
+    model_type: rf_kernel
+    n_qubits: 4
+    q_subsample: 300
+    seeds: [42, 43]
+    extra: { rf_method: rbf_sampler, n_components: 128, gamma: 1.0 }

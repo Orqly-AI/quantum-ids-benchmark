@@ -1,0 +1,37 @@
+# OVERNIGHT Phase 1: full quantum ablation on NSL-KDD (binary), right-sized to
+# quantum-dev's measured budget (q_subsample 2000 @ q<=8 / 1500 @ q12, 20 epochs,
+# device=cpu lightning.qubit). 3 seeds for significance. Names prefixed "ovn1_".
+#   bash run.sh runner.py --config configs/overnight_q_phase1.yaml
+defaults:
+  dataset: nslkdd
+  reduction: pca
+  n_features: 8
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  seeds: [42, 43, 44]
+  epochs: 20
+  batch_size: 64
+  lr: 0.005
+  q_subsample: 2000
+  extra: {device: cpu}
+
+runs:
+  # --- encoding ablation (hybrid VQC, q8, strongly-entangling) ---
+  - {name: ovn1_hybrid_angle_se,    model_type: hybrid_qnn, n_qubits: 8, n_features: 8, n_layers: 3, encoding: angle,     extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn1_hybrid_amp_se,      model_type: hybrid_qnn, n_qubits: 8, n_features: 8, n_layers: 3, encoding: amplitude, extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn1_hybrid_iqp_se,      model_type: hybrid_qnn, n_qubits: 8, n_features: 8, n_layers: 3, encoding: iqp,       extra: {device: cpu, ansatz: strongly_entangling}}
+  # --- ansatz ablation (basic-entangler vs SE, angle) ---
+  - {name: ovn1_hybrid_angle_be,    model_type: hybrid_qnn, n_qubits: 8, n_features: 8, n_layers: 3, encoding: angle,     extra: {device: cpu, ansatz: basic_entangler}}
+  # --- qubit-count ablation (angle, SE) ---
+  - {name: ovn1_hybrid_angle_q4,    model_type: hybrid_qnn, n_qubits: 4, n_features: 4, n_layers: 3, encoding: angle,     extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn1_hybrid_angle_q12,   model_type: hybrid_qnn, n_qubits: 12, n_features: 12, n_layers: 3, encoding: angle,   q_subsample: 1500, extra: {device: cpu, ansatz: strongly_entangling}}
+  # --- quantum-kernel SVM (projected = O(N), the campaign default) ---
+  - {name: ovn1_qsvm_iqp_proj,      model_type: qsvm, n_qubits: 8, n_features: 8, q_subsample: 2000, extra: {device: cpu, encoding: iqp,   kernel: projected}}
+  - {name: ovn1_qsvm_angle_proj,    model_type: qsvm, n_qubits: 8, n_features: 8, q_subsample: 2000, extra: {device: cpu, encoding: angle, kernel: projected}}
+  # NOTE: fidelity-kernel QSVM removed from the automated sweep — O(N^2) quantum
+  # evals make TEST-time prediction over the full 22,544-row test set intractable
+  # (~30h/run). The projected kernel (O(N)) is the campaign QSVM; fidelity's
+  # impracticality at scale is itself reported as a finding motivating it.
+  # --- same-harness classical reference (param-matched MLP) ---
+  - {name: ovn1_mlp_matched,        model_type: classical_mlp, n_qubits: 8, n_features: 8, n_layers: 3, q_subsample: 2000, extra: {device: cpu}}

@@ -1,0 +1,20 @@
+# #15 integration check: ONE CICIDS hybrid run, full 312k-row test set, parallel eval.
+# Small train subsample + few epochs (we're verifying the EVAL path + timing, not
+# training quality). Full test set is the point — that's what parallel_predict speeds up.
+name: evalcheck_cicids_hybrid
+dataset: cicids
+reduction: pca
+n_features: 8
+binary: true
+scale: minmax
+imbalance: class_weight
+model_type: hybrid_qnn
+n_qubits: 8
+n_layers: 2
+encoding: angle
+device: cpu
+seed: 42
+epochs: 2
+batch_size: 64
+q_subsample: 1000
+extra: {device: cpu, ansatz: strongly_entangling, eval_workers: 4}

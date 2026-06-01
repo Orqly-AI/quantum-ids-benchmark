@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use this software or benchmark, please cite the following work."
+title: "How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for Network Intrusion Detection"
+abstract: >-
+  A fair, reproducible, multi-dataset benchmark and quantum-attribution audit of
+  quantum machine learning for network intrusion detection. Hybrid variational
+  quantum circuits and quantum-kernel SVMs are evaluated against honestly-tuned
+  classical baselines across NSL-KDD, UNSW-NB15, CICIDS2017, and NF-ToN-IoT-v2,
+  with an equal-budget fairness design, operating-point and calibration metrics,
+  statistical significance, a NISQ noise sweep, and an attribution audit that
+  decomposes any measured gain into its classical and genuinely-quantum components.
+type: software
+authors:
+  - given-names: "Syeda Anshrah"
+    family-names: "Gillani"
+    email: "SyedaAnshrah16@gmail.com"
+    affiliation: "Hamdard University, Karachi, Pakistan"
+  - given-names: "Mirza Samad Ahmed"
+    family-names: "Baig"
+    email: "MirzaSamadcontact@gmail.com"
+    affiliation: "Fandaqah, Al Khobar, Saudi Arabia"
+keywords:
+  - quantum machine learning
+  - network intrusion detection
+  - hybrid quantum-classical neural networks
+  - quantum support vector machine
+  - NISQ
+  - reproducible benchmark
+  - model calibration
+license: MIT
+version: "1.0.0"
+date-released: "2026-06-01"
+repository-code: "https://github.com/[USER]/quantum-ids-benchmark"
+preferred-citation:
+  type: article
+  title: "How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for Network Intrusion Detection"
+  authors:
+    - given-names: "Syeda Anshrah"
+      family-names: "Gillani"
+    - given-names: "Mirza Samad Ahmed"
+      family-names: "Baig"
+  journal: "Computers & Security (under review)"
+  year: 2026

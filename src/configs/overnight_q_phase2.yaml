@@ -1,0 +1,36 @@
+# OVERNIGHT Phase 2: cross-dataset quantum runs — the best 2 hybrid encodings
+# (angle, iqp) + the projected QSVM, across all 4 datasets, 3 seeds. Establishes
+# the breadth half of the honest-broker benchmark. Names prefixed "ovn2_".
+#   bash run.sh runner.py --config configs/overnight_q_phase2.yaml
+defaults:
+  reduction: pca
+  n_features: 8
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  n_qubits: 8
+  n_layers: 3
+  seeds: [42, 43, 44]
+  epochs: 20
+  batch_size: 64
+  lr: 0.005
+  q_subsample: 2000
+  extra: {device: cpu}
+
+runs:
+  # nslkdd
+  - {name: ovn2_nslkdd_hybrid_angle, dataset: nslkdd, model_type: hybrid_qnn, encoding: angle, extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_nslkdd_hybrid_iqp,   dataset: nslkdd, model_type: hybrid_qnn, encoding: iqp,   extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_nslkdd_qsvm,         dataset: nslkdd, model_type: qsvm, extra: {device: cpu, encoding: iqp, kernel: projected}}
+  # unsw
+  - {name: ovn2_unsw_hybrid_angle,   dataset: unsw,   model_type: hybrid_qnn, encoding: angle, extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_unsw_hybrid_iqp,     dataset: unsw,   model_type: hybrid_qnn, encoding: iqp,   extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_unsw_qsvm,           dataset: unsw,   model_type: qsvm, extra: {device: cpu, encoding: iqp, kernel: projected}}
+  # cicids
+  - {name: ovn2_cicids_hybrid_angle, dataset: cicids, model_type: hybrid_qnn, encoding: angle, extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_cicids_hybrid_iqp,   dataset: cicids, model_type: hybrid_qnn, encoding: iqp,   extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_cicids_qsvm,         dataset: cicids, model_type: qsvm, extra: {device: cpu, encoding: iqp, kernel: projected}}
+  # toniot
+  - {name: ovn2_toniot_hybrid_angle, dataset: toniot, model_type: hybrid_qnn, encoding: angle, extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_toniot_hybrid_iqp,   dataset: toniot, model_type: hybrid_qnn, encoding: iqp,   extra: {device: cpu, ansatz: strongly_entangling}}
+  - {name: ovn2_toniot_qsvm,         dataset: toniot, model_type: qsvm, extra: {device: cpu, encoding: iqp, kernel: projected}}

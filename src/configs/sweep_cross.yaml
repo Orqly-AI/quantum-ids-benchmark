@@ -1,0 +1,51 @@
+# CROSS-DATASET SWEEP (task #7) — best 1-2 quantum encodings + projected QSVM +
+# all classical baselines across the 4 datasets, 3 seeds. Per quantum-dev's budget
+# this is the overnight run (the full 9-variant ablation is NSL-KDD-only, see
+# sweep_main.yaml). Edit the encodings below once sweep_main identifies the best.
+#   bash run.sh runner.py --config configs/sweep_cross.yaml
+#   bash run.sh aggregate.py && bash run.sh figures.py
+defaults:
+  reduction: pca
+  n_features: 8
+  n_qubits: 8
+  n_layers: 3
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  device: cpu
+  epochs: 20
+  batch_size: 64
+  lr: 0.005
+  q_subsample: 2000
+  seeds: [42, 43, 44]
+
+# One block per dataset; same model line-up. (data.load aliases: nslkdd/unsw/cicids/toniot.)
+runs:
+  # --- NSL-KDD ---
+  - {name: nsl_hybrid_reupload, dataset: nslkdd, model_type: hybrid_qnn, encoding: reupload}
+  - {name: nsl_hybrid_angle,    dataset: nslkdd, model_type: hybrid_qnn, encoding: angle}
+  - {name: nsl_qsvm,            dataset: nslkdd, model_type: qsvm, extra: {encoding: angle, kernel: projected}}
+  - {name: nsl_rf,   dataset: nslkdd, model_type: random_forest, q_subsample: 0}
+  - {name: nsl_xgb,  dataset: nslkdd, model_type: xgboost, q_subsample: 0}
+  - {name: nsl_cnn,  dataset: nslkdd, model_type: cnn1d}
+  # --- UNSW-NB15 ---
+  - {name: unsw_hybrid_reupload, dataset: unsw, model_type: hybrid_qnn, encoding: reupload}
+  - {name: unsw_hybrid_angle,    dataset: unsw, model_type: hybrid_qnn, encoding: angle}
+  - {name: unsw_qsvm,            dataset: unsw, model_type: qsvm, extra: {encoding: angle, kernel: projected}}
+  - {name: unsw_rf,  dataset: unsw, model_type: random_forest, q_subsample: 0}
+  - {name: unsw_xgb, dataset: unsw, model_type: xgboost, q_subsample: 0}
+  - {name: unsw_cnn, dataset: unsw, model_type: cnn1d}
+  # --- CICIDS2017 ---
+  - {name: cic_hybrid_reupload, dataset: cicids, model_type: hybrid_qnn, encoding: reupload}
+  - {name: cic_hybrid_angle,    dataset: cicids, model_type: hybrid_qnn, encoding: angle}
+  - {name: cic_qsvm,            dataset: cicids, model_type: qsvm, extra: {encoding: angle, kernel: projected}}
+  - {name: cic_rf,   dataset: cicids, model_type: random_forest, q_subsample: 0}
+  - {name: cic_xgb,  dataset: cicids, model_type: xgboost, q_subsample: 0}
+  - {name: cic_cnn,  dataset: cicids, model_type: cnn1d}
+  # --- TON-IoT ---
+  - {name: ton_hybrid_reupload, dataset: toniot, model_type: hybrid_qnn, encoding: reupload}
+  - {name: ton_hybrid_angle,    dataset: toniot, model_type: hybrid_qnn, encoding: angle}
+  - {name: ton_qsvm,            dataset: toniot, model_type: qsvm, extra: {encoding: angle, kernel: projected}}
+  - {name: ton_rf,   dataset: toniot, model_type: random_forest, q_subsample: 0}
+  - {name: ton_xgb,  dataset: toniot, model_type: xgboost, q_subsample: 0}
+  - {name: ton_cnn,  dataset: toniot, model_type: cnn1d}

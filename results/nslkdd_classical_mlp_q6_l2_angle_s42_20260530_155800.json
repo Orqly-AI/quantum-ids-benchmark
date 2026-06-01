@@ -1,0 +1,66 @@
+{
+  "config": {
+    "name": "ClassicalMLP",
+    "dataset": "nslkdd",
+    "n_features": 6,
+    "reduction": "pca",
+    "binary": true,
+    "scale": "minmax",
+    "model_type": "classical_mlp",
+    "n_qubits": 6,
+    "n_layers": 2,
+    "encoding": "angle",
+    "seed": 42,
+    "epochs": 3,
+    "batch_size": 64,
+    "lr": 0.005,
+    "q_subsample": 0,
+    "extra": {}
+  },
+  "env": {
+    "timestamp_utc": "2026-05-30T12:58:00.878891+00:00",
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.20",
+    "executable": "/home/mirza/miniconda3/envs/qml/bin/python",
+    "conda_env": "qml",
+    "python_no_user_site": "1",
+    "versions": {
+      "numpy": "2.2.6",
+      "torch": "2.5.1+cu121",
+      "pennylane": "0.42.3",
+      "sklearn": "1.7.2",
+      "scipy": "1.15.3",
+      "pandas": "2.3.3",
+      "xgboost": "3.2.0",
+      "yaml": "6.0.3"
+    },
+    "gpu": {
+      "cuda_available": true,
+      "torch_cuda_available": true,
+      "torch_cuda_version": "12.1",
+      "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+      "gpu_count": 1
+    },
+    "source_md5": {
+      "config.py": "fe9c6600d91194c69e0249c21014ebd5",
+      "runner.py": "ba28b8902ffd680e216239f85e9c4fec",
+      "model_factory.py": "06e86772e459e5f8c1c303d24d0c06fe",
+      "data.py": "bc9157f14de716981dadcb55b1c8207b",
+      "quantum_model.py": "17f97b4f91e4ab4b8bd4418479ebf572",
+      "seeding.py": "88732a6e39dc4507eb212df0c3fd6ff3"
+    }
+  },
+  "timestamp_utc": "2026-05-30T12:58:00.915243+00:00",
+  "device": "cuda",
+  "metrics": {
+    "accuracy": 0.7700053229240597,
+    "precision": 0.9688572829818538,
+    "recall": 0.6157562534091795,
+    "f1": 0.7529658392491305,
+    "detection_rate": 0.6157562534091795,
+    "false_positive_rate": 0.026155905673977964,
+    "roc_auc": 0.9372685341826459,
+    "train_time_s": 9.316,
+    "eval_time_s": 0.014
+  }
+}

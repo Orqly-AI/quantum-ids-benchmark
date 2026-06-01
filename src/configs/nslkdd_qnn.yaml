@@ -1,0 +1,18 @@
+# Single experiment: hybrid QNN on NSL-KDD (binary). Run with:
+#   bash run.sh runner.py --config configs/nslkdd_qnn.yaml
+name: nslkdd_qnn_q8
+dataset: nslkdd
+reduction: pca
+n_features: 8
+binary: true
+scale: minmax
+imbalance: class_weight
+model_type: hybrid_qnn
+n_qubits: 8
+n_layers: 3
+encoding: angle
+seed: 42
+epochs: 30
+batch_size: 64
+lr: 0.005
+q_subsample: 8000

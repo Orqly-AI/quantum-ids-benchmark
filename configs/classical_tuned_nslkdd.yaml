@@ -1,0 +1,165 @@
+defaults:
+  seed: 42
+  epochs: 40
+runs:
+- name: nslkdd_full_random_forest_tuned
+  dataset: nslkdd
+  model_type: random_forest
+  n_features: 122
+  reduction: none
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      n_estimators: 800
+      min_samples_split: 2
+      min_samples_leaf: 1
+      max_features: 0.5
+      max_depth: null
+    cv_best_f1: 0.9979565316430076
+- name: nslkdd_full_xgboost_tuned
+  dataset: nslkdd
+  model_type: xgboost
+  n_features: 122
+  reduction: none
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      subsample: 0.85
+      n_estimators: 200
+      min_child_weight: 1
+      max_depth: 8
+      learning_rate: 0.2
+      gamma: 0.3
+      colsample_bytree: 0.85
+    cv_best_f1: 0.9977781108759729
+- name: nslkdd_full_svm_rbf_tuned
+  dataset: nslkdd
+  model_type: svm_rbf
+  n_features: 122
+  reduction: none
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      gamma: 0.01
+      C: 100.0
+    cv_best_f1: 0.9915958451892406
+- name: nslkdd_full_mlp_tuned
+  dataset: nslkdd
+  model_type: tuned_mlp
+  n_features: 122
+  reduction: none
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      hidden:
+      - 128
+      - 64
+      dropout: 0.3
+      lr: 0.001
+    cv_best_f1: 0.9958255239393423
+- name: nslkdd_full_cnn1d_tuned
+  dataset: nslkdd
+  model_type: cnn1d
+  n_features: 122
+  reduction: none
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      channels:
+      - 32
+      - 64
+      kernel: 5
+      dropout: 0.3
+      lr: 0.0005
+    cv_best_f1: 0.9948801092243366
+- name: nslkdd_pca_random_forest_tuned
+  dataset: nslkdd
+  model_type: random_forest
+  n_features: 8
+  reduction: pca
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      n_estimators: 400
+      min_samples_split: 2
+      min_samples_leaf: 1
+      max_features: 0.5
+      max_depth: null
+    cv_best_f1: 0.9913054561993244
+- name: nslkdd_pca_xgboost_tuned
+  dataset: nslkdd
+  model_type: xgboost
+  n_features: 8
+  reduction: pca
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      subsample: 0.85
+      n_estimators: 600
+      min_child_weight: 3
+      max_depth: 8
+      learning_rate: 0.2
+      gamma: 0.1
+      colsample_bytree: 1.0
+    cv_best_f1: 0.9914634531809601
+- name: nslkdd_pca_svm_rbf_tuned
+  dataset: nslkdd
+  model_type: svm_rbf
+  n_features: 8
+  reduction: pca
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      gamma: 1.0
+      C: 100.0
+    cv_best_f1: 0.984567336000438
+- name: nslkdd_pca_mlp_tuned
+  dataset: nslkdd
+  model_type: tuned_mlp
+  n_features: 8
+  reduction: pca
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      hidden:
+      - 128
+      - 64
+      - 32
+      dropout: 0.3
+      lr: 0.001
+    cv_best_f1: 0.988021654801995
+- name: nslkdd_pca_cnn1d_tuned
+  dataset: nslkdd
+  model_type: cnn1d
+  n_features: 8
+  reduction: pca
+  scale: standard
+  binary: true
+  imbalance: class_weight
+  extra:
+    best_params:
+      channels:
+      - 64
+      - 128
+      kernel: 3
+      dropout: 0.4
+      lr: 0.0005
+    cv_best_f1: 0.988269419442904

@@ -1,0 +1,84 @@
+{
+  "config": {
+    "name": "ovn2_cicids_qsvm",
+    "dataset": "cicids",
+    "n_features": 8,
+    "reduction": "pca",
+    "binary": true,
+    "scale": "minmax",
+    "imbalance": "class_weight",
+    "model_type": "qsvm",
+    "n_qubits": 8,
+    "n_layers": 3,
+    "encoding": "angle",
+    "device": "cpu",
+    "seed": 43,
+    "epochs": 20,
+    "batch_size": 64,
+    "lr": 0.005,
+    "q_subsample": 2000,
+    "extra": {
+      "device": "cpu",
+      "encoding": "iqp",
+      "kernel": "projected"
+    }
+  },
+  "env": {
+    "timestamp_utc": "2026-05-31T20:22:55.633459+00:00",
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.20",
+    "executable": "/home/mirza/miniconda3/envs/qml/bin/python",
+    "conda_env": "qml",
+    "python_no_user_site": "1",
+    "versions": {
+      "numpy": "2.2.6",
+      "torch": "2.5.1+cu121",
+      "pennylane": "0.42.3",
+      "sklearn": "1.7.2",
+      "scipy": "1.15.3",
+      "pandas": "2.3.3",
+      "xgboost": "3.2.0",
+      "yaml": "6.0.3"
+    },
+    "gpu": {
+      "cuda_available": true,
+      "torch_cuda_available": true,
+      "torch_cuda_version": "12.1",
+      "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+      "gpu_count": 1
+    },
+    "source_md5": {
+      "config.py": "57e49b0c1f6d68c620b78354c380b269",
+      "runner.py": "0d87f2f5bf8a8c63d9ba4135dc7e5794",
+      "model_factory.py": "c196a9646a47af08d03c2b301d338acc",
+      "data.py": "837b43b78aa107161379feba8c3201aa",
+      "quantum_model.py": "4edccc418f60139a4012a0d57a6f02ff",
+      "seeding.py": "88732a6e39dc4507eb212df0c3fd6ff3"
+    }
+  },
+  "timestamp_utc": "2026-05-31T20:22:55.677299+00:00",
+  "device": "cpu/sklearn",
+  "metrics": {
+    "accuracy": 0.9847171977904228,
+    "precision": 0.9884068765842934,
+    "recall": 0.9557075981274757,
+    "f1": 0.9717822425380627,
+    "detection_rate": 0.9557075981274757,
+    "false_positive_rate": 0.004259507750979908,
+    "roc_auc": 0.9982692158152212,
+    "auprc": 0.9951947562141538,
+    "tpr_at_0.1pct_fpr": 0.8999965151532752,
+    "tpr_at_1pct_fpr": 0.9827151602448686,
+    "brier": 0.019537149309674512,
+    "ece": 0.020551103441753878,
+    "train_time_s": 22.362,
+    "eval_time_s": 0.281,
+    "quantum_backend": "lightning.qubit"
+  },
+  "predictions": {
+    "sidecar": "cicids_qsvm_q8_l3_angle_s43_ovn2_cicids_qsvm_20260531_232255.preds.npz",
+    "y_score_is_proba": false,
+    "has_score": true,
+    "n": 312639
+  }
+}

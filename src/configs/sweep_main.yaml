@@ -1,0 +1,46 @@
+# MAIN BENCHMARK SWEEP (task #7) — NSL-KDD full ablation.
+# Budgets from quantum-dev's throughput report (results/qnn_throughput.md):
+#   device=cpu (lightning.qubit, ~10x faster), hybrid q_subsample 2000 (q<=8),
+#   epochs=20, batch=64; projected QSVM as default, fidelity only as a small-N
+#   (<=600) NSL-KDD point. 3 seeds for paired significance.
+# The 9-variant ablation runs on NSL-KDD only (~2h); cross-dataset runs live in
+# sweep_cross.yaml. Classical baselines accept tuned hyperparams via extra.best_params
+# (folded in from ai-engineer's export_tuned_configs.py when ready).
+#
+#   bash run.sh runner.py --config configs/sweep_main.yaml   # serialize quantum runs!
+#   bash run.sh aggregate.py
+#   bash run.sh figures.py
+defaults:
+  dataset: nslkdd
+  reduction: pca
+  n_features: 8
+  n_qubits: 8
+  n_layers: 3
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  device: cpu
+  epochs: 20
+  batch_size: 64
+  lr: 0.005
+  q_subsample: 2000
+  seeds: [42, 43, 44]
+
+runs:
+  # ---- quantum: HybridQNN encoding x ansatz ablation (the 9-variant grid) ----
+  - {name: hybrid_angle_se,     model_type: hybrid_qnn, encoding: angle,    extra: {ansatz: strongly_entangling}}
+  - {name: hybrid_angle_be,     model_type: hybrid_qnn, encoding: angle,    extra: {ansatz: basic_entangler}}
+  - {name: hybrid_amplitude_se, model_type: hybrid_qnn, encoding: amplitude, extra: {ansatz: strongly_entangling}}
+  - {name: hybrid_iqp_se,       model_type: hybrid_qnn, encoding: iqp,      extra: {ansatz: strongly_entangling}}
+  - {name: hybrid_reupload_se,  model_type: hybrid_qnn, encoding: reupload, extra: {ansatz: strongly_entangling}}
+  - {name: hybrid_reupload_be,  model_type: hybrid_qnn, encoding: reupload, extra: {ansatz: basic_entangler}}
+  # ---- quantum kernel SVM ----
+  - {name: qsvm_projected, model_type: qsvm, q_subsample: 2000, extra: {encoding: angle, kernel: projected}}
+  - {name: qsvm_fidelity,  model_type: qsvm, q_subsample: 600,  extra: {encoding: iqp,   kernel: fidelity}}
+  # ---- classical baselines (tuned: drop best_params into extra when available) ----
+  - {name: mlp_matched, model_type: classical_mlp}
+  - {name: tuned_mlp,   model_type: tuned_mlp}
+  - {name: cnn1d,       model_type: cnn1d}
+  - {name: rf,          model_type: random_forest, q_subsample: 0}
+  - {name: xgb,         model_type: xgboost,       q_subsample: 0}
+  - {name: svm,         model_type: svm_rbf,       q_subsample: 8000}

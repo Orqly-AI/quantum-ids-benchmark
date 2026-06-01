@@ -1,0 +1,261 @@
+% References for: "How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware
+% Benchmark and Attribution Audit of Quantum Machine Learning for Network Intrusion Detection"
+% Target venue: Computers & Security (Elsevier)
+% Keys correspond to \cite{...} commands in manuscript.md.
+% Source: quantum-ids/paper/literature_review.md (lit-scout, task #1).
+
+% ---------- Tier A: direct SOTA baselines (must reproduce/beat) ----------
+
+@article{abreu2025quantumnetsec,
+  author  = {Abreu, Diego and Rothenberg, Christian Esteve and Abel{\'e}m, Antonio},
+  title   = {{QuantumNetSec}: Quantum Machine Learning for Network Security},
+  journal = {International Journal of Network Management},
+  publisher = {Wiley},
+  year    = {2025},
+  doi     = {10.1002/nem.70018},
+  note    = {Multi-dataset, multi-method (VQC/QSVM/QCNN), NISQ-aware}
+}
+
+@article{abreu2024qmlids,
+  author       = {Abreu, Diego and Rothenberg, Christian Esteve and Abel{\'e}m, Antonio},
+  title        = {{QML-IDS}: Quantum Machine Learning Intrusion Detection System},
+  journal      = {arXiv preprint},
+  year         = {2024},
+  eprint       = {2410.16308},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CR},
+  url          = {https://arxiv.org/abs/2410.16308}
+}
+
+@article{bhatnagar2026mqe,
+  author       = {Bhatnagar, Rohan and Innan, Nouhaila and Jothi, A. A. and Shafique, Muhammad},
+  title        = {Meta-Quantum Ensemble Framework for Robust Network Intrusion Detection},
+  journal      = {arXiv preprint},
+  year         = {2026},
+  eprint       = {2605.28879},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CR},
+  url          = {https://arxiv.org/abs/2605.28879},
+  note         = {AUPRC, TPR@0.1\%/1\% FPR, Brier, ECE, 5 noise channels; concedes classical RF/XGBoost remain superior}
+}
+
+@article{gong2024vqcnn,
+  author  = {Gong, Changqing and others},
+  title   = {Network Intrusion Detection Based on Variational Quantum Convolution Neural Network},
+  journal = {The Journal of Supercomputing},
+  publisher = {Springer},
+  year    = {2024},
+  doi     = {10.1007/s11227-024-05919-y}
+}
+
+@article{gong2022vqnn,
+  author  = {Gong, Changqing and others},
+  title   = {Network Attack Detection Scheme Based on Variational Quantum Neural Network},
+  journal = {The Journal of Supercomputing},
+  publisher = {Springer},
+  year    = {2022},
+  doi     = {10.1007/s11227-022-04542-z}
+}
+
+% ---------- Tier C: critical / sceptical voices we engage directly ----------
+
+@article{bellante2025pca,
+  author       = {Bellante, Armando and Fioravanti, Tommaso and Carminati, Michele and Zanero, Stefano and Luongo, Alessandro},
+  title        = {Evaluating the Potential of Quantum Machine Learning in Cybersecurity: A Case-Study on {PCA}-based Intrusion Detection Systems},
+  journal      = {Computers \& Security},
+  publisher    = {Elsevier},
+  year         = {2025},
+  eprint       = {2502.11173},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2502.11173},
+  note         = {Argues quantum advantage in PCA-IDS is explainable by regularisation, not quantum effects}
+}
+
+@misc{realitycheck2025,
+  author = {{Anonymous}},
+  title  = {Towards Network Intrusion Detection via Quantum Machine Learning: A Reality Check},
+  year   = {2025},
+  note   = {Preprint; quantum approx. or below classical},
+  url    = {https://www.researchgate.net/publication/389164564}
+}
+
+% ---------- Foundational / real-hardware / generalisation ----------
+
+@article{kalinin2022,
+  author  = {Kalinin, Maxim and Krundyshev, Vasiliy},
+  title   = {Security Intrusion Detection Using Quantum Machine Learning Techniques},
+  journal = {Journal of Computer Virology and Hacking Techniques},
+  publisher = {Springer},
+  volume  = {19},
+  number  = {1},
+  pages   = {125--136},
+  year    = {2022},
+  doi     = {10.1007/s11416-022-00435-0}
+}
+
+@article{epjqt2025hqcnn,
+  author  = {{Anonymous}},
+  title   = {Unified Hybrid Quantum-Classical Neural Network Framework for Detecting {DDoS} and {Android} Mobile Malware Attacks},
+  journal = {EPJ Quantum Technology},
+  publisher = {Springer},
+  year    = {2025},
+  doi     = {10.1140/epjqt/s40507-025-00380-z},
+  note    = {Run on AWS Braket real QPU}
+}
+
+@article{wang2025quanconv,
+  author       = {Wang, Zhihao and Fok, Kar-Wai and Thing, Vrizlynn L. L.},
+  title        = {Network Attack Traffic Detection With Hybrid Quantum-Enhanced Convolution Neural Network},
+  journal      = {arXiv preprint},
+  year         = {2025},
+  eprint       = {2504.20436},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CR},
+  url          = {https://arxiv.org/abs/2504.20436},
+  note         = {5G-NIDD; cross-base-station + unseen-attack generalisation}
+}
+
+% ---------- Methods landscape ----------
+
+@article{chaudhary2026qagnn,
+  author       = {Chaudhary, Deepak and Rajasegarar, Sutharshan and Pokhrel, Shiva Raj},
+  title        = {{Q-AGNN}: Quantum-Enhanced Attentive Graph Neural Network for Intrusion Detection},
+  journal      = {arXiv preprint},
+  year         = {2026},
+  eprint       = {2603.22365},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  url          = {https://arxiv.org/abs/2603.22365}
+}
+
+@article{kumari2025wavelet,
+  author       = {Kumari, Sneha and Pokhrel, Shiva Raj and others},
+  title        = {Modeling Wavelet Transformed Quantum Support Vector for Network Intrusion Detection},
+  journal      = {arXiv preprint},
+  year         = {2025},
+  eprint       = {2512.01365},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  url          = {https://arxiv.org/abs/2512.01365},
+  note         = {QSVM + Quantum Haar Wavelet Packet Transform; tested noiseless + depolarising}
+}
+
+@article{qsvmigwo2024,
+  author  = {{Anonymous}},
+  title   = {A Novel Intrusion Detection System Based on a Hybrid Quantum Support Vector Machine and Improved Grey Wolf Optimizer},
+  journal = {Cluster Computing},
+  publisher = {Springer},
+  year    = {2024},
+  doi     = {10.1007/s10586-024-04458-8}
+}
+
+@article{qdl2024anomaly,
+  author  = {{Anonymous}},
+  title   = {Quantum Deep Learning-Based Anomaly Detection for Enhanced Network Security},
+  journal = {Quantum Machine Intelligence},
+  publisher = {Springer},
+  year    = {2024},
+  doi     = {10.1007/s42484-024-00163-2}
+}
+
+@article{hqcae2025,
+  author       = {{Anonymous}},
+  title        = {Hybrid Quantum-Classical Autoencoders for Unsupervised Network Intrusion Detection},
+  journal      = {arXiv preprint},
+  year         = {2025},
+  eprint       = {2512.05069},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  url          = {https://arxiv.org/abs/2512.05069}
+}
+
+@article{qgan2025,
+  author       = {{Anonymous}},
+  title        = {Enhancing Network Anomaly Detection with Quantum {GANs} and Successive Data Injection for Multivariate Time Series},
+  journal      = {arXiv preprint},
+  year         = {2025},
+  eprint       = {2505.11631},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  url          = {https://arxiv.org/abs/2505.11631}
+}
+
+% ---------- Federated / systems frontier ----------
+
+@article{fedql2024,
+  author  = {{Anonymous}},
+  title   = {Hybrid Quantum Enhanced Federated Learning for Cyber Attack Detection},
+  journal = {Scientific Reports},
+  publisher = {Nature},
+  year    = {2024},
+  doi     = {10.1038/s41598-024-83682-z}
+}
+
+@article{fedcqids2025,
+  author  = {{Anonymous}},
+  title   = {An Intrusion Detection Model Integrating Federated Learning and Quantum Convolutional Neural Networks},
+  journal = {Journal of Computer Research and Development},
+  year    = {2025},
+  doi     = {10.7544/issn1000-1239.202550413}
+}
+
+% ---------- Surveys / reviews ----------
+
+@article{sai2025taxonomy,
+  author       = {Sai, Siva and Goyal, Ishita and Sharma, Shubham and Manuri, S. H. and Chamola, Vinay and Buyya, Rajkumar},
+  title        = {Quantum Machine Learning for Cybersecurity: A Taxonomy and Future Directions},
+  journal      = {arXiv preprint},
+  year         = {2025},
+  eprint       = {2512.15286},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CR},
+  url          = {https://arxiv.org/abs/2512.15286}
+}
+
+@article{qmlreview2024,
+  author       = {{Anonymous}},
+  title        = {Quantum Machine Learning Algorithms for Anomaly Detection: A Review},
+  journal      = {arXiv preprint},
+  year         = {2024},
+  eprint       = {2408.11047},
+  archivePrefix = {arXiv},
+  primaryClass = {quant-ph},
+  url          = {https://arxiv.org/abs/2408.11047}
+}
+
+% ---------- Datasets ----------
+
+@inproceedings{nslkdd2009,
+  author    = {Tavallaee, Mahbod and Bagheri, Ebrahim and Lu, Wei and Ghorbani, Ali A.},
+  title     = {A Detailed Analysis of the {KDD} {CUP} 99 Data Set},
+  booktitle = {IEEE Symposium on Computational Intelligence for Security and Defense Applications (CISDA)},
+  year      = {2009},
+  doi       = {10.1109/CISDA.2009.5356528}
+}
+
+@inproceedings{unswnb15,
+  author    = {Moustafa, Nour and Slay, Jill},
+  title     = {{UNSW-NB15}: A Comprehensive Data Set for Network Intrusion Detection Systems},
+  booktitle = {Military Communications and Information Systems Conference (MilCIS)},
+  year      = {2015},
+  doi       = {10.1109/MilCIS.2015.7348942}
+}
+
+@inproceedings{cicids2017,
+  author    = {Sharafaldin, Iman and Lashkari, Arash Habibi and Ghorbani, Ali A.},
+  title     = {Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization},
+  booktitle = {International Conference on Information Systems Security and Privacy (ICISSP)},
+  year      = {2018},
+  doi       = {10.5220/0006639801080116}
+}
+
+@article{toniot,
+  author  = {Sarhan, Mohanad and Layeghy, Siamak and Portmann, Marius},
+  title   = {Towards a Standard Feature Set for Network Intrusion Detection System Datasets},
+  journal = {Mobile Networks and Applications},
+  year    = {2022},
+  volume  = {27},
+  pages   = {357--370},
+  doi     = {10.1007/s11036-021-01843-0},
+  note    = {NetFlow-format NIDS datasets, incl. NF-ToN-IoT-v2}
+}

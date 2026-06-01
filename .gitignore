@@ -1,0 +1,26 @@
+# Large / re-downloadable data (fetch via src/download_*.sh)
+data/
+*.csv
+*.txt
+!requirements*.txt
+
+# Large prediction sidecars + logs (results JSONs are kept as the evidence)
+results/**/*.preds.npz
+results/logs/
+results/.overnight/
+results/_evalcheck/
+
+# Python / env
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+qml-env/
+*.log
+
+# Scratch / diagnostic scripts (not part of the released pipeline)
+src/_*.py
+src/_*.sh
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,36 @@
+# NISQ noise-robustness sweep (task #10): vary the depolarizing noise level on the
+# hybrid QNN and compare against the noiseless run + a classical reference. The
+# runner forwards extra.noise={type,p} to quantum_model.build_model, so quantum-dev
+# controls how the noisy device is constructed. Run:
+#   bash run.sh runner.py --config configs/sweep_noise.yaml
+#   bash run.sh aggregate.py
+defaults:
+  dataset: nslkdd
+  reduction: pca
+  n_features: 6
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  model_type: hybrid_qnn
+  n_qubits: 6
+  n_layers: 3
+  encoding: angle
+  seed: 42
+  epochs: 20
+  batch_size: 64
+  lr: 0.005
+  q_subsample: 4000
+
+runs:
+  - name: qnn_noiseless
+    # no extra.noise -> noiseless device
+  - name: qnn_depol_p0.01
+    extra: {noise: {type: depolarizing, p: 0.01}}
+  - name: qnn_depol_p0.05
+    extra: {noise: {type: depolarizing, p: 0.05}}
+  - name: qnn_depol_p0.1
+    extra: {noise: {type: depolarizing, p: 0.1}}
+  # classical reference (noise-free by construction)
+  - name: rf_ref
+    model_type: random_forest
+    q_subsample: 0

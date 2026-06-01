@@ -1,0 +1,35 @@
+# QUBIT x DEPTH ABLATION (task #7) — HybridQNN scaling on NSL-KDD.
+# n_qubits in {4,8,12} x n_layers in {2,3} x the two leading encodings, 3 seeds.
+# Budgets from results/qnn_throughput.md: device=cpu; q<=8 -> subsample 2000,
+# q=12 -> 1500 (set per-run below). Feeds figures.py's ablation line plots
+# (metric vs qubits, one line per encoding; metric vs depth). The full model
+# comparison (incl. classical baselines + QSVM) lives in sweep_main.yaml.
+#   bash run.sh runner.py --config configs/sweep_qubits.yaml
+#   bash run.sh aggregate.py && bash run.sh figures.py
+defaults:
+  dataset: nslkdd
+  reduction: pca
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  device: cpu
+  model_type: hybrid_qnn
+  epochs: 20
+  batch_size: 64
+  lr: 0.005
+  seeds: [42, 43, 44]
+
+runs:
+  # n_features tracks n_qubits (PCA target dim = qubit count).
+  # --- 4 qubits ---
+  - {name: q4_l2_angle,    n_qubits: 4,  n_features: 4,  n_layers: 2, encoding: angle,    q_subsample: 2000}
+  - {name: q4_l3_angle,    n_qubits: 4,  n_features: 4,  n_layers: 3, encoding: angle,    q_subsample: 2000}
+  - {name: q4_l3_reupload, n_qubits: 4,  n_features: 4,  n_layers: 3, encoding: reupload, q_subsample: 2000}
+  # --- 8 qubits ---
+  - {name: q8_l2_angle,    n_qubits: 8,  n_features: 8,  n_layers: 2, encoding: angle,    q_subsample: 2000}
+  - {name: q8_l3_angle,    n_qubits: 8,  n_features: 8,  n_layers: 3, encoding: angle,    q_subsample: 2000}
+  - {name: q8_l3_reupload, n_qubits: 8,  n_features: 8,  n_layers: 3, encoding: reupload, q_subsample: 2000}
+  # --- 12 qubits (smaller subsample per budget) ---
+  - {name: q12_l2_angle,    n_qubits: 12, n_features: 12, n_layers: 2, encoding: angle,    q_subsample: 1500}
+  - {name: q12_l3_angle,    n_qubits: 12, n_features: 12, n_layers: 3, encoding: angle,    q_subsample: 1500}
+  - {name: q12_l3_reupload, n_qubits: 12, n_features: 12, n_layers: 3, encoding: reupload, q_subsample: 1500}

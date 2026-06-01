@@ -1,0 +1,30 @@
+# OVERNIGHT Phase noise: NISQ robustness on NSL-KDD. default.mixed is density-matrix
+# (slow), so q6 + subsample 1000 + a focused grid: noiseless baseline, the 4 channels
+# at a low and moderate strength. Names prefixed "ovnN_".
+#   bash run.sh runner.py --config configs/overnight_noise.yaml
+defaults:
+  dataset: nslkdd
+  reduction: pca
+  n_features: 6
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  model_type: hybrid_qnn
+  n_qubits: 6
+  n_layers: 2
+  encoding: angle
+  seeds: [42, 43]
+  epochs: 15
+  batch_size: 64
+  lr: 0.005
+  q_subsample: 1000
+  extra: {device: cpu}
+
+runs:
+  - {name: ovnN_noiseless}
+  - {name: ovnN_depol_p01,   extra: {device: cpu, noise: {type: depolarizing,   p: 0.01}}}
+  - {name: ovnN_depol_p05,   extra: {device: cpu, noise: {type: depolarizing,   p: 0.05}}}
+  - {name: ovnN_ampdamp_p01, extra: {device: cpu, noise: {type: amplitude_damp, p: 0.01}}}
+  - {name: ovnN_ampdamp_p05, extra: {device: cpu, noise: {type: amplitude_damp, p: 0.05}}}
+  - {name: ovnN_phase_p05,   extra: {device: cpu, noise: {type: phase_damp,     p: 0.05}}}
+  - {name: ovnN_bitflip_p05, extra: {device: cpu, noise: {type: bit_flip,       p: 0.05}}}

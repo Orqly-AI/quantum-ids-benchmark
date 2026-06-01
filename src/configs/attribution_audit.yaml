@@ -1,0 +1,102 @@
+# Quantum-attribution audit sweep (task #9): pit each quantum model against its
+# matched classical controls on the SAME data + seeds, then build the report:
+#   bash run.sh runner.py --config configs/attribution_audit.yaml
+#   bash run.sh attribution.py --from-results ../results   # -> paper/attribution_audit.md
+#
+# The audit reads the result JSONs this sweep produces (grouped by name/seed) and
+# tabulates quantum vs best-matched-control deltas with paired significance. Run
+# >=3 seeds so the paired t-test / Wilcoxon are meaningful.
+#
+# Controls:
+#   matched_mlp  -- classical MLP capacity-matched (param count) to the QNN, with
+#                   an L2 (weight_decay) regularization sweep.
+#   rf_kernel    -- random-feature kernel (RBFSampler) + linear SVM: the classical
+#                   analogue of the quantum kernel (the headline Bellante rebuttal).
+#   random_forest / svm_rbf -- strong tuned classical baselines (reused from #5).
+#
+# device defaults to cpu (lightning.qubit, ~10x faster at these qubit counts).
+defaults:
+  dataset: nslkdd
+  reduction: pca
+  n_features: 8
+  binary: true
+  scale: minmax
+  imbalance: class_weight
+  epochs: 20
+  batch_size: 64
+  lr: 0.005
+  q_subsample: 2000
+
+runs:
+  # ---- quantum treatments (3 seeds each) ----
+  - name: qnn_angle
+    model_type: hybrid_qnn
+    n_qubits: 8
+    n_layers: 3
+    encoding: angle
+    seeds: [42, 43, 44]
+    extra: { device: cpu }
+  # Projected kernel is the PRIMARY QSVM: O(N) circuit evals (~3.3 ms/sample),
+  # ~1000x cheaper than fidelity (which is O(N^2) ~ 66 min at 1000 train). See
+  # results/qnn_throughput.md. This is the QSVM the rf_kernel control is matched to.
+  - name: qsvm_proj
+    model_type: qsvm
+    n_qubits: 8
+    q_subsample: 2000
+    seeds: [42, 43, 44]
+    extra: { encoding: angle, kernel: projected, gamma: 1.0, device: cpu }
+  # NOTE: fidelity-kernel QSVM removed — O(N^2) quantum evals make test-time
+  # prediction over the full 22,544-row test set intractable (~30h/run). The
+  # projected kernel above is the QSVM the rf_kernel control is matched to; the
+  # fidelity kernel's impracticality at scale is reported as a finding.
+
+  # ---- capacity-matched MLP control + L2 regularization sweep ----
+  - name: matched_mlp_l2_0
+    model_type: matched_mlp
+    n_qubits: 8
+    n_layers: 3
+    seeds: [42, 43, 44]
+    extra: { weight_decay: 0.0 }
+  - name: matched_mlp_l2_1e-4
+    model_type: matched_mlp
+    n_qubits: 8
+    n_layers: 3
+    seeds: [42, 43, 44]
+    extra: { weight_decay: 0.0001 }
+  - name: matched_mlp_l2_1e-3
+    model_type: matched_mlp
+    n_qubits: 8
+    n_layers: 3
+    seeds: [42, 43, 44]
+    extra: { weight_decay: 0.001 }
+  - name: matched_mlp_l2_1e-2
+    model_type: matched_mlp
+    n_qubits: 8
+    n_layers: 3
+    seeds: [42, 43, 44]
+    extra: { weight_decay: 0.01 }
+
+  # ---- random-feature kernel control (classical analogue of the quantum kernel) ----
+  - name: rf_kernel_rbf
+    model_type: rf_kernel
+    n_qubits: 8
+    q_subsample: 1200
+    seeds: [42, 43, 44]
+    extra: { rf_method: rbf_sampler, n_components: 512, gamma: 1.0 }
+  - name: rf_kernel_nystroem
+    model_type: rf_kernel
+    n_qubits: 8
+    q_subsample: 1200
+    seeds: [42, 43, 44]
+    extra: { rf_method: nystroem, n_components: 512, gamma: 1.0 }
+
+  # ---- strong tuned classical baselines (reused from task #5) ----
+  - name: rf
+    model_type: random_forest
+    n_qubits: 8
+    q_subsample: 0
+    seeds: [42, 43, 44]
+  - name: svm
+    model_type: svm_rbf
+    n_qubits: 8
+    seeds: [42, 43, 44]
