@@ -1,0 +1,105 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{bhatnagar2026mqe}
+R.~Bhatnagar, N.~Innan, A.~A. Jothi, M.~Shafique,
+  \href{https://arxiv.org/abs/2605.28879}{Meta-quantum ensemble framework for
+  robust network intrusion detection}, arXiv preprintAUPRC, TPR@0.1\%/1\% FPR,
+  Brier, ECE, 5 noise channels; concedes classical RF/XGBoost remain superior
+  (2026).
+\newblock \href {http://arxiv.org/abs/2605.28879} {\path{arXiv:2605.28879}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2605.28879}
+
+\bibitem{bellante2025pca}
+A.~Bellante, T.~Fioravanti, M.~Carminati, S.~Zanero, A.~Luongo,
+  \href{https://arxiv.org/abs/2502.11173}{Evaluating the potential of quantum
+  machine learning in cybersecurity: A case-study on {PCA}-based intrusion
+  detection systems}, Computers \& SecurityArgues quantum advantage in PCA-IDS
+  is explainable by regularisation, not quantum effects (2025).
+\newblock \href {http://arxiv.org/abs/2502.11173} {\path{arXiv:2502.11173}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2502.11173}
+
+\bibitem{kalinin2022}
+M.~Kalinin, V.~Krundyshev, Security intrusion detection using quantum machine
+  learning techniques, Journal of Computer Virology and Hacking Techniques
+  19~(1) (2022) 125--136.
+\newblock \href {https://doi.org/10.1007/s11416-022-00435-0}
+  {\path{doi:10.1007/s11416-022-00435-0}}.
+
+\bibitem{gong2024vqcnn}
+C.~Gong, et~al., Network intrusion detection based on variational quantum
+  convolution neural network, The Journal of Supercomputing (2024).
+\newblock \href {https://doi.org/10.1007/s11227-024-05919-y}
+  {\path{doi:10.1007/s11227-024-05919-y}}.
+
+\bibitem{abreu2024qmlids}
+D.~Abreu, C.~E. Rothenberg, A.~Abel{\'e}m,
+  \href{https://arxiv.org/abs/2410.16308}{{QML-IDS}: Quantum machine learning
+  intrusion detection system}, arXiv preprint (2024).
+\newblock \href {http://arxiv.org/abs/2410.16308} {\path{arXiv:2410.16308}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2410.16308}
+
+\bibitem{abreu2025quantumnetsec}
+D.~Abreu, C.~E. Rothenberg, A.~Abel{\'e}m, {QuantumNetSec}: Quantum machine
+  learning for network security, International Journal of Network
+  ManagementMulti-dataset, multi-method (VQC/QSVM/QCNN), NISQ-aware (2025).
+\newblock \href {https://doi.org/10.1002/nem.70018}
+  {\path{doi:10.1002/nem.70018}}.
+
+\bibitem{wang2025quanconv}
+Z.~Wang, K.-W. Fok, V.~L.~L. Thing,
+  \href{https://arxiv.org/abs/2504.20436}{Network attack traffic detection with
+  hybrid quantum-enhanced convolution neural network}, arXiv preprint5G-NIDD;
+  cross-base-station + unseen-attack generalisation (2025).
+\newblock \href {http://arxiv.org/abs/2504.20436} {\path{arXiv:2504.20436}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2504.20436}
+
+\bibitem{kumari2025wavelet}
+S.~Kumari, S.~R. Pokhrel, et~al.,
+  \href{https://arxiv.org/abs/2512.01365}{Modeling wavelet transformed quantum
+  support vector for network intrusion detection}, arXiv preprintQSVM + Quantum
+  Haar Wavelet Packet Transform; tested noiseless + depolarising (2025).
+\newblock \href {http://arxiv.org/abs/2512.01365} {\path{arXiv:2512.01365}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2512.01365}
+
+\bibitem{chaudhary2026qagnn}
+D.~Chaudhary, S.~Rajasegarar, S.~R. Pokhrel,
+  \href{https://arxiv.org/abs/2603.22365}{{Q-AGNN}: Quantum-enhanced attentive
+  graph neural network for intrusion detection}, arXiv preprint (2026).
+\newblock \href {http://arxiv.org/abs/2603.22365} {\path{arXiv:2603.22365}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2603.22365}
+
+\bibitem{nslkdd2009}
+M.~Tavallaee, E.~Bagheri, W.~Lu, A.~A. Ghorbani, A detailed analysis of the
+  {KDD} {CUP} 99 data set, in: IEEE Symposium on Computational Intelligence for
+  Security and Defense Applications (CISDA), 2009.
+\newblock \href {https://doi.org/10.1109/CISDA.2009.5356528}
+  {\path{doi:10.1109/CISDA.2009.5356528}}.
+
+\bibitem{unswnb15}
+N.~Moustafa, J.~Slay, {UNSW-NB15}: A comprehensive data set for network
+  intrusion detection systems, in: Military Communications and Information
+  Systems Conference (MilCIS), 2015.
+\newblock \href {https://doi.org/10.1109/MilCIS.2015.7348942}
+  {\path{doi:10.1109/MilCIS.2015.7348942}}.
+
+\bibitem{cicids2017}
+I.~Sharafaldin, A.~H. Lashkari, A.~A. Ghorbani, Toward generating a new
+  intrusion detection dataset and intrusion traffic characterization, in:
+  International Conference on Information Systems Security and Privacy
+  (ICISSP), 2018.
+\newblock \href {https://doi.org/10.5220/0006639801080116}
+  {\path{doi:10.5220/0006639801080116}}.
+
+\bibitem{toniot}
+M.~Sarhan, S.~Layeghy, M.~Portmann, Towards a standard feature set for network
+  intrusion detection system datasets, Mobile Networks and Applications 27
+  (2022) 357--370, netFlow-format NIDS datasets, incl. NF-ToN-IoT-v2.
+\newblock \href {https://doi.org/10.1007/s11036-021-01843-0}
+  {\path{doi:10.1007/s11036-021-01843-0}}.
+
+\end{thebibliography}
