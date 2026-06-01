@@ -1,27 +1,23 @@
-\documentclass[11pt]{article}
+\documentclass[preprint,11pt]{elsarticle}
 
 % ---------------------------------------------------------------------------
-%  How Quantum Is the Advantage?  --  manuscript (arXiv / Computers & Security)
+%  How Quantum Is the Advantage?  --  manuscript (Computers & Security, Elsevier)
 % ---------------------------------------------------------------------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{tabularx}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \usepackage{graphicx}
-\graphicspath{{../}{./}}  % ../figures locally; ./figures in the arXiv bundle
-\usepackage{subcaption}
 \usepackage{xcolor}
-\usepackage{microtype}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.17}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
-\usepackage[numbers,sort&compress]{natbib}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{hyperref}
+% elsarticle loads natbib internally; do not load it again.
 
 % --- palette for diagrams ---
 \definecolor{qpurple}{RGB}{106,61,154}
@@ -35,25 +31,25 @@
 \newcommand{\tpr}{\mathrm{TPR}}
 \newcommand{\fpr}{\mathrm{FPR}}
 
-\title{\textbf{How Quantum Is the Advantage?}\\[2pt]
-\large A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of\\
-Quantum Machine Learning for Network Intrusion Detection}
-
-\author{
-  Syeda Anshrah Gillani\thanks{Corresponding author: \texttt{SyedaAnshrah16@gmail.com}}\\
-  \small Hamdard University, Karachi, Pakistan
-  \and
-  Mirza Samad Ahmed Baig\\
-  \small Fandaqah, Al Khobar, Saudi Arabia\\
-  \small \texttt{MirzaSamadcontact@gmail.com}
-}
-\date{2026}
+\journal{Computers \& Security}
 
 \begin{document}
-\maketitle
+
+\begin{frontmatter}
+
+\title{How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware
+Benchmark and Attribution Audit of Quantum Machine Learning for Network
+Intrusion Detection}
+
+\author[ham]{Syeda Anshrah Gillani\corref{cor1}}
+\ead{SyedaAnshrah16@gmail.com}
+\author[fan]{Mirza Samad Ahmed Baig}
+\ead{MirzaSamadcontact@gmail.com}
+\cortext[cor1]{Corresponding author.}
+\address[ham]{Hamdard University, Karachi, Pakistan}
+\address[fan]{Fandaqah, Al Khobar, Saudi Arabia}
 
 \begin{abstract}
-\noindent
 Quantum machine learning (QML) for network intrusion detection (NIDS) is routinely
 reported to reach near-perfect accuracy, yet the field's most rigorous studies find
 that well-tuned classical models remain competitive or superior on tabular IDS data
@@ -81,12 +77,15 @@ small four-qubit hybrid circuit significantly out-detects the best classical bas
 the $1\%$ false-positive operating point on the distribution-shifted NSL-KDD task
 ($p=0.005$). Code, seeds, and splits are released; our contribution stands whether quantum
 wins, ties, or loses.
-
-\medskip
-\noindent\textbf{Keywords:} quantum machine learning; network intrusion detection; hybrid
-quantum-classical neural networks; quantum support vector machine; NISQ; reproducible
-benchmark; class imbalance; model calibration
 \end{abstract}
+
+\begin{keyword}
+quantum machine learning \sep network intrusion detection \sep hybrid
+quantum-classical neural networks \sep quantum support vector machine \sep NISQ
+\sep reproducible benchmark \sep class imbalance \sep model calibration
+\end{keyword}
+
+\end{frontmatter}
 
 % ===========================================================================
 \section{Introduction}
@@ -332,25 +331,30 @@ decomposition} reporting, per dataset and metric, the quantum-minus-control diff
 % ---- Figure 2: attribution-audit concept (TikZ) ----
 \begin{figure}[t]
 \centering
-\resizebox{0.92\textwidth}{!}{%
+\resizebox{0.95\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\small,
-  qb/.style={rounded corners=2pt,draw=qpurple,fill=lightq,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
-  cb/.style={rounded corners=2pt,draw=qblue,fill=lightc,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
-  res/.style={rounded corners=2pt,draw=qgreen,fill=qgreen!12,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
-  cl/.style={rounded corners=2pt,draw=qblue,fill=qblue!10,thick,minimum width=3.3cm,minimum height=1.0cm,align=center},
-  dec/.style={diamond,aspect=1.7,draw=qorange,thick,fill=qorange!15,align=center,inner sep=2pt},
-  arr/.style={-{Stealth[length=2.2mm]},thick,qgray},
+  qb/.style={rounded corners=3pt,draw=qpurple,fill=lightq,thick,minimum width=3.6cm,minimum height=1.15cm,align=center},
+  cb/.style={rounded corners=3pt,draw=qblue,fill=lightc,thick,minimum width=3.6cm,minimum height=1.15cm,align=center},
+  res/.style={rounded corners=3pt,draw=qgreen,fill=qgreen!12,thick,minimum width=3.8cm,minimum height=1.15cm,align=center},
+  cl/.style={rounded corners=3pt,draw=qblue,fill=qblue!10,thick,minimum width=3.8cm,minimum height=1.15cm,align=center},
+  dec/.style={diamond,aspect=1.6,draw=qorange,thick,fill=qorange!15,align=center,inner sep=3pt,minimum width=2.0cm},
+  arr/.style={-{Stealth[length=2.4mm]},thick,qgray},
+  lbl/.style={font=\footnotesize\bfseries,fill=white,inner sep=1.5pt},
   ]
-  \node[qb] (q) {Quantum model\\[1pt]\scriptsize hybrid VQC / QSVM};
-  \node[cb,below=1.0cm of q] (c) {Matched classical control\\[1pt]\scriptsize same front-end $+$ capacity\\[1pt]\scriptsize $+$ regularisation sweep};
-  \node[dec,right=1.8cm of $(q)!0.5!(c)$] (d) {Gap\\closes?};
-  \node[res,right=2.4cm of d] (qu) {Residual is \textbf{quantum}\\[1pt]\scriptsize report with significance};
-  \node[cl,below=1.0cm of qu] (cla) {Advantage is \textbf{classical}\\[1pt]\scriptsize preprocessing / regularisation};
-  \draw[arr] (q.east) -| (d.north);
-  \draw[arr] (c.east) -| (d.south);
-  \draw[arr] (d.north) |- node[pos=0.75,above,font=\scriptsize]{no} (qu.west);
-  \draw[arr] (d.south) |- node[pos=0.75,below,font=\scriptsize]{yes} (cla.west);
+  % left column: the two compared models
+  \node[qb] (q)  at (0, 1.5)  {Quantum model\\[1pt]\scriptsize hybrid VQC / QSVM};
+  \node[cb] (c)  at (0,-1.5)  {Matched classical control\\[1pt]\scriptsize same front-end, capacity,\\[1pt]\scriptsize and regularisation sweep};
+  % centre: decision
+  \node[dec] (d) at (5.4, 0)  {Gap\\closes?};
+  % right column: the two conclusions
+  \node[res] (qu)  at (10.8, 1.5)  {Residual is \textbf{quantum}\\[1pt]\scriptsize report with significance};
+  \node[cl]  (cla) at (10.8,-1.5)  {Advantage is \textbf{classical}\\[1pt]\scriptsize preprocessing / regularisation};
+  % inputs converge into the diamond's left vertex; outputs fan from the right vertex
+  \draw[arr] (q.east)   -- (d.west);
+  \draw[arr] (c.east)   -- (d.west);
+  \draw[arr] (d.east)   -- node[lbl,pos=0.45]{no}  (qu.west);
+  \draw[arr] (d.east)   -- node[lbl,pos=0.45]{yes} (cla.west);
 \end{tikzpicture}}
 \caption{The attribution audit. Each quantum model is compared with a parameter-matched classical
 control sharing its front-end, plus a regularisation sweep. If a comparably-regularised classical model
@@ -667,7 +671,7 @@ and contested, on common, honest ground.
 \paragraph{Reproducibility.} Code, configurations, fixed seeds, dataset splits, and per-run provenance are
 released at \url{https://github.com/Mirza-Samad-Ahmed-Baig/quantum-ids-benchmark}.
 
-\bibliographystyle{unsrtnat}
+\bibliographystyle{elsarticle-num}
 \bibliography{references}
 
 \end{document}
