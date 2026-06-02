@@ -19,6 +19,17 @@ authors:
     family-names: "Baig"
     email: "MirzaSamadcontact@gmail.com"
     affiliation: "Fandaqah, Al Khobar, Saudi Arabia"
+  - given-names: "Shahid Munir"
+    family-names: "Shah"
+    email: "Shahidmunirshah@yahoo.com"
+    affiliation: "SZABIST University, Pakistan"
+  - given-names: "Asher"
+    family-names: "Ali"
+    email: "CTO@Fandaqah.com"
+    affiliation: "Fandaqah, Al Khobar, Saudi Arabia"
+  - given-names: "Hamzah"
+    family-names: "Siddiqui"
+    affiliation: "Fandaqah, Al Khobar, Saudi Arabia; Hamdard University, Karachi, Pakistan"
 keywords:
   - quantum machine learning
   - network intrusion detection
@@ -39,5 +50,11 @@ preferred-citation:
       family-names: "Gillani"
     - given-names: "Mirza Samad Ahmed"
       family-names: "Baig"
+    - given-names: "Shahid Munir"
+      family-names: "Shah"
+    - given-names: "Asher"
+      family-names: "Ali"
+    - given-names: "Hamzah"
+      family-names: "Siddiqui"
   journal: "Computers & Security (under review)"
   year: 2026
