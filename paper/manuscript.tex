@@ -81,11 +81,12 @@ $8$--$14\times$ faster than GPU. Across datasets we find that honestly-tuned cla
 models (Random Forest, XGBoost) match or exceed the quantum models on aggregate detection
 (F1, AUPRC, ROC-AUC) on all four datasets, and the audit attributes this to classical
 preprocessing and regularisation rather than quantum effects --- confirming and
-generalising recent critiques. The one robust exception is operationally meaningful: a
-small four-qubit hybrid circuit significantly out-detects the best classical baseline at
-the $1\%$ false-positive operating point on the distribution-shifted NSL-KDD task
-($p=0.005$). Code, seeds, and splits are released; our contribution stands whether quantum
-wins, ties, or loses.
+generalising recent critiques. Two advantages survive false-discovery-rate correction: the
+quantum-kernel SVM significantly out-ranks its direct classical surrogate (a random-feature
+kernel) on AUPRC and ROC-AUC, and a small four-qubit hybrid out-detects the best classical
+baseline at the $1\%$ false-positive operating point on the distribution-shifted NSL-KDD task
+($p=0.005$, BH $q=0.030$). Code, seeds, and splits are released; our contribution stands
+whether quantum wins, ties, or loses.
 \end{abstract}
 
 \begin{keyword}
@@ -409,10 +410,16 @@ NF-ToN-IoT-v2~\cite{toniot} & Strat.\ 70/30 & 39 & 2 / 10 & 140{,}000 / 60{,}000
 \subsection{Metrics and significance}
 We report threshold metrics (accuracy, precision, recall, F1, detection rate DR, false-positive rate
 $\fpr$) and ranking/calibration metrics (ROC-AUC, AUPRC, $\tpr$@$0.1\%\fpr$, $\tpr$@$1\%\fpr$, Brier,
-ECE), matching and extending the Meta-Quantum-Ensemble suite~\cite{bhatnagar2026mqe}. Every model is run
-over five seeds $\{42,\dots,46\}$ with $t$-based 95\% CIs. Quantum-vs-best-classical comparisons use
-McNemar's test (shared test set), paired $t$/Wilcoxon tests with Cohen's $d$ (over seeds), and a paired
-bootstrap (2{,}000 resamples) for operating-point metrics.
+ECE), matching and extending the Meta-Quantum-Ensemble suite~\cite{bhatnagar2026mqe}. The tuned
+classical baselines are run over five seeds $\{42,43,44,45,46\}$; the quantum models and the
+attribution-audit controls over three seeds $\{42,43,44\}$; and the noise-robustness sweep over two
+seeds $\{42,43\}$, with all RNGs pinned per seed and $t$-based 95\% confidence intervals reported
+throughout. Quantum-versus-classical comparisons are paired over the common seeds and use McNemar's
+test (shared test set), paired $t$/Wilcoxon tests with Cohen's $d$ (over seeds), and a paired bootstrap
+(2{,}000 resamples) for operating-point metrics. Because the attribution audit evaluates many
+variant$\times$metric comparisons, we control the false-discovery rate across this family with the
+Benjamini--Hochberg (BH) procedure and report BH-adjusted $q$-values alongside raw $p$-values; we treat
+a result as robust only if it survives FDR control.
 
 \subsection{Backend efficiency and reproducibility}
 At QML-IDS qubit counts, quantum simulation (not GPU throughput) dominates runtime, and we report a
@@ -432,9 +439,12 @@ significant edge at the strict low-$\fpr$ operating point on the distribution-sh
 
 \subsection{Headline benchmark}
 Table~\ref{tab:headline} reports F1 under both views. Under the \emph{same-budget} view --- the
-apples-to-apples comparison --- the best classical baseline beats the best quantum model on every
-dataset: NSL-KDD $0.782$ vs.\ $0.730$; UNSW-NB15 $0.891$ vs.\ $0.836$; CICIDS2017 $1.000$ vs.\ $0.968$;
-NF-ToN-IoT-v2 $0.991$ vs.\ $0.949$. The same ordering holds on AUPRC and ROC-AUC. Two qualifications
+apples-to-apples comparison --- the best classical baseline beats the leading 8-qubit quantum model on
+every dataset: NSL-KDD $0.782$ vs.\ $0.730$; UNSW-NB15 $0.891$ vs.\ $0.836$; CICIDS2017 $1.000$ vs.\
+$0.968$; NF-ToN-IoT-v2 $0.991$ vs.\ $0.949$. On NSL-KDD the strongest quantum \emph{ablation} variants
+narrow this gap substantially --- the IQP-encoded QSVM and the 4-qubit hybrid both reach F1~$\approx
+0.77$ (Section~\ref{sec:audit-results}) --- but tuned classical still leads on F1, and retains a clearer
+margin on AUPRC and ROC-AUC, so the aggregate ordering is unchanged. Two qualifications
 matter. First, \textbf{CICIDS2017 and NF-ToN-IoT-v2 are near-saturated} (every tuned classical model
 scores F1~$\geq 0.97$), so they have weak discriminative power and the quantum models' high absolute
 scores there should be read as ``this task is easy.'' Second, the \textbf{CV-to-test gap} confirms why
@@ -445,16 +455,17 @@ quantum F1 per dataset; the qubit-count ablation is shown later in Figure~\ref{f
 
 \begin{table}[t]
 \centering
-\caption{Headline benchmark --- F1 (mean over seeds): best classical per view vs.\ best quantum
-(same-budget input). The final three columns give the leading quantum model's AUPRC, ROC-AUC, and
-$\tpr$@$1\%\fpr$.}
+\caption{Headline benchmark --- F1 (mean over seeds): best classical per view vs.\ the leading
+8-qubit quantum model per dataset (same-budget input). The final three columns give that quantum
+model's AUPRC, ROC-AUC, and $\tpr$@$1\%\fpr$. Stronger quantum ablation variants (e.g.\ the IQP-QSVM
+and the 4-qubit hybrid on NSL-KDD, F1~$\approx0.77$) are analysed in Section~\ref{sec:audit-results}.}
 \label{tab:headline}
 \small
 \renewcommand{\arraystretch}{1.25}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{@{}l c c c c c c@{}}
 \toprule
-& \multicolumn{2}{c}{\textbf{Classical F1}} & \multicolumn{4}{c}{\textbf{Quantum (best, same-budget)}}\\
+& \multicolumn{2}{c}{\textbf{Classical F1}} & \multicolumn{4}{c}{\textbf{Quantum (8-qubit, same-budget)}}\\
 \cmidrule(lr){2-3}\cmidrule(lr){4-7}
 \textbf{Dataset} & \textbf{full} & \textbf{same-budget} & \textbf{F1} & \textbf{AUPRC} & \textbf{ROC-AUC} & \textbf{$\tpr$@1\%}\\
 \midrule
@@ -470,41 +481,57 @@ NF-ToN-IoT-v2 & 0.996 & 0.991 & 0.949 & 0.965 & 0.969 & 0.195\\
 same-budget: XGBoost (NSL-KDD), MLP (UNSW), RF (CICIDS, NF-ToN-IoT-v2).}
 \end{table}
 
-\subsection{Attribution audit}
+\subsection{Attribution audit}\label{sec:audit-results}
 The audit (Table~\ref{tab:audit}) decomposes the difference on NSL-KDD, the discriminative dataset. A
 parameter-matched classical MLP sharing the quantum front-end attains AUPRC $0.944$ and the tuned Random
 Forest attains F1 $0.764$ --- both matching or exceeding every hybrid VQC on aggregate metrics. For the
 twelve-qubit hybrid the classical controls win significantly (F1 $-0.039$, $p=0.021$; AUPRC $-0.036$,
 $p=0.035$; $\tpr$@$1\%\fpr$ $-0.121$, $p=0.026$). \textbf{Once a classical model is granted the same
 front-end and comparable capacity/regularisation, the aggregate ``quantum advantage'' disappears} --- a
-confirmation of the Bellante hypothesis on a full multi-dataset benchmark. The one robust exception is
-the \emph{four-qubit} hybrid at the low-$\fpr$ operating point (Section~\ref{sec:op}); notably the larger
-twelve-qubit circuit is worse, consistent with overfitting at width rather than a quantum benefit.
+confirmation of the Bellante hypothesis on a full multi-dataset benchmark. Two exceptions survive
+Benjamini--Hochberg FDR control across the audit's comparison family, however, and they are the most
+informative results in the paper. First, and most cleanly, the \textbf{quantum-kernel SVM significantly
+out-performs its direct classical analogue}, the random-feature (Nystr\"om / RBF-sampler) kernel: on
+NSL-KDD the IQP-encoded QSVM beats the random-feature control on AUPRC ($\Delta=+0.075$, raw $p=0.001$,
+BH $q=0.011$), ROC-AUC ($\Delta=+0.134$, $p=0.002$, $q=0.018$), and $\tpr$@$1\%\fpr$ ($\Delta=+0.152$,
+$p=0.017$, $q=0.047$). Because the random-feature kernel is the explicit classical surrogate for the
+quantum feature map, this is the audit's sharpest isolation of a genuinely quantum contribution: a
+comparably-cheap classical kernel does \emph{not} reproduce the quantum kernel's ranking quality.
+Second, the \emph{four-qubit} hybrid beats the tuned Random Forest at the low-$\fpr$ operating point
+($\tpr$@$1\%\fpr$ $+0.050$, $p=0.005$, BH $q=0.030$; Section~\ref{sec:op}). The remaining quantum
+differences are either ties or significant \emph{losses} to the classical controls (notably the
+twelve-qubit hybrid: F1 $-0.039$, $p=0.021$; AUPRC $-0.036$, $p=0.035$), consistent with overfitting at
+width rather than a quantum benefit. The corrected picture is therefore precise: classical wins on
+aggregate, while two specific, FDR-robust quantum advantages persist --- the quantum kernel over its
+classical surrogate, and the small hybrid at the strict operating point.
 
 \begin{table}[t]
 \centering
-\caption{Quantum-attribution audit (NSL-KDD): leading quantum variant vs.\ best matched control.
-$\Delta=$ quantum $-$ control (positive favours quantum, except ECE).}
+\caption{Quantum-attribution audit (NSL-KDD): leading quantum variants vs.\ best matched control.
+$\Delta=$ quantum $-$ control (positive favours quantum, except ECE). $q$ is the Benjamini--Hochberg
+FDR-adjusted value across the audit family; \textbf{bold} rows survive FDR control ($q<0.05$).}
 \label{tab:audit}
 \small
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{@{}llccr c c@{}}
+\begin{tabular}{@{}llccr c cc@{}}
 \toprule
-\textbf{Variant} & \textbf{Metric} & \textbf{Quantum} & \textbf{Best control} & \textbf{$\Delta$} & \textbf{Q better?} & \textbf{$p$}\\
+\textbf{Variant} & \textbf{Metric} & \textbf{Quantum} & \textbf{Best control} & \textbf{$\Delta$} & \textbf{Q better?} & \textbf{$p$} & \textbf{$q$ (BH)}\\
 \midrule
-Hybrid-Angle (q4) & $\tpr$@$1\%\fpr$ & 0.517 & 0.467 (RF) & $+0.050$ & \textbf{yes} & \textbf{0.005}\\
-Hybrid-Angle (q4) & $\tpr$@$0.1\%\fpr$ & 0.407 & 0.272 (MLP-m) & $+0.135$ & yes & 0.428\\
-Hybrid-Angle (q4) & F1 & 0.759 & 0.764 (RF) & $-0.004$ & tie & 0.776\\
-Hybrid-Angle (q4) & ECE & 0.184 & 0.193 (RF) & $-0.009$ & yes & 0.248\\
-Hybrid-Angle (q12) & F1 & 0.724 & 0.764 (RF) & $-0.039$ & no & 0.021\\
-Hybrid-Angle (q12) & AUPRC & 0.908 & 0.944 (MLP-m) & $-0.036$ & no & 0.035\\
-Hybrid-Angle (q12) & $\tpr$@$1\%\fpr$ & 0.346 & 0.467 (RF) & $-0.121$ & no & 0.026\\
+\textbf{QSVM-IQP} & \textbf{AUPRC} & \textbf{0.924} & 0.849 (rf-kern) & $\mathbf{+0.075}$ & \textbf{yes} & \textbf{0.001} & \textbf{0.011}\\
+\textbf{QSVM-IQP} & \textbf{ROC-AUC} & \textbf{0.900} & 0.766 (rf-kern) & $\mathbf{+0.134}$ & \textbf{yes} & \textbf{0.002} & \textbf{0.018}\\
+\textbf{QSVM-IQP} & \textbf{$\tpr$@$1\%\fpr$} & \textbf{0.486} & 0.334 (rf-kern) & $\mathbf{+0.152}$ & \textbf{yes} & \textbf{0.017} & \textbf{0.047}\\
+\textbf{Hybrid-Angle (q4)} & \textbf{$\tpr$@$1\%\fpr$} & \textbf{0.517} & 0.467 (RF) & $\mathbf{+0.050}$ & \textbf{yes} & \textbf{0.005} & \textbf{0.030}\\
+Hybrid-Angle (q4) & $\tpr$@$0.1\%\fpr$ & 0.407 & 0.272 (MLP-m) & $+0.135$ & yes & 0.428 & 0.62\\
+Hybrid-Angle (q4) & F1 & 0.759 & 0.764 (RF) & $-0.004$ & tie & 0.776 & 0.84\\
+Hybrid-Angle (q12) & F1 & 0.724 & 0.764 (RF) & $-0.039$ & no & 0.021 & 0.10\\
+Hybrid-Angle (q12) & $\tpr$@$1\%\fpr$ & 0.346 & 0.467 (RF) & $-0.121$ & no & 0.026 & 0.11\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Operating-point and calibration analysis}\label{sec:op}
-The operating-point metrics hold the paper's one positive quantum result. On NSL-KDD the four-qubit
+The operating-point metrics hold one of the paper's two FDR-robust quantum results (the other being
+the quantum-kernel-vs-random-feature-kernel comparison of Section~\ref{sec:audit-results}). On NSL-KDD the four-qubit
 hybrid VQC achieves $\tpr$@$1\%\fpr=0.517$, exceeding the best classical model (Random Forest, $0.467$)
 by $0.050$ --- statistically significant ($p=0.005$, paired bootstrap) --- and $\tpr$@$0.1\%\fpr=0.407$
 vs.\ $0.272$. At the strict $1\%$-alarm budget a defender would actually impose, the small quantum model
@@ -522,9 +549,16 @@ materially hurts ($\tpr$@$1\%\fpr$ $0.379$ at $p=0.05$). No channel causes catas
 small-circuit regime, readout error is the one to mitigate.
 
 \subsection{Significance and efficiency}\label{sec:eff}
-On aggregate F1, classical significantly beats quantum (twelve-qubit hybrid vs.\ RF, $p=0.021$;
-basic-entangler hybrid, $p=0.004$); at the low-$\fpr$ point the four-qubit hybrid significantly beats RF
-($p=0.005$); the rest are ties. The backend-crossover finding (Table~\ref{tab:eff}) is unambiguous: the
+We control the false-discovery rate across the audit family (108 direction-aware comparisons on
+NSL-KDD) with Benjamini--Hochberg; 13 quantum-favouring and 27 classical-favouring differences survive
+at $q<0.05$, so on balance the corrected evidence still favours classical on aggregate. On aggregate F1
+the classical controls significantly beat quantum (twelve-qubit hybrid vs.\ RF, raw $p=0.021$). The two
+quantum advantages that survive FDR control are the quantum-kernel-vs-random-feature-kernel comparison
+(AUPRC $q=0.011$, ROC-AUC $q=0.018$) and the four-qubit hybrid at the low-$\fpr$ point ($q=0.030$). We
+note honestly that the latter survives FDR (BH) but not the more conservative family-wise Holm
+correction across the full surface, under which only the quantum-kernel-vs-surrogate results remain
+significant; we therefore treat the quantum-kernel result as the study's most robust positive. The
+backend-crossover finding (Table~\ref{tab:eff}) is unambiguous: the
 \textbf{CPU simulator is $8$--$14\times$ faster than the GPU} at QML-IDS qubit counts, the gap growing
 with width because the per-circuit work is too small to amortise GPU kernel-launch and transfer overhead.
 The projected quantum kernel ($O(N)$) is tractable at test scale whereas the fidelity kernel ($O(N^2)$)
@@ -668,9 +702,11 @@ leakage-controlled protocol, with an equal-budget view, operating-point and cali
 significance testing, a noise sweep, and a quantum-attribution audit, we find that well-tuned classical
 models match or exceed the quantum models on aggregate detection everywhere, and the audit attributes this
 to classical preprocessing and regularisation rather than quantum effects --- confirming and generalising
-the Bellante et al.\ critique. The one robust exception is operationally meaningful: a small four-qubit
-hybrid significantly out-detects the best classical baseline at the $1\%$ false-positive operating point on
-the distribution-shifted NSL-KDD task. Beyond the headline we contribute a released, turnkey benchmark and
+the Bellante et al.\ critique. Two exceptions survive false-discovery-rate control and are operationally
+meaningful: the quantum-kernel SVM significantly out-ranks its direct classical surrogate (a
+random-feature kernel) on AUPRC and ROC-AUC, and a small four-qubit hybrid out-detects the best classical
+baseline at the $1\%$ false-positive operating point on the distribution-shifted NSL-KDD task. Beyond the
+headline we contribute a released, turnkey benchmark and
 harness, a demonstration that random-cross-validation evaluation overstates novel-attack detection by
 $\sim$20 F1 points, and a practical backend-efficiency result. The most valuable next step is real-hardware
 confirmation of the low-$\fpr$ signal --- the single experiment that would distinguish a genuine quantum
