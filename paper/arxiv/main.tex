@@ -259,7 +259,7 @@ the attribution audit (Section~\ref{sec:audit}) is built to do.
 % ---- Figure 1: hybrid architecture (TikZ) ----
 \begin{figure}[t]
 \centering
-\includegraphics[page=1,width=\textwidth]{figs}
+\includegraphics[width=\textwidth]{Fig1}
 \caption{Hybrid quantum-classical classifier. A classical front-end compresses flow features to the
 per-qubit budget; a variational quantum circuit (encoding $+$ ansatz $+$ measurement) processes the
 encoded state; a classical read-out produces class logits. The quantum component is sandwiched between
@@ -310,7 +310,7 @@ decomposition} reporting, per dataset and metric, the quantum-minus-control diff
 % ---- Figure 2: attribution-audit concept (TikZ) ----
 \begin{figure}[t]
 \centering
-\includegraphics[page=2,width=0.95\textwidth]{figs}
+\includegraphics[width=0.95\textwidth]{Fig2}
 \caption{The attribution audit. Each quantum model is compared with a parameter-matched classical
 control sharing its front-end, plus a regularisation sweep. If a comparably-regularised classical model
 closes the gap, the apparent advantage is classical; any significant residual is attributed to the
@@ -497,7 +497,7 @@ training-step time at fixed work.}
 % ---- matplotlib figures ----
 \begin{figure}[t]
 \centering
-\includegraphics[page=3,width=0.95\textwidth]{figs}
+\includegraphics[width=0.95\textwidth]{Fig3}
 \caption{Best classical (same-budget) vs.\ best quantum F1 per dataset (mean over seeds). Tuned
 classical models lead on every dataset; the gap is largest on the discriminative datasets (NSL-KDD,
 UNSW-NB15) and smallest where the task is near-saturated (CICIDS2017, NF-ToN-IoT-v2, where every
@@ -507,7 +507,7 @@ classical model exceeds $0.97$).}
 
 \begin{figure}[t]
 \centering
-\includegraphics[page=4,width=0.78\textwidth]{figs}
+\includegraphics[width=0.78\textwidth]{Fig4}
 \caption{Qubit-count ablation of the hybrid VQC on NSL-KDD. Both F1 and the low-FPR detection rate
 \emph{decline} with width --- more qubits do not help on the shifted task. Crucially, only the small
 four-qubit circuit exceeds the best classical baseline's $\tpr$@$1\%\fpr$ (Random Forest, dashed
