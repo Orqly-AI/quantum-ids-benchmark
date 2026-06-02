@@ -419,8 +419,8 @@ NF-ToN-IoT-v2 & 0.996 & 0.991 & 0.949 & 0.965 & 0.969 & 0.195\\
 \end{tabular}
 
 \smallskip
-{\footnotesize Best classical model per cell --- full view: SVM (NSL-KDD), MLP (UNSW), RF (CICIDS, ToN-IoT);
-same-budget: XGBoost (NSL-KDD), MLP (UNSW), RF (CICIDS, ToN-IoT).}
+{\footnotesize Best classical model per cell --- full view: SVM (NSL-KDD), MLP (UNSW), RF (CICIDS, NF-ToN-IoT-v2);
+same-budget: XGBoost (NSL-KDD), MLP (UNSW), RF (CICIDS, NF-ToN-IoT-v2).}
 \end{table}
 
 \subsection{Attribution audit}
@@ -560,8 +560,8 @@ is a caution for the whole QML-IDS literature, and the backend crossover (the GP
 models NISQ effects rather than measuring them, omitting correlated/non-Markovian noise, crosstalk,
 connectivity, and transpilation. A real-hardware confirmation of even one configuration would strengthen
 the conclusions; we treat the simulated results as an optimistic bound.
-\textbf{Qubit budget.} The 4\,GB GPU caps width at $\sim$16 qubits (noiseless) / 12 (noisy, $(2^n)^2$
-memory); the main configuration uses eight, so we cannot probe the larger-width regime.
+\textbf{Qubit budget.} The 4\,GB GPU caps width at roughly sixteen qubits (noiseless) / twelve (noisy,
+$(2^n)^2$ memory); the main configuration uses eight, so we cannot probe the larger-width regime.
 \textbf{Dimensionality reduction} discards variance (eight PCs retain $\sim$84\% on NSL-KDD), so any
 advantage is conditioned on information-reduced input.
 \textbf{Dataset age/composition.} NSL-KDD is dated (mitigated by three further datasets); the IoT coverage
