@@ -27,7 +27,7 @@ keywords:
   - NISQ
   - reproducible benchmark
   - model calibration
-license: MIT
+license-url: "https://github.com/Orqly-AI/quantum-ids-benchmark/blob/main/LICENSE"
 version: "1.0.0"
 date-released: "2026-06-01"
 repository-code: "https://github.com/Orqly-AI/quantum-ids-benchmark"

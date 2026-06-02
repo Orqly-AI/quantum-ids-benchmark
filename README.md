@@ -154,4 +154,10 @@ If you use this benchmark or harness, please cite the paper (see `CITATION.cff`)
 > Attribution Audit of Quantum Machine Learning for Network Intrusion Detection.*
 
 ## License
-MIT — see `LICENSE`.
+Orqly-AI Restricted Attribution License (ORAL) v1.0 — see `LICENSE`.
+
+Original Work by Mirza Samad Ahmed Baig and Syeda Anshrah Gillani (Orqly-AI),
+Copyright (c) 2026. Source: https://github.com/Orqly-AI/quantum-ids-benchmark
+Academic, non-commercial use is permitted with attribution and citation of the
+associated research paper; commercial use and reproduction of the paper require
+prior written permission from the authors.
