@@ -36,3 +36,4 @@ paper/page*.png
 # OS
 .DS_Store
 Thumbs.db
+paper/chk*.png
