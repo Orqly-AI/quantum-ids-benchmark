@@ -1,7 +1,22 @@
 #!/usr/bin/env bash
-# Build the manuscript PDF and an arXiv-ready source zip from manuscript.md.
-# Requires pandoc + tectonic (installed in the qml conda env). Run:
-#   bash paper/build_pdf.sh
+# ---------------------------------------------------------------------------
+# SUPERSEDED -- DO NOT RUN.
+#
+# manuscript.tex is now hand-maintained native LaTeX (elsarticle) and is the
+# single source of truth. This script regenerates manuscript.tex from the
+# stale manuscript.md via pandoc and would destroy it.
+#
+# Current build:
+#   bash paper/_render.sh                       # manuscript.pdf
+#   python paper/_sync_figs.py                  # -> arxiv/figs.tex
+#   (cd paper/arxiv && tectonic figs.tex && pdfseparate figs.pdf Fig%d.pdf)
+#   python paper/_sync_arxiv.py                 # -> arxiv/main.tex
+#   (cd paper/arxiv && tectonic main.tex --keep-intermediates --reruns 5)
+# ---------------------------------------------------------------------------
+echo "build_pdf.sh is superseded and would overwrite manuscript.tex; see the" >&2
+echo "header of this file for the current build steps. Refusing to run." >&2
+exit 1
+
 set -e
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate qml

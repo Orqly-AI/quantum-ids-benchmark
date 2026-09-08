@@ -261,36 +261,7 @@ the attribution audit (Section~\ref{sec:audit}) is built to do.
 
 \begin{figure}[t]
 \centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[
-  font=\footnotesize,
-  box/.style={rounded corners=2pt,draw,thick,align=center,
-              text width=1.78cm,minimum height=1.68cm,inner xsep=3pt},
-  cbox/.style={box,fill=lightc,draw=qblue},
-  qbox/.style={box,fill=lightq,draw=qpurple},
-  arr/.style={-{Stealth[length=2.2mm]},thick,qgray},
-  sub/.style={qblue,font=\scriptsize},
-  ]
-  \node[cbox]                      (in)   {Flow\\features $x$};
-  \node[cbox,right=0.25cm of in]   (pre)  {Classical\\front-end\\[1pt]\scriptsize PCA/AE\\$\to$ linear};
-  \node[qbox,right=0.55cm of pre]  (enc)  {Encoding\\[1pt]\scriptsize angle\,/\,IQP\,/\\amplitude\,/\\reupload};
-  \node[qbox,right=0.22cm of enc]  (ans)  {Variational\\ansatz\\[1pt]\scriptsize SE\,/\,BE,\\depth $L$};
-  \node[qbox,right=0.22cm of ans]  (meas) {Measure\\$\langle Z_i\rangle$};
-  \node[cbox,right=0.55cm of meas] (out)  {Read-out\\$\to$ logits};
-  \draw[arr] (in)   -- (pre);
-  \draw[arr] (pre)  -- (enc);
-  \draw[arr] (enc)  -- (ans);
-  \draw[arr] (ans)  -- (meas);
-  \draw[arr] (meas) -- (out);
-  \begin{scope}[on background layer]
-    \node[draw=qpurple,dashed,rounded corners=3pt,inner sep=7pt,
-          fit=(enc)(ans)(meas)] (qfit) {};
-  \end{scope}
-  \node[qpurple,font=\scriptsize,fill=white,inner sep=1.5pt,
-        anchor=center] at (qfit.north) {Quantum circuit (VQC)};
-  \node[sub,below=3pt of in.south]  {classical};
-  \node[sub,below=3pt of out.south] {classical};
-\end{tikzpicture}}
+\includegraphics[width=\textwidth]{Fig1.pdf}
 \caption{Hybrid quantum-classical classifier. A classical front-end compresses flow features to the
 per-qubit budget; a variational quantum circuit (encoding $+$ ansatz $+$ measurement) processes the
 encoded state; a classical read-out produces class logits. The quantum component is sandwiched between
@@ -338,36 +309,7 @@ decomposition} reporting, per dataset and metric, the quantum-minus-control diff
 
 \begin{figure}[t]
 \centering
-\resizebox{0.95\textwidth}{!}{%
-\begin{tikzpicture}[
-  font=\small,
-  bx/.style={rounded corners=3pt,draw,thick,align=center,
-             text width=3.6cm,minimum height=1.85cm,inner xsep=4pt},
-  qb/.style={bx,draw=qpurple,fill=lightq},
-  cb/.style={bx,draw=qblue,fill=lightc},
-  res/.style={bx,draw=qgreen,fill=qgreen!12},
-  cl/.style={bx,draw=qblue,fill=qblue!10},
-  dec/.style={diamond,draw=qorange,thick,fill=qorange!15,align=center,
-              inner sep=1pt,minimum width=2.3cm,minimum height=1.4cm,
-              font=\footnotesize},
-  ln/.style={thick,qgray},
-  arr/.style={ln,-{Stealth[length=2.4mm]}},
-  lbl/.style={font=\footnotesize\bfseries,fill=white,inner sep=1.5pt},
-  ]
-  \node[qb] (q)   at (0, 1.8) {Quantum model\\[1pt]\scriptsize hybrid VQC / QSVM};
-  \node[cb] (c)   at (0,-1.8) {Matched classical\\control\\[1pt]\scriptsize same front-end, capacity,\\and regularisation sweep};
-  \node[dec] (d)  at (5.0, 0)  {Gap\\closes?};
-  \node[res] (qu)  at (10.04, 1.8) {Residual is \textbf{quantum}\\[1pt]\scriptsize report with significance};
-  \node[cl]  (cla) at (10.04,-1.8) {Advantage is \textbf{classical}\\[1pt]\scriptsize preprocessing / regularisation};
-  \draw[ln]  (q.east) -- (3.2, 1.8);
-  \draw[ln]  (c.east) -- (3.2,-1.8);
-  \draw[ln]  (3.2,1.8) -- (3.2,-1.8);
-  \draw[arr] (3.2,0) -- (d.west);
-  \draw[ln]  (d.east) -- (6.8,0);
-  \draw[ln]  (6.8,1.8) -- (6.8,-1.8);
-  \draw[arr] (6.8, 1.8) -- node[lbl,pos=0.5,above=1pt] {no}  (qu.west);
-  \draw[arr] (6.8,-1.8) -- node[lbl,pos=0.5,below=1pt] {yes} (cla.west);
-\end{tikzpicture}}
+\includegraphics[width=0.95\textwidth]{Fig2.pdf}
 \caption{The attribution audit. Each quantum model is compared with a parameter-matched classical
 control sharing its front-end, plus a regularisation sweep. If a comparably-regularised classical model
 closes the gap, the apparent advantage is classical; any significant residual is attributed to the
@@ -597,33 +539,7 @@ training-step time at fixed work.}
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-  ybar, bar width=12pt,
-  width=\textwidth, height=6.6cm,
-  enlarge x limits=0.24,%
-  ymin=0.6, ymax=1.15,%
-  ytick={0.6,0.7,0.8,0.9,1.0},
-  ylabel={F1 (mean over seeds)},
-  ylabel style={font=\small},
-  y tick label style={font=\small},
-  symbolic x coords={NSL-KDD,UNSW-NB15,CICIDS2017,NF-ToN-IoT-v2},
-  xtick=data,
-  x tick label style={font=\small},
-  legend style={at={(0.5,-0.15)},anchor=north,legend columns=2,font=\small,draw=none,
-    /tikz/every even column/.append style={column sep=12pt}},
-  nodes near coords,
-  every node near coord/.append style={font=\tiny,rotate=90,anchor=west,
-    /pgf/number format/.cd,fixed,fixed zerofill,precision=3},
-  ymajorgrids,grid style={gray!22},
-]
-\addplot[fill=qblue!72,draw=qblue] coordinates
-  {(NSL-KDD,0.782)(UNSW-NB15,0.891)(CICIDS2017,1.000)(NF-ToN-IoT-v2,0.991)};
-\addplot[fill=qpurple!72,draw=qpurple] coordinates
-  {(NSL-KDD,0.730)(UNSW-NB15,0.836)(CICIDS2017,0.968)(NF-ToN-IoT-v2,0.949)};
-\legend{Best classical (same-budget),Best quantum}
-\end{axis}
-\end{tikzpicture}
+\includegraphics[width=\textwidth]{Fig3.pdf}
 \caption{Best classical (same-budget) vs.\ best quantum F1 per dataset (mean over seeds). Tuned
 classical models lead on every dataset; the gap is largest on the discriminative datasets (NSL-KDD,
 UNSW-NB15) and smallest where the task is near-saturated (CICIDS2017, NF-ToN-IoT-v2, where every
@@ -633,27 +549,7 @@ classical model exceeds $0.97$). The vertical axis is truncated at $0.6$.}
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-  width=0.92\textwidth, height=6.4cm,
-  xlabel={Number of qubits in the hybrid VQC},
-  xlabel style={font=\small,yshift=-2pt},
-  ylabel={Score (NSL-KDD test)},
-  ylabel style={font=\small},
-  tick label style={font=\small},
-  xtick={4,8,12}, xmin=3.4, xmax=12.6,
-  ymin=0.28, ymax=0.85,
-  legend style={at={(0.5,-0.30)},anchor=north,legend columns=3,font=\footnotesize,draw=none,
-    /tikz/every even column/.append style={column sep=10pt}},
-  ymajorgrids,grid style={gray!22},
-  every axis plot/.append style={very thick},
-]
-\addplot[qpurple,mark=*] coordinates {(4,0.759)(8,0.730)(12,0.724)};
-\addplot[qgreen,mark=square*] coordinates {(4,0.517)(8,0.411)(12,0.346)};
-\addplot[qorange,dashed,mark=none] coordinates {(3.4,0.467)(12.6,0.467)};
-\legend{Hybrid F1,Hybrid $\tpr$@$1\%\fpr$,RF $\tpr$@$1\%\fpr$ (constant ref.)}
-\end{axis}
-\end{tikzpicture}
+\includegraphics[width=0.92\textwidth]{Fig4.pdf}
 \caption{Qubit-count ablation of the hybrid VQC on NSL-KDD. Both F1 and the low-FPR detection rate
 \emph{decline} with width, so more qubits do not help on the shifted task. Crucially, only the small
 four-qubit circuit exceeds the best classical baseline's $\tpr$@$1\%\fpr$ (Random Forest, dashed

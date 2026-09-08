@@ -1,0 +1,90 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{hyperref}
+\usepackage{xurl}
+\hypersetup{hidelinks}
+\pagestyle{empty}
+\begin{document}
+
+\textbf{To:} The Editors, \emph{Quantum Machine Intelligence}\\
+\textbf{Re:} Submission of original research article\\
+\textbf{Topic:} Quantum Computing for AI
+
+\bigskip
+Dear Editors,
+
+We are pleased to submit our manuscript, \textbf{``How Quantum Is the Advantage? A Fair,
+Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for
+Network Intrusion Detection,''} for consideration as an original research article in
+\emph{Quantum Machine Intelligence}.
+
+\textbf{The question.} Applied quantum machine learning reports near-perfect accuracies across
+many application domains, network intrusion detection among them, with figures in the 97 to
+99.9\% range. The field's more careful studies have begun to question those numbers, showing that
+well-tuned classical models remain competitive on tabular data and that apparent quantum gains may
+be artefacts of the classical dimensionality reduction and implicit regularisation that every
+hybrid pipeline contains. What the literature lacks is not another accuracy record but a
+\emph{method} for deciding, for a given result, how much of the measured advantage is actually
+attributable to the quantum component. That is what this paper supplies.
+
+\textbf{What we contribute.} The methodological core is a \textbf{quantum-attribution audit}: for
+every quantum model we construct a parameter-matched classical control sharing the identical
+classical front-end; for every quantum kernel we construct a random-feature kernel as its explicit
+classical surrogate; and we run a regularisation sweep to test whether comparable regularisation
+closes any observed gap. Differences are reported per variant and metric with significance testing
+and Benjamini-Hochberg control of the false-discovery rate across the whole comparison family. The
+audit is general: it applies to any claim of quantum advantage in a hybrid learning pipeline, and
+we demonstrate it on a benchmark of two quantum model families (hybrid variational circuits and
+quantum-kernel SVMs) against five honestly-tuned classical baselines, across four standard
+datasets, under one leakage-controlled protocol with an equal-budget feature view, imbalance- and
+calibration-aware metrics, and a simulated NISQ noise sweep.
+
+\textbf{What we find.} Tuned classical models match or exceed the quantum models on aggregate
+detection on every dataset, and the audit attributes this to classical preprocessing and
+regularisation rather than to quantum effects. Two advantages survive FDR control. The
+quantum-kernel SVM significantly out-ranks its direct classical surrogate on AUPRC ($q=0.011$) and
+ROC-AUC ($q=0.018$); because the random-feature kernel is the explicit classical analogue of the
+quantum feature map, this is the sharpest isolation of a genuinely quantum contribution in the
+study, and it is the one result that also survives the more conservative family-wise Holm
+correction. Separately, a small four-qubit hybrid out-detects the best classical baseline at the
+1\% false-positive operating point on a distribution-shifted task ($p=0.005$, $q=0.030$); we report
+plainly that this one does not survive Holm.
+
+\textbf{Fit for the journal.} The work sits in the journal's Quantum Computing for AI perspective
+and speaks directly to its stated emphasis on benchmarking and empirical evaluation. It is
+addressed to readers who want to know whether reported quantum advantages hold up under matched
+classical controls, which is a question for this readership rather than for an applications venue.
+We also believe the audit is reusable well beyond intrusion detection.
+
+\textbf{Limitations we state up front.} All quantum results are simulated; we have no QPU access
+and treat the simulated numbers as an optimistic bound. Our seed budget is small and uneven (five
+seeds for the classical baselines on one dataset, three elsewhere and for all quantum runs, two for
+the noise sweep), which we report explicitly and which is why the operating-point claims rest on a
+paired bootstrap rather than on seed-level tests. The attribution audit is decomposed on the most
+discriminative dataset. We prefer to surface these limits than have them inferred.
+
+\textbf{Reproducibility.} The code, configurations, fixed seeds, the scripts that reconstruct our
+exact splits, and the per-run result records are released publicly; every reported number is
+regenerable from the released harness.
+
+This manuscript is original, has not been published previously, and is not under consideration
+elsewhere. All authors have approved the submission and declare no competing interests.
+
+Thank you for your consideration.
+
+\bigskip
+Sincerely,
+
+\smallskip
+Syeda Anshrah Gillani (corresponding author), Hamdard University, Karachi, Pakistan\\
+\texttt{SyedaAnshrah16@gmail.com}\\[2pt]
+Mirza Samad Ahmed Baig (corresponding author), Fandaqah, Al Khobar, Saudi Arabia\\
+\texttt{MirzaSamadcontact@gmail.com}\\[2pt]
+Shahid Munir Shah, SZABIST University, Pakistan\\[2pt]
+Asher Ali, Fandaqah, Al Khobar, Saudi Arabia\\[2pt]
+Hamzah Siddiqui, Fandaqah, Al Khobar, Saudi Arabia and Hamdard University, Karachi, Pakistan
+
+\end{document}

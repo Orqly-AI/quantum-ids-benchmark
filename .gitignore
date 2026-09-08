@@ -37,3 +37,9 @@ paper/page*.png
 .DS_Store
 Thumbs.db
 paper/chk*.png
+
+# LaTeX build artefacts in subdirectories (paper/arxiv, paper/submission)
+paper/**/*.aux
+paper/**/*.out
+paper/**/*.log
+paper/**/*.blg

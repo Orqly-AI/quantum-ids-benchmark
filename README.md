@@ -56,6 +56,13 @@ python src/attribution.py --config configs/attribution_audit.yaml --results-dir 
 - scikit-learn, xgboost, pandas, numpy, matplotlib, seaborn
 
 ## Datasets (open benchmarks)
+
+> **Availability.** We do not redistribute the source corpora: fetch them from their
+> original providers with the `src/download_*.sh` scripts below, which together with
+> the fixed seeds reproduce our exact splits. The **preprocessed datasets will be
+> released on request** (open an issue or contact the authors). Per-run result records
+> are already in `results/`.
+
 - NSL-KDD (official KDDTrain+/KDDTest+ split — measures novel-attack generalisation)
 - UNSW-NB15 (official train/test split)
 - CICIDS2017 (3-day MachineLearningCVE subset; full corpus configurable)
