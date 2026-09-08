@@ -39,8 +39,8 @@ keywords:
   - reproducible benchmark
   - model calibration
 license-url: "https://github.com/Orqly-AI/quantum-ids-benchmark/blob/main/LICENSE"
-version: "1.0.0"
-date-released: "2026-06-01"
+version: "1.1.0"
+date-released: "2026-09-08"
 repository-code: "https://github.com/Orqly-AI/quantum-ids-benchmark"
 preferred-citation:
   type: article
@@ -56,5 +56,11 @@ preferred-citation:
       family-names: "Ali"
     - given-names: "Hamzah"
       family-names: "Siddiqui"
-  journal: "Computers & Security (under review)"
+  journal: "arXiv preprint"
   year: 2026
+  url: "https://arxiv.org/abs/2608.18155"
+  identifiers:
+    - type: other
+      value: "arXiv:2608.18155"
+      description: "arXiv identifier of the preprint"
+  notes: "Preprint on arXiv (quant-ph); under review at Quantum Machine Intelligence."

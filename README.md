@@ -1,5 +1,7 @@
 # How Quantum Is the Advantage?
 
+[![arXiv](https://img.shields.io/badge/arXiv-2608.18155-b31b1b.svg)](https://arxiv.org/abs/2608.18155)
+
 **A fair, calibration- and noise-aware benchmark and attribution audit of quantum machine learning for network intrusion detection.**
 
 Reproducible code, configs, seeds, and splits for the paper of the same name. We
@@ -10,16 +12,19 @@ design, operating-point/calibration metrics, statistical significance, a NISQ no
 sweep, and a **quantum-attribution audit** that decomposes any measured gain into
 its classical and genuinely-quantum components.
 
-**Target venue:** Computers & Security (Elsevier).
+**Preprint:** [arXiv:2608.18155](https://arxiv.org/abs/2608.18155)
+**Under review at:** Quantum Machine Intelligence (Springer).
 
 ## TL;DR — headline result
 
 Tuned classical models (Random Forest, XGBoost) **match or exceed the quantum models
 on aggregate detection on every dataset**, and the attribution audit traces the
 apparent quantum gain to classical preprocessing/regularisation rather than quantum
-effects. The one robust exception is operationally meaningful: a small 4-qubit hybrid
-circuit **significantly out-detects the best classical baseline at the 1% false-positive
-operating point** on the distribution-shifted NSL-KDD task (p = 0.005).
+effects. Two exceptions survive false-discovery-rate correction: the quantum-kernel SVM
+**out-ranks its direct classical surrogate** (a random-feature kernel) on AUPRC and ROC-AUC
+(q = 0.011 / 0.018), which is the study's most robust positive; and a small 4-qubit hybrid
+**out-detects the best classical baseline at the 1% false-positive operating point** on the
+distribution-shifted NSL-KDD task (p = 0.005, q = 0.030).
 
 | Dataset | Best classical F1 (same-budget) | Best quantum F1 | Verdict |
 |---|---|---|---|
@@ -155,10 +160,20 @@ paired bootstrap (operating-point metrics). Training/inference time logged throu
 
 ## Citation
 
-If you use this benchmark or harness, please cite the paper (see `CITATION.cff`):
+If you use this benchmark or harness, please cite the paper
+([arXiv:2608.18155](https://arxiv.org/abs/2608.18155); see also `CITATION.cff`):
 
-> *How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware Benchmark and
-> Attribution Audit of Quantum Machine Learning for Network Intrusion Detection.*
+```bibtex
+@misc{gillani2026quantumadvantagefaircalibration,
+      title={How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for Network Intrusion Detection},
+      author={Syeda Anshrah Gillani and Mirza Samad Ahmed Baig and Shahid Munir Shah and Asher Ali and Hamzah Siddiqui},
+      year={2026},
+      eprint={2608.18155},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph},
+      url={https://arxiv.org/abs/2608.18155},
+}
+```
 
 ## License
 Orqly-AI Restricted Attribution License (ORAL) v1.0 — see `LICENSE`.
