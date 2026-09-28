@@ -1,0 +1,22 @@
+The device runs also settle the status of the audit's one surviving positive.
+Section~\ref{sec:audit-results} left the four-qubit hybrid's advantage over the tuned Random Forest at
+$1\%$ false positives as a hypothesis for hardware testing; Table~\ref{tab:hybridhw} tests it. On
+2{,}000 class-balanced test rows the retrained model's exact scores give ROC-AUC $0.900$ and
+$\tpr$@$1\%\fpr=0.496$, against $0.929$ and $0.304$ for the Random Forest on the same rows, so the pattern
+of Table~\ref{tab:audit} is present in this sample: the forest is better on aggregate ($\Delta$ROC-AUC
+$=-0.029$, $[-0.042,-0.017]$) and the hybrid better at the low-false-positive operating point
+($\Delta\tpr=+0.192$, $[0.009,0.296]$, $p=0.031$). With the four expectations measured on
+\texttt{ibm\_fez}, \texttt{ibm\_kingston} and \texttt{ibm\_marrakesh} instead of simulated, they
+correlate with their exact values at $r=0.97$ to $0.98$ (RMSE $0.11$ to $0.12$, of which shot noise at
+128 shots accounts for up to $0.09$), the final scores at $r=0.99$, and the model's ROC-AUC falls by
+$0.017$ to $0.020$ on every device ($p<0.001$): close to the $0.012$ that shot noise alone costs in
+simulation, with a device contribution below $0.01$. The operating-point result is untouched.
+$\tpr$@$1\%\fpr$ is $0.498$, $0.498$ and $0.501$ on the three devices against $0.496$ exact ($p\ge0.9$),
+and the margin over the Random Forest on the same rows is $+0.194$, $+0.194$ and $+0.197$ ($p=0.033$,
+$0.058$ and $0.047$). The low-FPR result therefore survives real device noise on three processors, which
+is more than the simulated audit could say. It remains what it was: a comparison between a variational
+model and a tree ensemble on one dataset, resting here on 1{,}000 benign rows, and not an attribution to
+the quantum layer, whose four-qubit circuit is well within classical reach. The cost was 86 to 87
+QPU-seconds per device for 2{,}000 samples, about $0.04$ QPU-seconds per sample.
+
+@@TAB_HYBRIDHW@@

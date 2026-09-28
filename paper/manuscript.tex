@@ -74,18 +74,19 @@ where quantum machine learning routinely reports near-perfect accuracy. Benchmar
 circuits and quantum-kernel SVMs against five tuned classical baselines on four NIDS datasets under one
 leakage-controlled protocol, with a quantum-attribution audit of parameter-matched controls, we find that
 tuned classical models match or exceed the quantum models on aggregate detection on every dataset, yet a
-quantum kernel significantly out-ranks its classical surrogate. Dissecting that result with exact kernels
-on identical data, the gap is set by the classical bandwidth grid: under NSL-KDD's shift to 17 unseen
+quantum kernel significantly out-ranks its classical surrogate. With exact kernels on identical data,
+the gap is set by the classical bandwidth grid: under NSL-KDD's shift to 17 unseen
 attack types, in-distribution cross-validation cannot rank bandwidths, so a narrow grid yields a spurious
 ROC-AUC advantage of $0.167$ while a wide grid leaves $0.007$, with the classical kernel ahead at $1\%$
 false positives. On UNSW-NB15, which has no unseen attack types, standard selection is reliable and
-classical kernels win outright. We introduce leave-attack-types-out cross-validation, which restores
-reliable selection under shift, and show with the geometric difference of Huang et al.\ that the IQP
-kernel lies within $1.4$ to $2.4$ of a classical kernel built on the circuit's own phases on all four
-datasets, which reproduces it with no quantum state. On three IBM Heron processors the projected kernel's
-classifier stays within $0.01$ ROC-AUC of its exact simulation, so the analysed object is realisable on
-current hardware. Significance is not attribution. Code, seeds, splits and raw device measurements are
-released.
+classical kernels win outright, and holding whole attack families out of its training data recreates
+the failure on demand. Leave-attack-types-out cross-validation repairs selection on NSL-KDD but not
+under that induced shift, so no training-only rule is a general remedy. The geometric difference of
+Huang et al.\ places the IQP kernel within $1.4$ to $2.4$ of a classical kernel on the circuit's own
+phases on all four datasets. On three IBM Heron processors the projected kernel's classifier stays
+within $0.01$ ROC-AUC of its exact simulation, and the four-qubit hybrid's one surviving result, higher
+detection than a tuned Random Forest at $1\%$ false positives, reproduces on every device. Significance
+is not attribution. Code, seeds, splits and raw device measurements are released.
 \end{abstract}
 
 \begin{keyword}
@@ -162,11 +163,15 @@ classical kernels on identical data with exact Gram matrices and equal tuning, w
 quantum-kernel advantage surviving both FDR and Holm correction is produced by the classical baseline's
 bandwidth search, because in-distribution cross-validation cannot see the novel-attack shift of NSL-KDD's
 official split. On UNSW-NB15, which lacks that shift, classical kernels win outright.
-\item \textbf{Shift-aware model selection and a label-free dequantisation test.} Leave-attack-types-out
-cross-validation restores reliable model selection under novel-attack shift. The geometric difference of
-Huang et al., computed on all four datasets, shows the IQP kernel to be reproducible by a classical kernel
-on its own circuit phases, and the projected kernel proves robust to finite-shot measurement and, on three
-IBM Heron processors, to real device noise.
+\item \textbf{An induced-shift test, the limits of shift-aware selection, and a label-free
+dequantisation test.} Holding whole attack families out of UNSW-NB15's training data reproduces the
+selection failure on demand. Leave-attack-types-out cross-validation repairs it on NSL-KDD, where the
+unseen attacks are variants of seen families, but not under the induced shift, so we recommend reporting
+kernel comparisons under several selection rules with the oracle bound. The geometric difference of
+Huang et al., computed on all four datasets, shows the IQP kernel to be reproducible by a classical
+kernel on its own circuit phases; the projected kernel proves robust to finite-shot measurement and, on
+three IBM Heron processors, to real device noise, and the four-qubit hybrid's low-false-positive result,
+the audit's one surviving positive, reproduces on the same three devices.
 \item \textbf{Operationally meaningful evaluation under noise.} Beyond accuracy/F1 we report
 detection rate and false-positive rate together, low-FPR operating points, and calibration, and
 characterise degradation under depolarising, amplitude-damping, phase-damping, and readout-error
@@ -429,6 +434,13 @@ because the choice matters: a narrow one of seven values from $0.003$ to $3$, an
 values from $0.001$ to $30$, both logarithmically spaced. Selection is either standard 5-fold
 stratified cross-validation or the shift-aware variant described in Section~\ref{sec:kcv}.
 
+\paragraph{Induced shift.} To test whether novel attack types cause the selection failure rather than
+merely accompany it, we repeat the kernel comparison on UNSW-NB15 after removing whole attack categories
+from the training sample while leaving them in the test sample, with two different sets of removed
+categories (Section~\ref{sec:kinduced}). As a sensitivity check on the shift-aware rule we also report a
+second fold construction, which splits benign rows evenly across folds and assigns attack types
+largest-first to the fold holding the fewest attack rows, so that every fold contains both classes.
+
 \paragraph{Geometric difference and model complexity.} Following Huang et al.~\cite{huang2021power}, for
 kernels normalised to $\operatorname{Tr}K=N$ we compute
 \[
@@ -464,6 +476,18 @@ are submitted as a single job. We compare the measured features and the resultin
 exact statevector values by Pearson correlation, and train and test the projected-kernel SVM on the
 measured features alone. As a control we first run the same pipeline on a noisy local simulation of the
 device built from its calibration data.
+
+The same devices also run the variational model behind the audit's one surviving positive, the
+four-qubit hybrid of Table~\ref{tab:audit}. Its trained circuit (angle encoding, three strongly
+entangling layers) is rebuilt in Qiskit with the trained weights bound as constants and the four input
+angles as circuit parameters (statevector expectations agree with PennyLane to $10^{-15}$), transpiled to
+the heavy-hex coupling map (depth 81 to 92 and 21 to 30 two-qubit gates, depending on the layout chosen
+for the device's current calibration), and its four $\langle Z_i\rangle$ are measured at 128 shots for a
+seeded, class-balanced sample of 2{,}000 test rows, as one job per device. The measured expectations pass
+through the trained classical head unchanged, so only the quantum layer is replaced. The model is
+retrained from the released configuration and seed before the run; the retrained model reproduces the
+published test scores to $2\times10^{-8}$. We compare it with the tuned Random Forest of
+Table~\ref{tab:audit} on the same 2{,}000 rows by paired bootstrap.
 
 \paragraph{Classical phase kernels.} Under angle encoding every qubit remains in a product state, so its
 Pauli features are exactly $(\sin x_i, 0, \cos x_i)$ and the ``quantum'' projected kernel is an RBF kernel
@@ -841,8 +865,9 @@ standard CV score is uncorrelated with its test ROC-AUC ($r=-0.16$).
 
 This motivates \emph{shift-aware model selection}: leave-attack-types-out cross-validation, in which each
 attack type lives in exactly one fold, so every validation fold contains attack types its training fold
-never saw. It reproduces the condition of the official split using training data alone. Its score
-correlates with test ROC-AUC at $r=+0.79$ for the RBF kernel, and it selects robust settings for every
+never saw. It reproduces the condition of the official split using training data alone; attack types
+are assigned to folds by GroupKFold, and the three of five folds in which both classes occur are used.
+Its score correlates with test ROC-AUC at $r=+0.79$ for the RBF kernel, and it selects robust settings for every
 kernel family, with test ROC-AUC between $0.939$ and $0.947$ (Table~\ref{tab:fair}). Under this rule the
 quantum projected kernel also reaches the highest operating-point detection we observe,
 $\tpr$@$1\%\fpr=0.499$, above the RBF kernel's $0.466$ ($\Delta=+0.033$, $[0.021,0.067]$, $p<0.001$). We do
@@ -921,8 +946,9 @@ $0.457$ ($\Delta=-0.294$, $[-0.318,-0.263]$), and even the raw-feature RBF kerne
 $[-0.087,-0.022]$, $p=0.005$). The one property that had favoured the quantum kernel on NSL-KDD, fewer poor
 hyperparameter settings (worst test ROC-AUC $0.893$ against $0.740$), does not survive either: on
 UNSW-NB15 its worst setting is the lowest of the three ($0.697$ against $0.787$ and $0.789$). We therefore do
-not claim it as a property of quantum kernels. Shift-aware CV is not informative on UNSW-NB15, where the
-dominance of a single attack category leaves only one usable fold, and we report no result from it there.
+not claim it as a property of quantum kernels. Shift-aware CV on UNSW-NB15, whose official split has no
+novel attacks for it to anticipate, is examined with the induced-shift experiment in
+Section~\ref{sec:kinduced}.
 
 \begin{table}[t]
 \centering
@@ -946,6 +972,83 @@ from the result files.}
 \multirow{3}{*}{UNSW-NB15} & Quantum IQP projected & 0.930 & 0.943 & 0.457 & 0.697 & $+0.82$\\
  & Phase kernel (classical) & 0.956 & 0.968 & 0.751 & 0.787 & $+0.83$\\
  & RBF, raw features (classical) & 0.938 & 0.951 & 0.514 & 0.789 & $+0.83$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Inducing the shift}\label{sec:kinduced}
+The contrast between the two datasets is consistent with the novel-attack explanation but does not test
+it, because the datasets differ in more than their splits. We therefore induce the shift on UNSW-NB15
+itself: whole attack categories are removed from the 2{,}000-row training sample and left in the
+20{,}000-row test sample, and the protocol of Table~\ref{tab:twosplits} is repeated. Two holdouts guard
+against a lucky choice. Holdout A removes Exploits, Fuzzers and Reconnaissance, which then make up $25\%$
+of the test rows; holdout B removes Generic, DoS, Analysis and Backdoor, $29\%$ of the test rows.
+Table~\ref{tab:induced} gives the result.
+
+Unseen attack types are necessary for the failure but not sufficient. Under holdout A standard CV still
+ranks the grid correctly for every kernel ($r=+0.85$ to $+0.99$) and its choices lie within $0.009$
+ROC-AUC of the best setting in the grid. Under holdout B the NSL-KDD picture returns. Every kernel loses
+between $0.06$ and $0.16$ ROC-AUC at its best setting, the correlation between CV score and test ROC-AUC
+falls to $+0.62$ to $+0.69$, and the loss from selection is unequal across kernels: the CV-selected
+raw-feature RBF kernel sits $0.108$ below its oracle ($0.794$ against $0.902$), the quantum kernel
+$0.028$ below ($0.761$ against $0.789$). A comparison made at the CV-selected settings therefore
+understates the classical kernel's lead by $0.08$ ROC-AUC, and at $1\%$ false positives it reverses the
+order outright: the quantum kernel detects $0.302$ of attacks against $0.263$ for the RBF kernel, whose
+best setting in the grid detects $0.465$. This is the mechanism of Section~\ref{sec:kcv} reproduced on
+demand, on a dataset on which it was absent, by changing nothing but which attack types the training
+sample contains. What separates the two holdouts is the bandwidth landscape: under holdout B the RBF
+kernel's test ROC-AUC peaks sharply at $\gamma=0.3$ ($0.902$, against $0.794$ at $\gamma=0.1$ and
+$0.864$ at $\gamma=1$) while its CV score is flat across those settings ($0.966$ to $0.967$), so the
+selection criterion cannot resolve the one setting that generalises to the unseen categories.
+
+Shift-aware selection does not repair holdout B. Leave-attack-types-out CV, which restored selection on
+NSL-KDD, correlates with test ROC-AUC at $r=+0.43$ for the RBF kernel here and chooses a setting worse
+than standard CV ($0.751$). Its folds can only hold out attack types the training sample contains
+(Exploits, Fuzzers, Reconnaissance, Shellcode, Worms), and a shift towards those types is not the shift
+towards Generic and DoS that the test set presents. On NSL-KDD the seventeen unseen types are variants
+within the same four attack families as the seen ones, which is why holding out types reproduces the
+official split there. Nor is the result an artefact of how the folds are built. The construction used
+throughout assigns attack types to folds with GroupKFold, which leaves three usable folds on NSL-KDD and
+one on UNSW-NB15; an alternative that splits the benign rows evenly and assigns attack types largest-first
+to the emptiest fold makes all five folds usable on every dataset, but gives $r=+0.54$ instead of $+0.79$
+for the RBF kernel on NSL-KDD, $r=-0.38$ under holdout B, and on the official UNSW-NB15 split, which has
+no unseen types, it selects an over-smooth bandwidth for the RBF kernel (test ROC-AUC $0.859$ against
+$0.938$ under standard CV). Shift-aware selection is a choice of target rather than a free improvement:
+it buys robustness to the kinds of novelty the training data can imitate, at a cost when there is no
+novelty to be robust to, and it cannot anticipate novelty of a kind the training data has never seen.
+The general lesson is procedural. A kernel comparison under distribution shift should be reported under
+more than one selection rule, with the oracle bound alongside, so that a reader can see how much of a
+claimed difference is selection.
+
+\begin{table}[!htb]
+\centering
+\caption{Inducing novel-attack shift on UNSW-NB15. Whole attack categories are removed from the
+2{,}000-row training sample and kept in the 20{,}000-row test sample: holdout A removes Exploits, Fuzzers, Recon. (25\% of test rows); holdout B removes Generic, DoS, Analysis, Backdoor (29\% of test rows). Each kernel is
+selected by standard 5-fold CV over the full grid ($\gamma\le30$, $C\le100$); $r$ is the correlation
+across the 40 settings between the CV score and the test ROC-AUC, and \emph{oracle} the best test ROC-AUC
+in the grid. The last two columns give TPR@1\%FPR at the CV-selected setting and the best in the grid.
+Generated from the result files.}
+\label{tab:induced}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}lYccccc@{}}
+\toprule
+& & & \multicolumn{2}{c}{\textbf{Test ROC-AUC}} & \multicolumn{2}{c}{\textbf{TPR@1\%FPR}}\\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+\textbf{Unseen types} & \textbf{Kernel} & $\bm{r}$ & \textbf{CV pick} & \textbf{Oracle} & \textbf{CV pick} & \textbf{Best}\\
+\midrule
+\multirow{3}{*}{None (0\%)} & Quantum IQP projected & $+0.82$ & 0.930 & 0.948 & 0.457 & 0.561\\
+ & Phase kernel (classical) & $+0.83$ & 0.956 & 0.957 & 0.751 & 0.751\\
+ & RBF, raw features (classical) & $+0.83$ & 0.938 & 0.957 & 0.514 & 0.661\\
+\addlinespace[3pt]
+\multirow{3}{*}{Holdout A (25\%)} & Quantum IQP projected & $+0.99$ & 0.936 & 0.940 & 0.739 & 0.744\\
+ & Phase kernel (classical) & $+0.85$ & 0.938 & 0.947 & 0.714 & 0.764\\
+ & RBF, raw features (classical) & $+0.92$ & 0.940 & 0.946 & 0.708 & 0.779\\
+\addlinespace[3pt]
+\multirow{3}{*}{Holdout B (29\%)} & Quantum IQP projected & $+0.69$ & 0.761 & 0.789 & 0.302 & 0.344\\
+ & Phase kernel (classical) & $+0.62$ & 0.844 & 0.861 & 0.413 & 0.487\\
+ & RBF, raw features (classical) & $+0.69$ & 0.794 & 0.902 & 0.263 & 0.465\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1089,17 +1192,73 @@ Noisy simulation (FakeFez, 256 shots) & 0.984 & 0.990 & 0.941 & 0.938 & 0.420\\
 \end{tabularx}
 \end{table}
 
+The device runs also settle the status of the audit's one surviving positive.
+Section~\ref{sec:audit-results} left the four-qubit hybrid's advantage over the tuned Random Forest at
+$1\%$ false positives as a hypothesis for hardware testing; Table~\ref{tab:hybridhw} tests it. On
+2{,}000 class-balanced test rows the retrained model's exact scores give ROC-AUC $0.900$ and
+$\tpr$@$1\%\fpr=0.496$, against $0.929$ and $0.304$ for the Random Forest on the same rows, so the pattern
+of Table~\ref{tab:audit} is present in this sample: the forest is better on aggregate ($\Delta$ROC-AUC
+$=-0.029$, $[-0.042,-0.017]$) and the hybrid better at the low-false-positive operating point
+($\Delta\tpr=+0.192$, $[0.009,0.296]$, $p=0.031$). With the four expectations measured on
+\texttt{ibm\_fez}, \texttt{ibm\_kingston} and \texttt{ibm\_marrakesh} instead of simulated, they
+correlate with their exact values at $r=0.97$ to $0.98$ (RMSE $0.11$ to $0.12$, of which shot noise at
+128 shots accounts for up to $0.09$), the final scores at $r=0.99$, and the model's ROC-AUC falls by
+$0.017$ to $0.020$ on every device ($p<0.001$): close to the $0.012$ that shot noise alone costs in
+simulation, with a device contribution below $0.01$. The operating-point result is untouched.
+$\tpr$@$1\%\fpr$ is $0.498$, $0.498$ and $0.501$ on the three devices against $0.496$ exact ($p\ge0.9$),
+and the margin over the Random Forest on the same rows is $+0.194$, $+0.194$ and $+0.197$ ($p=0.033$,
+$0.058$ and $0.047$). The low-FPR result therefore survives real device noise on three processors, which
+is more than the simulated audit could say. It remains what it was: a comparison between a variational
+model and a tree ensemble on one dataset, resting here on 1{,}000 benign rows, and not an attribution to
+the quantum layer, whose four-qubit circuit is well within classical reach. The cost was 86 to 87
+QPU-seconds per device for 2{,}000 samples, about $0.04$ QPU-seconds per sample.
+
+\begin{table}[!htb]
+\centering
+\caption{The 4-qubit hybrid on hardware: NSL-KDD, 2{,}000 class-balanced test rows.
+Only the four $\langle Z_i\rangle$ that feed the trained classical head are measured; every other part of
+the model is the published one. $r$ is the Pearson correlation of the source's expectations with the
+exact statevector values. Metric columns are the hybrid's own on that source; the shot-noise row is the
+mean of 20 binomial resamplings of the exact expectations. The last column is the
+paired-bootstrap difference in TPR@1\%FPR against the tuned random forest on the same rows (positive
+favours the hybrid; two-sided $p$ in brackets). Generated from the result files.}
+\label{tab:hybridhw}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}Yccccc@{}}
+\toprule
+& & \multicolumn{3}{c}{\textbf{Hybrid QNN}} & \\
+\cmidrule(lr){3-5}
+\textbf{Source of $\langle Z_i\rangle$} & $\bm{r}$ & \textbf{ROC-AUC} & \textbf{AUPRC} & \textbf{TPR@1\%FPR} & $\bm{\Delta}$\textbf{TPR vs RF}\\
+\midrule
+Exact statevector & 1.000 & 0.900 & 0.914 & 0.496 & $+0.192$ [$0.03$]\\
+Shot noise only (128 shots) &  & 0.888 & 0.909 & 0.502 & \\
+FakeFez simulation (128 shots) & 0.981 & 0.881 & 0.905 & 0.495 & \\
+\texttt{ibm\_fez} (128 shots) & 0.976 & 0.883 & 0.906 & 0.498 & $+0.194$ [$0.03$]\\
+\texttt{ibm\_kingston} (128 shots) & 0.972 & 0.882 & 0.904 & 0.498 & $+0.194$ [$0.06$]\\
+\texttt{ibm\_marrakesh} (128 shots) & 0.976 & 0.880 & 0.904 & 0.501 & $+0.197$ [$0.05$]\\
+\addlinespace[2pt]
+Tuned random forest, same rows &  & 0.929 & 0.917 & 0.304 & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \subsection{Summary}\label{sec:ksum}
 Once kernels are compared on identical data with equal and adequate tuning, no quantum-kernel advantage
 survives the choice of selection rule or of dataset. The audit's strongest positive was produced by its
 own classical surrogate: first by four confounds, then by a bandwidth grid too narrow for a distribution
-shift that in-distribution cross-validation cannot see. Two findings of general use come out of the
-exercise. Leave-attack-types-out cross-validation restores reliable model selection under novel-attack
-shift, and the geometric difference identifies, without labels, when a quantum kernel is classically
-reproducible, which here it is from its own circuit phases on every dataset. The projected kernel itself
-runs on current hardware: on three IBM Heron processors its measured Gram matrix correlates at $0.97$ to
-$0.98$ with simulation and its classifier stays within $0.01$ ROC-AUC of the exact kernel, so the object
-under analysis is realisable, and its classical reproducibility is not an artefact of simulation.
+shift that in-distribution cross-validation cannot see. Three findings of general use come out of the
+exercise. The selection failure can be induced at will by holding attack families out of training, and
+no training-only rule repairs it in general: leave-attack-types-out cross-validation restores selection
+on NSL-KDD, where the unseen attacks are relatives of seen ones, but not under the induced shift, so
+kernel comparisons under shift should be reported under several rules with the oracle bound. The
+geometric difference identifies, without labels, when a quantum kernel is classically reproducible, which
+here it is from its own circuit phases on every dataset. And the objects under analysis run on current
+hardware: on three IBM Heron processors the projected kernel's measured Gram matrix correlates at $0.97$
+to $0.98$ with simulation and its classifier stays within $0.01$ ROC-AUC of the exact kernel, and the
+four-qubit hybrid keeps its low-false-positive margin over the Random Forest, so neither the classical
+reproducibility nor the one surviving positive is an artefact of simulation.
 
 \section{Discussion}
 
@@ -1118,32 +1277,38 @@ bandwidth grid (Section~\ref{sec:kernel}). This is a cautionary result for the f
 paper. Statistical robustness does not establish attribution, and under the distribution shift that makes
 NIDS evaluation meaningful, the classical baseline's hyperparameter search can manufacture or erase an
 apparent quantum advantage. A QML-IDS claim evaluated on a split with unseen attack types should report
-how its classical baselines were tuned, over what range, and by which selection rule, and should prefer
-shift-aware selection to standard cross-validation.
+how its classical baselines were tuned, over what range, and by which selection rule, and should report
+the comparison under more than one rule with the oracle bound, since no training-only rule, shift-aware
+selection included, proved reliable under every shift we induced.
 
 One narrower positive remains from the audit. At the $1\%$-$\fpr$ operating point on NSL-KDD the
 four-qubit hybrid out-detects the tuned Random Forest ($p=0.005$, BH $q=0.030$), although it does not
 survive the more conservative Holm correction. It appears on the discriminative dataset rather than the
 saturated ones, and it is strongest for the small circuit and vanishes at twelve qubits, consistent with
 implicit regularisation rather than expressivity. Our noise sweep used a six-qubit hybrid, so it does not
-bear on this configuration. We regard the result as a hypothesis for real-hardware testing rather than
-evidence of quantum advantage, and we note that it compares a variational model with a tree ensemble, a
-comparison the kernel-level controls of Section~\ref{sec:kernel} do not address.
+bear on this configuration. On three IBM Heron processors it reproduces with the quantum layer's
+expectations measured rather than simulated (Section~\ref{sec:khw}), so it is not an artefact of
+noiseless simulation; but it remains a comparison between a variational model and a tree ensemble on one
+dataset, a comparison the kernel-level controls of Section~\ref{sec:kernel} do not address, and we do
+not regard it as evidence of quantum advantage.
 
 \textbf{What remains classical.} For a practitioner choosing a detector today, the honest recommendation
 is a tuned Random Forest or XGBoost: they win or tie on every aggregate metric, on every dataset, at a
 fraction of the cost and with no quantum hardware. Three methodological findings generalise. The
 $\approx 0.20$ F1 CV-to-test gap is a caution for the whole QML-IDS literature; leave-attack-types-out
-cross-validation addresses the model-selection failure behind it; and the backend crossover (the GPU is an
+cross-validation addresses the model-selection failure behind it on NSL-KDD, and the induced-shift
+experiment shows where such rules stop working; and the backend crossover (the GPU is an
 order of magnitude \emph{slower} at these qubit counts) saves researchers real time.
 
 \section{Limitations and Threats to Validity}
-\textbf{Hardware.} The projected quantum kernel was executed on three IBM Heron processors
-(Section~\ref{sec:khw}); every other quantum result, including the variational hybrids and the noise
-sweep, is simulated, and the noise sweep models NISQ effects rather than measuring them. The device runs
-used 200 training and 500 test samples, 128 shots per basis, and only the primitive's default readout
-mitigation; they realise the kernel, not a full QSVM training loop, on hardware, and the fidelity kernel,
-whose cost is quadratic in the sample count, was not run.
+\textbf{Hardware.} The projected quantum kernel and the four-qubit hybrid's quantum layer were executed
+on three IBM Heron processors (Section~\ref{sec:khw}); every other quantum result, including the wider
+hybrids and the noise sweep, is simulated, and the noise sweep models NISQ effects rather than measuring
+them. The device runs used 200 training and 500 test samples for the kernel and 2{,}000 test samples for
+the hybrid, 128 shots per basis, and only the primitive's default readout mitigation; they realise
+inference, not training, on hardware, and the fidelity kernel, whose cost is quadratic in the sample
+count, was not run. The hybrid's low-false-positive margin on hardware rests on 1{,}000 benign rows, so
+its $1\%$ threshold is set by ten scores and its confidence intervals are wide.
 \textbf{Qubit budget.} The 4\,GB GPU caps width at roughly sixteen qubits (noiseless) / twelve (noisy,
 $(2^n)^2$ memory); the main configuration uses eight, so we cannot probe the larger-width regime.
 \textbf{Dimensionality reduction} discards variance (eight PCs retain $\sim$84\% on NSL-KDD), so any
@@ -1180,8 +1345,8 @@ the classical bandwidth grid, under a distribution shift that standard cross-val
 a classical kernel on the circuit's own phases reproduces the quantum kernel on all four datasets. The
 lesson reaches beyond this paper: in QML benchmarks evaluated under distribution shift, significance is
 not attribution, and the tuning of the classical baseline must be reported as carefully as the quantum
-model itself. We contribute the benchmark and harness, the kernel-level diagnostics, and a shift-aware
-selection rule, and release them so that QML-IDS claims can be stated, and contested, on common, honest
+model itself. We contribute the benchmark and harness, the kernel-level diagnostics, an induced-shift
+test, and a shift-aware selection rule together with its limits, and release them so that QML-IDS claims can be stated, and contested, on common, honest
 ground.
 
 \paragraph{Reproducibility.} Code, configurations, fixed seeds, split scripts, and per-run provenance are

@@ -26,17 +26,26 @@ baseline's tuning**: on identical data with exact kernels, a bandwidth grid capp
 yields a spurious ROC-AUC advantage of 0.167, a grid to gamma <= 30 leaves 0.007 with the
 classical kernel ahead at 1% FPR. The cause is NSL-KDD's shift to 17 unseen attack types, which
 in-distribution cross-validation cannot see (`src/kernel_analysis.py`, paper Section 7).
-Leave-attack-types-out CV restores reliable selection; on UNSW-NB15, which has no unseen attack
-types, standard selection works and classical kernels win outright. A classical kernel on the
-circuit's own phases reproduces the IQP quantum kernel (geometric difference 1.4 to 2.4) on all four
-datasets. One narrower result remains: a 4-qubit hybrid out-detects the best classical baseline at
-the 1% false-positive point on NSL-KDD (p = 0.005, BH q = 0.030; survives FDR, not Holm).
+On UNSW-NB15, which has no unseen attack types, standard selection works and classical kernels win
+outright; holding whole attack families out of its training data recreates the failure on demand
+(paper Section 7.4, `induced_unsw_a` / `induced_unsw_b`). Leave-attack-types-out CV repairs selection
+on NSL-KDD but not under that induced shift, so no training-only rule is a general remedy: kernel
+comparisons under shift should be reported under several selection rules with the oracle bound. A
+classical kernel on the circuit's own phases reproduces the IQP quantum kernel (geometric difference
+1.4 to 2.4) on all four datasets. One narrower result remains: a 4-qubit hybrid out-detects the best
+classical baseline at the 1% false-positive point on NSL-KDD (p = 0.005, BH q = 0.030; survives FDR,
+not Holm), and it reproduces with the hybrid's quantum layer run on three IBM Heron processors (below).
 
 **Real hardware.** The projected quantum kernel was executed on three IBM Heron processors
 (`ibm_fez`, `ibm_kingston`, `ibm_marrakesh`; 200 train + 500 test samples, 128 shots per basis, one
 job of ~90 QPU-seconds each). Measured Gram matrices correlate with the exact ones at r = 0.97 to 0.98
 and the classifier built on measured features stays within 0.01 ROC-AUC of the exact kernel
-(`src/kernel_hardware.py`, raw expectations in `results/kernel_analysis/hardware_*.npz`).
+(`src/kernel_hardware.py`, raw expectations in `results/kernel_analysis/hardware_*.npz`). The 4-qubit
+hybrid's quantum layer was then run on the same three devices for 2,000 class-balanced NSL-KDD test rows
+(128 shots, 86 to 87 QPU-seconds each): its measured expectations correlate with the exact ones at
+r = 0.97 to 0.98, ROC-AUC falls by 0.02 (mostly shot noise), and its 1%-FPR detection (0.498 to 0.501
+against 0.496 exact) keeps its margin over the tuned Random Forest on the same rows (+0.19, p = 0.03 to
+0.06) (`src/hybrid_hardware.py`, raw expectations in `results/kernel_analysis/hybrid_hardware_*.npz`).
 
 | Dataset | Best classical F1 (same-budget) | Best quantum F1 | Verdict |
 |---|---|---|---|
@@ -64,10 +73,16 @@ python src/attribution.py --config configs/attribution_audit.yaml --results-dir 
 python src/kernel_analysis.py validate      # engine vs the QSVM circuits (agrees to 1e-15)
 python src/kernel_analysis.py fair          # surrogate confounds removed, equal tuning
 python src/kernel_analysis.py landscape     # bandwidth grid, standard vs shift-aware CV
+python src/kernel_analysis.py induced_unsw_a   # induced shift on UNSW-NB15 (also induced_unsw_b)
+python src/kernel_analysis.py landscape --folds balanced   # alternative shift-aware folds -> *_bal.json
 python src/kernel_analysis.py geometry_trig # geometric difference, all four datasets
 python src/kernel_analysis.py shots         # finite-shot robustness
 python src/kernel_hardware.py dryrun        # noisy simulation of a Heron device (free)
 python src/kernel_hardware.py run --confirm # real IBM Quantum device (needs an account; costs QPU time)
+python src/hybrid_hardware.py train         # retrain the published 4-qubit hybrid, keep its weights
+python src/hybrid_hardware.py validate      # Qiskit circuit vs PennyLane (agrees to 1e-15)
+python src/hybrid_hardware.py dryrun        # its quantum layer on a noisy Heron simulation (free)
+python src/hybrid_hardware.py run --confirm --backend ibm_fez --rf results/<rf result>.json
 cd paper && python _gen_tables.py && python _gen_tables2.py && python _gen_tables3.py  # tables from JSON
 ```
 

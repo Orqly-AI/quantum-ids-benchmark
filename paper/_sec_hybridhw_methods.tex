@@ -1,0 +1,11 @@
+The same devices also run the variational model behind the audit's one surviving positive, the
+four-qubit hybrid of Table~\ref{tab:audit}. Its trained circuit (angle encoding, three strongly
+entangling layers) is rebuilt in Qiskit with the trained weights bound as constants and the four input
+angles as circuit parameters (statevector expectations agree with PennyLane to $10^{-15}$), transpiled to
+the heavy-hex coupling map (depth 81 to 92 and 21 to 30 two-qubit gates, depending on the layout chosen
+for the device's current calibration), and its four $\langle Z_i\rangle$ are measured at 128 shots for a
+seeded, class-balanced sample of 2{,}000 test rows, as one job per device. The measured expectations pass
+through the trained classical head unchanged, so only the quantum layer is replaced. The model is
+retrained from the released configuration and seed before the run; the retrained model reproduces the
+published test scores to $2\times10^{-8}$. We compare it with the tuned Random Forest of
+Table~\ref{tab:audit} on the same 2{,}000 rows by paired bootstrap.

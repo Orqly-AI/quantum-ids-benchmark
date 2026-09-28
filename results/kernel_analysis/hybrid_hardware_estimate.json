@@ -1,0 +1,9 @@
+{
+  "samples": 2000,
+  "measurement_settings_per_sample": 1,
+  "circuit_executions": 2000,
+  "shots_per_setting": 128,
+  "total_shots": 256000,
+  "rough_qpu_seconds_at_3k_shots_per_s": 85.33333333333333,
+  "note": "the three Heron kernel jobs ran ~269k shots in 89 to 91 QPU seconds"
+}

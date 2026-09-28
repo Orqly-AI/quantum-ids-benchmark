@@ -1,0 +1,27 @@
+{
+  "state_file": "hybrid_q4_s42_state.npz",
+  "state_keys": [
+    "post.bias",
+    "post.weight",
+    "pre.0.bias",
+    "pre.0.weight",
+    "qlayer.weights"
+  ],
+  "train_time_s": 229.93801474571228,
+  "metrics_full_test": {
+    "roc_auc": 0.8886216030405663,
+    "auprc": 0.9240858465680806,
+    "tpr_at_1pct_fpr": 0.522559027507208,
+    "tpr_at_0.1pct_fpr": 0.4081664458817112
+  },
+  "published_file": "nslkdd_hybrid_qnn_q4_l3_angle_s42_ovn1_hybrid_angle_q4_20260531_110946.json",
+  "published_metrics": {
+    "roc_auc": 0.8886216030405663,
+    "auprc": 0.9240858465680805,
+    "tpr_at_1pct_fpr": 0.522559027507208
+  },
+  "agreement_with_published": {
+    "max_abs_score_diff": 2.2351741790771484e-08,
+    "pearson_r": 1.0
+  }
+}

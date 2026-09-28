@@ -1,0 +1,32 @@
+\begin{table}[!htb]
+\centering
+\caption{Inducing novel-attack shift on UNSW-NB15. Whole attack categories are removed from the
+2{,}000-row training sample and kept in the 20{,}000-row test sample: holdout A removes Exploits, Fuzzers, Recon. (25\% of test rows); holdout B removes Generic, DoS, Analysis, Backdoor (29\% of test rows). Each kernel is
+selected by standard 5-fold CV over the full grid ($\gamma\le30$, $C\le100$); $r$ is the correlation
+across the 40 settings between the CV score and the test ROC-AUC, and \emph{oracle} the best test ROC-AUC
+in the grid. The last two columns give TPR@1\%FPR at the CV-selected setting and the best in the grid.
+Generated from the result files.}
+\label{tab:induced}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}lYccccc@{}}
+\toprule
+& & & \multicolumn{2}{c}{\textbf{Test ROC-AUC}} & \multicolumn{2}{c}{\textbf{TPR@1\%FPR}}\\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+\textbf{Unseen types} & \textbf{Kernel} & $\bm{r}$ & \textbf{CV pick} & \textbf{Oracle} & \textbf{CV pick} & \textbf{Best}\\
+\midrule
+\multirow{3}{*}{None (0\%)} & Quantum IQP projected & $+0.82$ & 0.930 & 0.948 & 0.457 & 0.561\\
+ & Phase kernel (classical) & $+0.83$ & 0.956 & 0.957 & 0.751 & 0.751\\
+ & RBF, raw features (classical) & $+0.83$ & 0.938 & 0.957 & 0.514 & 0.661\\
+\addlinespace[3pt]
+\multirow{3}{*}{Holdout A (25\%)} & Quantum IQP projected & $+0.99$ & 0.936 & 0.940 & 0.739 & 0.744\\
+ & Phase kernel (classical) & $+0.85$ & 0.938 & 0.947 & 0.714 & 0.764\\
+ & RBF, raw features (classical) & $+0.92$ & 0.940 & 0.946 & 0.708 & 0.779\\
+\addlinespace[3pt]
+\multirow{3}{*}{Holdout B (29\%)} & Quantum IQP projected & $+0.69$ & 0.761 & 0.789 & 0.302 & 0.344\\
+ & Phase kernel (classical) & $+0.62$ & 0.844 & 0.861 & 0.413 & 0.487\\
+ & RBF, raw features (classical) & $+0.69$ & 0.794 & 0.902 & 0.263 & 0.465\\
+\bottomrule
+\end{tabularx}
+\end{table}

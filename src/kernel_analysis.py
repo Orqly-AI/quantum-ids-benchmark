@@ -469,16 +469,47 @@ def geometry_trig(n_qubits=8, N=800, lam=1e-2, seed=0):
 WIDE_GAMMAS = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0]
 
 
-def _shift_folds(attack_names, k=5, seed=42):
+FOLD_SCHEME = "grouped"   # set by --folds; "balanced" writes *_bal.json result files
+SUFFIX = ""
+
+
+def _shift_folds(attack_names, k=5, seed=42, scheme=None):
     """Leave-attack-types-out CV: every attack type lives in exactly one fold, so
     each validation fold contains attack types its training fold never saw --
     the same condition as NSL-KDD's official test set. Benign rows are spread
-    evenly over the folds."""
-    from sklearn.model_selection import GroupKFold
+    evenly over the folds.
+
+    scheme "grouped" (original): GroupKFold over attack types plus k benign
+    pseudo-groups. GroupKFold's size-greedy assignment can pack the benign
+    pseudo-groups into the same folds, leaving validation folds with no benign
+    rows (UNSW-NB15: one usable fold of five). scheme "balanced": benign rows
+    are split evenly across the k folds explicitly, then attack types are
+    assigned largest-first to the fold holding the fewest attack rows, so every
+    fold has both classes whenever there are at least k attack types."""
+    scheme = scheme or FOLD_SCHEME
+    names = np.asarray(attack_names)
     rng = np.random.RandomState(seed)
-    groups = np.array([n if n != "normal" else f"normal_{rng.randint(k)}"
-                       for n in attack_names])
-    return list(GroupKFold(k).split(np.zeros(len(groups)), groups=groups))
+    if scheme == "grouped":
+        from sklearn.model_selection import GroupKFold
+        groups = np.array([n if n != "normal" else f"normal_{rng.randint(k)}" for n in names])
+        return list(GroupKFold(k).split(np.zeros(len(groups)), groups=groups))
+    folds = [[] for _ in range(k)]
+    normal = np.where(names == "normal")[0]
+    rng.shuffle(normal)
+    for f, chunk in enumerate(np.array_split(normal, k)):
+        folds[f].extend(chunk.tolist())
+    types, counts = np.unique(names[names != "normal"], return_counts=True)
+    load = np.zeros(k, int)
+    for t in types[np.argsort(-counts, kind="stable")]:
+        f = int(np.argmin(load))
+        idx = np.where(names == t)[0]
+        folds[f].extend(idx.tolist())
+        load[f] += len(idx)
+    out = []
+    for f in range(k):
+        va = np.array(sorted(folds[f]))
+        out.append((np.setdiff1d(np.arange(len(names)), va), va))
+    return out
 
 
 def landscape(n_qubits=8, n_train=2000):
@@ -539,7 +570,7 @@ def selected(n_qubits=8, n_train=2000, n_boot=2000):
     """Re-fit the std-CV and shift-CV winners from landscape.json and compare
     each to the quantum projected kernel's std-CV winner with a paired bootstrap."""
     from sklearn.svm import SVC
-    land = json.load(open(os.path.join(RESULTS, "landscape.json")))
+    land = json.load(open(os.path.join(RESULTS, f"landscape{SUFFIX}.json")))
     Xtr, ytr, Xte, yte = load_nslkdd(n_qubits)
     Xq, yq = np.asarray(Xtr[:n_train], float), np.asarray(ytr[:n_train])
     Xte, yte = np.asarray(Xte, float), np.asarray(yte)
@@ -585,7 +616,7 @@ def selected(n_qubits=8, n_train=2000, n_boot=2000):
 # --------------------------------------------------------------------------- #
 def selected_within(n_qubits=8, n_train=2000, n_boot=2000):
     from sklearn.svm import SVC
-    land = json.load(open(os.path.join(RESULTS, "landscape.json")))
+    land = json.load(open(os.path.join(RESULTS, f"landscape{SUFFIX}.json")))
     Xtr, ytr, Xte, yte = load_nslkdd(n_qubits)
     Xq, yq = np.asarray(Xtr[:n_train], float), np.asarray(ytr[:n_train])
     Xte, yte = np.asarray(Xte, float), np.asarray(yte)
@@ -605,7 +636,7 @@ def selected_within(n_qubits=8, n_train=2000, n_boot=2000):
                 A, B = feats[fam]
                 Ktr, Kte = rbf(A, A, float(g)), rbf(B, A, float(g))
             scores[f"{fam}|{rule}"] = SVC(kernel="precomputed", C=float(C)).fit(Ktr, yq).decision_function(Kte)
-    np.savez_compressed(os.path.join(RESULTS, "selected_scores.npz"), y_test=yte,
+    np.savez_compressed(os.path.join(RESULTS, f"selected_scores{SUFFIX}.npz"), y_test=yte,
                         **{k.replace(" ", "_").replace("|", "__").replace("+", "plus")
                            .replace("[", "").replace("]", "").replace(",", "_"): v for k, v in scores.items()})
     out = {}
@@ -628,7 +659,7 @@ def selected_within(n_qubits=8, n_train=2000, n_boot=2000):
 # --------------------------------------------------------------------------- #
 # I. the landscape on a second official split (UNSW-NB15), as a contrast case
 # --------------------------------------------------------------------------- #
-def landscape_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0):
+def landscape_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0, holdout=()):
     """Same protocol as `landscape`, for a dataset whose training file may be
     sorted by class: rows are drawn by a seeded stratified sample (identical for
     every kernel) instead of taking the first n_train."""
@@ -638,6 +669,9 @@ def landscape_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0):
     X, ym, Xt, ymt, meta = load_meta(ds, n_qubits, "pca", False, "minmax", 42)
     names_all = np.array(meta["class_names"])
     benign = [n for n in names_all if str(n).lower() in ("normal", "benign")][0]
+    if holdout:   # induced shift: these attack categories never appear in training
+        keep = ~np.isin(names_all[ym], list(holdout))
+        X, ym = X[keep], ym[keep]
     yb, ybt = (names_all[ym] != benign).astype(int), (names_all[ymt] != benign).astype(int)
     itr, _ = train_test_split(np.arange(len(yb)), train_size=n_train, stratify=ym, random_state=seed)
     ite, _ = train_test_split(np.arange(len(ybt)), train_size=n_test, stratify=ymt, random_state=seed)
@@ -661,6 +695,8 @@ def landscape_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0):
         return float(np.mean(a))
 
     out = {"dataset": ds, "n_train": n_train, "n_test": n_test, "n_shift_folds": len(shift_folds),
+           "holdout": list(holdout),
+           "unseen_test_fraction": float(np.mean(np.isin(names_all[ymt[ite]], list(holdout)))) if holdout else 0.0,
            "unseen_test_types": sorted(set(names_all[ymt]) - set(names_all[ym])),
            "gammas": WIDE_GAMMAS, "Cs": CS, "families": {}}
     for fam, (A, B) in fams.items():
@@ -685,7 +721,7 @@ def selected_within_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0
     from sklearn.model_selection import train_test_split
     from sklearn.svm import SVC
     from data import load_meta
-    land = json.load(open(os.path.join(RESULTS, f"landscape_{ds}.json")))
+    land = json.load(open(os.path.join(RESULTS, f"landscape_{ds}{SUFFIX}.json")))
     X, ym, Xt, ymt, meta = load_meta(ds, n_qubits, "pca", False, "minmax", 42)
     names_all = np.array(meta["class_names"])
     benign = [n for n in names_all if str(n).lower() in ("normal", "benign")][0]
@@ -720,9 +756,15 @@ def selected_within_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("part", choices=["validate", "reproduce", "fair", "geometry", "concentration", "shots", "dequant", "geometry_trig", "landscape", "selected", "selected_within", "landscape_unsw", "selected_unsw"])
+    ap.add_argument("part", choices=["validate", "reproduce", "fair", "geometry", "concentration", "shots", "dequant", "geometry_trig", "landscape", "selected", "selected_within", "landscape_unsw", "selected_unsw", "induced_unsw_a", "induced_unsw_b"])
+    ap.add_argument("--folds", choices=["grouped", "balanced"], default="grouped",
+                    help="leave-attack-types-out fold construction (balanced -> *_bal.json)")
     a = ap.parse_args()
+    FOLD_SCHEME = a.folds
+    SUFFIX = "_bal" if a.folds == "balanced" else ""
     os.makedirs(RESULTS, exist_ok=True)
-    out = {"validate": validate, "reproduce": reproduce, "fair": fair, "geometry": geometry, "concentration": concentration, "shots": shots, "dequant": dequant, "geometry_trig": geometry_trig, "landscape": landscape, "selected": selected, "selected_within": selected_within, "landscape_unsw": lambda: landscape_ds("unsw"), "selected_unsw": lambda: selected_within_ds("unsw")}[a.part]()
+    out = {"validate": validate, "reproduce": reproduce, "fair": fair, "geometry": geometry, "concentration": concentration, "shots": shots, "dequant": dequant, "geometry_trig": geometry_trig, "landscape": landscape, "selected": selected, "selected_within": selected_within, "landscape_unsw": lambda: landscape_ds("unsw"), "selected_unsw": lambda: selected_within_ds("unsw"),
+           "induced_unsw_a": lambda: landscape_ds("unsw", holdout=("Exploits", "Fuzzers", "Reconnaissance")),
+           "induced_unsw_b": lambda: landscape_ds("unsw", holdout=("Generic", "DoS", "Analysis", "Backdoor"))}[a.part]()
     print(json.dumps(out, indent=2))
-    json.dump(out, open(os.path.join(RESULTS, f"{a.part}.json"), "w"), indent=2)
+    json.dump(out, open(os.path.join(RESULTS, f"{a.part}{SUFFIX}.json"), "w"), indent=2)

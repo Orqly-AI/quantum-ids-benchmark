@@ -1,0 +1,6 @@
+\paragraph{Induced shift.} To test whether novel attack types cause the selection failure rather than
+merely accompany it, we repeat the kernel comparison on UNSW-NB15 after removing whole attack categories
+from the training sample while leaving them in the test sample, with two different sets of removed
+categories (Section~\ref{sec:kinduced}). As a sensitivity check on the shift-aware rule we also report a
+second fold construction, which splits benign rows evenly across folds and assigns attack types
+largest-first to the fold holding the fewest attack rows, so that every fold contains both classes.

@@ -1,0 +1,5 @@
+{
+  "n": 64,
+  "max_abs_err_numpy_model_vs_torch_scores": 1.2278316552372104e-07,
+  "max_abs_err_qiskit_vs_pennylane": 9.43689570931383e-16
+}

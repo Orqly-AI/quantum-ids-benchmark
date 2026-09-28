@@ -46,12 +46,15 @@ the test set contains 17 attack types absent from training, that in-distribution
 see; on a second dataset without such a shift, standard selection is reliable and classical kernels win
 outright. The geometric difference places the IQP quantum kernel within $1.4$ to $2.4$ of a classical
 kernel built on the circuit's own phases on all four datasets, and that classical kernel reproduces it
-with no quantum state. We also show that leave-attack-types-out cross-validation restores reliable model
-selection under the shift, and that the projected quantum kernel is robust to finite-shot measurement
-down to 16 shots per basis. Finally we execute the projected kernel on three IBM Heron processors,
-where its measured Gram matrix correlates at $0.97$ to $0.98$ with the exact one and the classifier built
-on measured features stays within $0.01$ ROC-AUC of the exact kernel, so the object we analyse is
-realisable at current noise levels.
+with no quantum state. Inducing the shift on the second dataset, by holding whole attack families out of
+its training data, recreates the failure on demand; leave-attack-types-out cross-validation repairs
+selection on NSL-KDD but not under that induced shift, so we recommend reporting kernel comparisons under
+several selection rules with the oracle bound. The projected quantum kernel is robust to finite-shot
+measurement down to 16 shots per basis. Finally we execute the projected kernel on three IBM Heron
+processors, where its measured Gram matrix correlates at $0.97$ to $0.98$ with the exact one and the
+classifier built on measured features stays within $0.01$ ROC-AUC of the exact kernel, and we run the
+quantum layer of the four-qubit hybrid, the audit's one surviving positive, on the same three devices,
+where its low-false-positive margin over a tuned Random Forest reproduces.
 
 \textbf{Why this journal.} The contribution is a method for adjudicating claims of quantum-kernel
 advantage, demonstrated on a task where such claims are frequent. It builds on work that has appeared
@@ -63,9 +66,10 @@ the classical baseline's tuning manufacture or erase an apparent quantum advanta
 quantum learning benchmark evaluated on shifted data.
 
 \textbf{Limitations we state up front.} The variational results and the noise sweep are simulated at
-eight qubits; only the projected kernel was run on hardware, with 700 samples per device and default
-readout mitigation. The seed budget is small and uneven, and we report it exactly. Shift-aware selection requires attack-type labels, which were
-informative on one dataset and not on the other.
+eight qubits; only the projected kernel and the hybrid's quantum layer were run on hardware, as
+inference with 700 and 2{,}000 samples per device and default readout mitigation. The seed budget is
+small and uneven, and we report it exactly. Shift-aware selection requires attack-type labels and can
+only anticipate novelty of a kind the training data contains, which the induced shift makes explicit.
 
 \textbf{Reproducibility.} The code, configurations, fixed seeds, the scripts that reconstruct our exact
 splits, the kernel-level analysis, the raw device measurements, and the per-run result records are released at

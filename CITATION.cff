@@ -63,4 +63,4 @@ preferred-citation:
     - type: other
       value: "arXiv:2608.18155"
       description: "arXiv identifier of the preprint"
-  notes: "Preprint on arXiv (quant-ph). A revised version adding a kernel-level analysis, which shows the quantum-kernel advantage to be an artefact of classical baseline tuning under distribution shift, is in preparation."
+  notes: "Preprint on arXiv (quant-ph). The revised version (v2) adds a kernel-level analysis showing the quantum-kernel advantage to be an artefact of classical baseline tuning under distribution shift, an induced-shift experiment on UNSW-NB15, and runs of the projected kernel and of the 4-qubit hybrid's quantum layer on three IBM Heron processors."

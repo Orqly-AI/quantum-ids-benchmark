@@ -1,0 +1,57 @@
+{
+  "backend": "FakeFez (local noisy simulation)",
+  "n_test": 2000,
+  "shots": 128,
+  "subset_seed": 0,
+  "wall_seconds": 78.50354981422424,
+  "expectation_agreement": {
+    "pearson_r": 0.9805662951604881,
+    "rmse": 0.09792728531900562,
+    "pearson_r_per_qubit": [
+      0.9068686099020294,
+      0.9663382692700936,
+      0.983626100183604,
+      0.9891353324543755
+    ]
+  },
+  "score_agreement": {
+    "pearson_r": 0.9920034726728222,
+    "max_abs_diff": 0.3640781780990044
+  },
+  "exact": {
+    "roc_auc": 0.899801,
+    "auprc": 0.9143960911937153,
+    "tpr_at_1pct_fpr": 0.496,
+    "tpr_at_0.1pct_fpr": 0.405
+  },
+  "hardware": {
+    "roc_auc": 0.8813380000000001,
+    "auprc": 0.9050538980974487,
+    "tpr_at_1pct_fpr": 0.495,
+    "tpr_at_0.1pct_fpr": 0.375
+  },
+  "hardware_minus_exact_roc_auc": {
+    "diff": -0.018462999999999896,
+    "ci95": [
+      -0.024945996394392628,
+      -0.012215895975720674
+    ],
+    "p": 0.0
+  },
+  "hardware_minus_exact_auprc": {
+    "diff": -0.009342193096266604,
+    "ci95": [
+      -0.012798536372948236,
+      -0.00602178173045249
+    ],
+    "p": 0.0
+  },
+  "hardware_minus_exact_tpr_at_1pct_fpr": {
+    "diff": -0.0010000000000000009,
+    "ci95": [
+      -0.04522563285064122,
+      0.03385631500858354
+    ],
+    "p": 0.495
+  }
+}

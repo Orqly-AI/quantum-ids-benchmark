@@ -51,6 +51,9 @@ paper/**/*.blg
 !paper/_submission_meta.py
 !paper/_assemble_kernel.py
 !paper/_assemble_hardware.py
+!paper/_assemble_v3.py
+!paper/_refresh_tables.py
+!paper/_arxiv_meta.py
 !paper/_build_all.sh
 !paper/_render_png.sh
 !paper/_check_build.sh

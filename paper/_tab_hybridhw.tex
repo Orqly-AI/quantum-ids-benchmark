@@ -1,0 +1,30 @@
+\begin{table}[!htb]
+\centering
+\caption{The 4-qubit hybrid on hardware: NSL-KDD, 2{,}000 class-balanced test rows.
+Only the four $\langle Z_i\rangle$ that feed the trained classical head are measured; every other part of
+the model is the published one. $r$ is the Pearson correlation of the source's expectations with the
+exact statevector values. Metric columns are the hybrid's own on that source; the shot-noise row is the
+mean of 20 binomial resamplings of the exact expectations. The last column is the
+paired-bootstrap difference in TPR@1\%FPR against the tuned random forest on the same rows (positive
+favours the hybrid; two-sided $p$ in brackets). Generated from the result files.}
+\label{tab:hybridhw}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}Yccccc@{}}
+\toprule
+& & \multicolumn{3}{c}{\textbf{Hybrid QNN}} & \\
+\cmidrule(lr){3-5}
+\textbf{Source of $\langle Z_i\rangle$} & $\bm{r}$ & \textbf{ROC-AUC} & \textbf{AUPRC} & \textbf{TPR@1\%FPR} & $\bm{\Delta}$\textbf{TPR vs RF}\\
+\midrule
+Exact statevector & 1.000 & 0.900 & 0.914 & 0.496 & $+0.192$ [$0.03$]\\
+Shot noise only (128 shots) &  & 0.888 & 0.909 & 0.502 & \\
+FakeFez simulation (128 shots) & 0.981 & 0.881 & 0.905 & 0.495 & \\
+\texttt{ibm\_fez} (128 shots) & 0.976 & 0.883 & 0.906 & 0.498 & $+0.194$ [$0.03$]\\
+\texttt{ibm\_kingston} (128 shots) & 0.972 & 0.882 & 0.904 & 0.498 & $+0.194$ [$0.06$]\\
+\texttt{ibm\_marrakesh} (128 shots) & 0.976 & 0.880 & 0.904 & 0.501 & $+0.197$ [$0.05$]\\
+\addlinespace[2pt]
+Tuned random forest, same rows &  & 0.929 & 0.917 & 0.304 & \\
+\bottomrule
+\end{tabularx}
+\end{table}
