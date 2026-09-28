@@ -1,0 +1,24 @@
+Figure~\ref{fig:landscape} shows why the grid matters so much. Within the training distribution every
+kernel scores between $0.95$ and $0.99$ at every bandwidth for $C=1$, and that is also what the kernels
+achieve on held-out rows of the training file: there, standard cross-validation ranks the 40 settings
+correctly for every kernel ($r=+0.94$ to $+0.99$; Table~\ref{tab:decomp}) and the narrow-grid artefact is
+absent ($\Delta$ROC-AUC $-0.002$). On the official test set the raw-feature RBF kernel is instead U-shaped
+in $\gamma$: strong at very wide and very narrow bandwidths (up to $0.945$), and weakest at intermediate
+ones ($0.740$ at worst across the grid), which is exactly where a grid capped at $\gamma=3$ leads
+cross-validation. Across the 40 settings its standard CV score is uncorrelated with its test ROC-AUC
+($r=-0.16$). The training rows and the cross-validation are the same in both cases; only the test
+distribution differs, and a criterion computed on the training distribution cannot anticipate how the
+shift reshapes the test landscape.
+
+Table~\ref{tab:decomp} separates the shift into its parts. Removing the 17 novel attack types from the
+test set (3{,}750 rows) leaves the blindness in place (RBF $r=-0.01$) and shrinks the narrow-grid
+artefact from $0.167$ to $0.063$ ROC-AUC. Reweighting the remaining rows to the training file's
+attack-type mix shrinks it to $0.012$, as the RBF landscape flattens (test ROC-AUC $0.97$ to $0.99$ at
+every setting, which also makes its $r$ uninformative there). Of the aggregate artefact, the novel types
+thus account for about $60\%$ and the changed attack mix for about $30\%$. At the operating point the
+decomposition differs: the RBF setting selected on the narrow grid detects $0.078$ of attacks at $1\%$
+false positives on the official set, $0.090$ without the novel types and $0.087$ after reweighting,
+against $0.964$ on held-out training rows. That collapse comes from drift within attack types the
+training file contains, not from the novel types.
+
+@@TAB_DECOMP@@

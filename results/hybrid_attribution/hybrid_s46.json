@@ -1,0 +1,13 @@
+{
+  "model": "hybrid",
+  "seed": 46,
+  "train_time_s": 202.76354718208313,
+  "params_total": 66,
+  "params_middle": 36,
+  "metrics": {
+    "roc_auc": 0.8975823451572627,
+    "auprc": 0.9287901195274089,
+    "tpr_at_1pct_fpr": 0.5046364840645211,
+    "tpr_at_0.1pct_fpr": 0.3566586145094678
+  }
+}

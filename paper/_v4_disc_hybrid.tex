@@ -1,0 +1,12 @@
+The narrower positive the audit left, the four-qubit hybrid's higher detection than the tuned Random
+Forest at the $1\%$-$\fpr$ operating point on NSL-KDD ($p=0.005$, BH $q=0.030$), is classical as well
+(Section~\ref{sec:kattr}). It was strongest for the smallest circuit and vanished at twelve qubits, which
+we had read as implicit regularisation rather than expressivity; the classical twins confirm that reading
+and remove the quantum layer from it. About half of the margin is the input, since a Random Forest on the
+hybrid's four features closes it by half, and nearly all of the rest is the neural model class: a tanh
+layer of the same width, or no middle layer at all, in the same pipeline reproduces it, and the gain lies
+in novel attack types, to which small neural networks on four principal components extrapolate better
+than tree ensembles. It reproduces on three IBM Heron processors, so it is not an artefact of noiseless
+simulation, but neither is it quantum. For variational models the lesson is that the control attribution
+requires is a classical twin that replaces only the quantum layer; a strong classical baseline on
+different inputs, however well tuned, cannot supply it.

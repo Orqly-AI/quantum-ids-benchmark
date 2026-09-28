@@ -54,6 +54,8 @@ paper/**/*.blg
 !paper/_assemble_v3.py
 !paper/_refresh_tables.py
 !paper/_arxiv_meta.py
+!paper/_assemble_v4.py
+!paper/_gen_fig6.py
 !paper/_build_all.sh
 !paper/_render_png.sh
 !paper/_check_build.sh

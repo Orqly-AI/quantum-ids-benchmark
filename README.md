@@ -12,40 +12,46 @@ design, operating-point/calibration metrics, statistical significance, a NISQ no
 sweep, and a **quantum-attribution audit** that decomposes any measured gain into
 its classical and genuinely-quantum components.
 
-**Preprint:** [arXiv:2608.18155](https://arxiv.org/abs/2608.18155) (v1; v2 with the kernel-level
-analysis of Section 7 is being prepared, together with a journal submission).
+**Preprint:** [arXiv:2608.18155](https://arxiv.org/abs/2608.18155) (v1; v2 with the kernel- and model-level
+analysis of Section 7 and the hardware runs is being prepared, together with a journal submission).
 
 ## TL;DR — headline result
 
 Tuned classical models (Random Forest, XGBoost) **match or exceed the quantum models
-on aggregate detection on every dataset**, and the attribution audit traces the
-apparent quantum gain to classical preprocessing/regularisation rather than quantum
-effects. The audit's strongest positive, a quantum-kernel SVM that out-ranked its classical
-surrogate under both FDR and Holm correction, **turned out to be an artefact of the classical
-baseline's tuning**: on identical data with exact kernels, a bandwidth grid capped at gamma <= 3
-yields a spurious ROC-AUC advantage of 0.167, a grid to gamma <= 30 leaves 0.007 with the
-classical kernel ahead at 1% FPR. The cause is NSL-KDD's shift to 17 unseen attack types, which
-in-distribution cross-validation cannot see (`src/kernel_analysis.py`, paper Section 7).
-On UNSW-NB15, which has no unseen attack types, standard selection works and classical kernels win
-outright; holding whole attack families out of its training data recreates the failure on demand
-(paper Section 7.4, `induced_unsw_a` / `induced_unsw_b`). Leave-attack-types-out CV repairs selection
-on NSL-KDD but not under that induced shift, so no training-only rule is a general remedy: kernel
-comparisons under shift should be reported under several selection rules with the oracle bound. A
-classical kernel on the circuit's own phases reproduces the IQP quantum kernel (geometric difference
-1.4 to 2.4) on all four datasets. One narrower result remains: a 4-qubit hybrid out-detects the best
-classical baseline at the 1% false-positive point on NSL-KDD (p = 0.005, BH q = 0.030; survives FDR,
-not Holm), and it reproduces with the hybrid's quantum layer run on three IBM Heron processors (below).
+on aggregate detection on every dataset**. The attribution audit left two quantum results that
+survived multiple-testing correction; **neither survives attribution** (paper Section 7).
 
-**Real hardware.** The projected quantum kernel was executed on three IBM Heron processors
-(`ibm_fez`, `ibm_kingston`, `ibm_marrakesh`; 200 train + 500 test samples, 128 shots per basis, one
-job of ~90 QPU-seconds each). Measured Gram matrices correlate with the exact ones at r = 0.97 to 0.98
-and the classifier built on measured features stays within 0.01 ROC-AUC of the exact kernel
-(`src/kernel_hardware.py`, raw expectations in `results/kernel_analysis/hardware_*.npz`). The 4-qubit
-hybrid's quantum layer was then run on the same three devices for 2,000 class-balanced NSL-KDD test rows
-(128 shots, 86 to 87 QPU-seconds each): its measured expectations correlate with the exact ones at
-r = 0.97 to 0.98, ROC-AUC falls by 0.02 (mostly shot noise), and its 1%-FPR detection (0.498 to 0.501
-against 0.496 exact) keeps its margin over the tuned Random Forest on the same rows (+0.19, p = 0.03 to
-0.06) (`src/hybrid_hardware.py`, raw expectations in `results/kernel_analysis/hybrid_hardware_*.npz`).
+**1. The quantum-kernel advantage is an artefact of classical tuning under shift.** The audit's
+strongest positive, a quantum-kernel SVM that out-ranked its classical surrogate under both FDR and
+Holm correction, is set by the classical bandwidth grid: on identical data with exact kernels, a grid
+capped at gamma <= 3 yields a spurious ROC-AUC advantage of 0.167, a grid to gamma <= 30 leaves 0.007.
+Cross-validation cannot see NSL-KDD's train-to-test shift. Test-set controls show the mechanism:
+on held-out training rows (no shift) CV ranks the grid correctly (r >= +0.94) and the artefact vanishes;
+removing the 17 novel attack types shrinks it to 0.063, reweighting to the training attack mix to 0.012.
+Holding attack families out of training on UNSW-NB15, ToN-IoT and CICIDS2017 (26 runs) recreates the
+failure, including a spurious 0.17 quantum lead on CICIDS2017, while at its best setting the quantum
+kernel never leads by more than 0.003; a label-free MMD between training and unlabelled test traffic
+tracks the failure (Spearman rho = -0.61). Leave-attack-types-out CV repairs selection on NSL-KDD but
+not under induced shift, so kernel comparisons under shift should be reported under several selection
+rules with the oracle bound. A classical kernel on the circuit's own phases reproduces the IQP quantum
+kernel (geometric difference 1.4 to 2.4) on all four datasets.
+
+**2. The 4-qubit hybrid's low-FPR edge is classical.** The hybrid detects more attacks than the tuned
+Random Forest at 1% FPR on NSL-KDD (p = 0.005, BH q = 0.030). Classical twins that replace only its
+quantum layer (`src/hybrid_attribution.py`) show why: the trained circuit is exactly an 81-term
+trigonometric polynomial (error 2e-15), and a tanh layer of the same width reproduces the result on all
+five seeds (0.511 vs 0.515, never significantly different). About half of the margin over the forest
+is the input (the forest on the hybrid's 4 features closes half the gap); the rest is the neural model
+class, and the gain lies entirely in novel attack types (0.25 vs at most 0.15 for the forest).
+
+**Real hardware.** Both models ran on three IBM Heron processors (`ibm_fez`, `ibm_kingston`,
+`ibm_marrakesh`; 12 jobs, 1,047 QPU-seconds). The projected kernel (200 train + 500 test, 128 shots per
+basis): Gram r = 0.97 to 0.98, classifier within 0.01 ROC-AUC of exact (`src/kernel_hardware.py`). The
+hybrid's quantum layer (6,000 class-balanced test rows per device, three disjoint subsets): expectation
+r = 0.97 to 0.98, 1%-FPR detection unchanged (0.505 to 0.517 vs 0.513 exact), margin over the forest
++0.13 to +0.14 (p <= 0.012), and no difference from the classical tanh twin on the same rows
+(`src/hybrid_hardware.py`, `src/hybrid_hardware_pool.py`; raw expectations in
+`results/kernel_analysis/*hardware_*.npz`).
 
 | Dataset | Best classical F1 (same-budget) | Best quantum F1 | Verdict |
 |---|---|---|---|
@@ -73,17 +79,28 @@ python src/attribution.py --config configs/attribution_audit.yaml --results-dir 
 python src/kernel_analysis.py validate      # engine vs the QSVM circuits (agrees to 1e-15)
 python src/kernel_analysis.py fair          # surrogate confounds removed, equal tuning
 python src/kernel_analysis.py landscape     # bandwidth grid, standard vs shift-aware CV
-python src/kernel_analysis.py induced_unsw_a   # induced shift on UNSW-NB15 (also induced_unsw_b)
+python src/kernel_analysis.py landscape_nsl_seen      # test-set shift controls: novel types removed,
+python src/kernel_analysis.py landscape_nsl_seen_rw   #   ... and attack mix reweighted,
+python src/kernel_analysis.py landscape_nsl_iid       #   ... and held-out training rows (no shift)
+python src/kernel_analysis.py induced --ds unsw --holdout Generic --seed 0   # one induced-shift run
+python src/induced_summary.py               # all induced_<ds>_<holdout>_s<seed>.json -> induced_summary.json
 python src/kernel_analysis.py landscape --folds balanced   # alternative shift-aware folds -> *_bal.json
 python src/kernel_analysis.py geometry_trig # geometric difference, all four datasets
 python src/kernel_analysis.py shots         # finite-shot robustness
 python src/kernel_hardware.py dryrun        # noisy simulation of a Heron device (free)
 python src/kernel_hardware.py run --confirm # real IBM Quantum device (needs an account; costs QPU time)
+
+# the 4-qubit hybrid: classical twins (results/hybrid_attribution/) and hardware
+python src/hybrid_attribution.py train --model fourier --seed 42   # also mlp, linear, hybrid; seeds 42-46
+python src/hybrid_attribution.py rf --model rf_f4_full --seed 42   # the forest on the hybrid's input
+python src/hybrid_attribution.py certificate --seed 42             # exact 81-term expansion of the circuit
+python src/hybrid_attribution.py summary
 python src/hybrid_hardware.py train         # retrain the published 4-qubit hybrid, keep its weights
 python src/hybrid_hardware.py validate      # Qiskit circuit vs PennyLane (agrees to 1e-15)
 python src/hybrid_hardware.py dryrun        # its quantum layer on a noisy Heron simulation (free)
-python src/hybrid_hardware.py run --confirm --backend ibm_fez --rf results/<rf result>.json
-cd paper && python _gen_tables.py && python _gen_tables2.py && python _gen_tables3.py  # tables from JSON
+python src/hybrid_hardware.py run --confirm --backend ibm_fez --seed 1 --rf results/<rf result>.json
+python src/hybrid_hardware_pool.py          # pool the disjoint subsets per device
+cd paper && bash _build_all.sh              # tables and figures from JSON, then every PDF and package
 ```
 
 ## Hardware

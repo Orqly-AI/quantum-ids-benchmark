@@ -144,12 +144,19 @@ def test_set():
     return Xte, yte
 
 
-def sample_test(n_test, seed=0):
-    """Class-balanced seeded subset of the official test set, in original order."""
+def sample_test(n_test, subset=0):
+    """Class-balanced subset `subset` of the official test set, in original order.
+
+    Subsets are disjoint and deterministic: subset k is drawn with seed k from the
+    rows that subsets 0..k-1 did not use, so subset 0 is the original draw and a
+    later subset never repeats a row already measured on hardware."""
     Xte, yte = test_set()
-    rng = np.random.RandomState(seed)
-    idx = np.sort(np.concatenate([rng.choice(np.where(yte == c)[0], n_test // 2, replace=False)
-                                  for c in (0, 1)]))
+    pool = np.ones(len(yte), bool)
+    for k in range(subset + 1):
+        rng = np.random.RandomState(k)
+        idx = np.sort(np.concatenate([rng.choice(np.where((yte == c) & pool)[0], n_test // 2, replace=False)
+                                      for c in (0, 1)]))
+        pool[idx] = False
     return Xte[idx], yte[idx], idx
 
 
@@ -316,7 +323,8 @@ if __name__ == "__main__":
     ap.add_argument("--fake", default="FakeFez")
     ap.add_argument("--n-test", type=int, default=2000)
     ap.add_argument("--shots", type=int, default=128)
-    ap.add_argument("--seed", type=int, default=0, help="seed of the test subset draw")
+    ap.add_argument("--seed", type=int, default=0,
+                    help="index of the disjoint class-balanced test subset (0 = the original draw)")
     ap.add_argument("--rf", default=None, help="published RF result JSON for the same-rows comparison")
     ap.add_argument("--confirm", action="store_true")
     ap.add_argument("--max-seconds", type=int, default=150,
@@ -336,5 +344,5 @@ if __name__ == "__main__":
     else:
         out = run(a.backend, a.n_test, a.shots, a.confirm, a.account, a.max_seconds, a.seed, a.rf)
     print(json.dumps(out, indent=2, default=str))
-    tag = a.mode if a.mode != "run" else f"run_{out['backend']}"
+    tag = a.mode if a.mode != "run" else f"run_{out['backend']}" + (f"_s{a.seed}" if a.seed else "")
     json.dump(out, open(os.path.join(RESULTS, f"hybrid_hardware_{tag}.json"), "w"), indent=2, default=str)

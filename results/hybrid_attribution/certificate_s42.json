@@ -1,0 +1,16 @@
+{
+  "seed": 42,
+  "n_basis": 81,
+  "nonzero_coefficients": 316,
+  "max_abs_err_fit": 2.220446049250313e-15,
+  "max_abs_err_heldout_angles": 2.3314683517128287e-15,
+  "n_basis_without_fourway": 65,
+  "max_abs_err_heldout_without_fourway": 0.044011939284131496,
+  "max_abs_score_diff_on_test_set": 3.794915592880699e-07,
+  "metrics_twin": {
+    "roc_auc": 0.8886215508825326,
+    "auprc": 0.9240856941195967,
+    "tpr_at_1pct_fpr": 0.522559027507208,
+    "tpr_at_0.1pct_fpr": 0.4081664458817112
+  }
+}

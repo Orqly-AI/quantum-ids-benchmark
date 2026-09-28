@@ -1,0 +1,13 @@
+{
+  "model": "fourier",
+  "seed": 43,
+  "train_time_s": 0.8326084613800049,
+  "params_total": 358,
+  "params_middle": 328,
+  "metrics": {
+    "roc_auc": 0.8392679385700015,
+    "auprc": 0.9026099034153977,
+    "tpr_at_1pct_fpr": 0.4955193641393283,
+    "tpr_at_0.1pct_fpr": 0.40956907971635625
+  }
+}

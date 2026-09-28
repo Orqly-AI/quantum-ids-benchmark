@@ -1,0 +1,57 @@
+{
+  "No holdout": {
+    "n": 3,
+    "min_r_median": 0.9933145655665109,
+    "min_r_min": 0.817567740729294,
+    "loss_median": 0.0025172518089904283,
+    "loss_max": 0.01871920157982776,
+    "flips": 0,
+    "err_max": -0.017428179656258536,
+    "err_run": "induced_unsw_none_s0.json",
+    "qlead_oracle_max": -0.0009436563747655669
+  },
+  "UNSW-NB15, single family": {
+    "n": 9,
+    "min_r_median": 0.8495717636264551,
+    "min_r_min": 0.5878230448017124,
+    "loss_median": 0.013606621396636376,
+    "loss_max": 0.06117261567305865,
+    "flips": 2,
+    "err_max": -0.020906674451999452,
+    "err_run": "induced_unsw_generic_s0.json",
+    "qlead_oracle_max": 1.3265861524835998e-05
+  },
+  "UNSW-NB15, A and B, 3 seeds": {
+    "n": 6,
+    "min_r_median": 0.7467028538799338,
+    "min_r_min": 0.48245088124105634,
+    "loss_median": 0.04752075091929492,
+    "loss_max": 0.11170016049166576,
+    "flips": 0,
+    "err_max": 0.0754341543658893,
+    "err_run": "induced_unsw_generic+dos+analysis+backdoor_s2.json",
+    "qlead_oracle_max": -0.007360370795883697
+  },
+  "ToN-IoT, single family": {
+    "n": 9,
+    "min_r_median": 0.9906449288203407,
+    "min_r_min": 0.45851409537511084,
+    "loss_median": 0.004656731611282328,
+    "loss_max": 0.018868749586487987,
+    "flips": 2,
+    "err_max": -0.0075074195563885615,
+    "err_run": "induced_toniot_xss_s0.json",
+    "qlead_oracle_max": 0.0013187018231342051
+  },
+  "CICIDS2017, single family": {
+    "n": 2,
+    "min_r_median": -0.018772651568823323,
+    "min_r_min": -0.0662833737436743,
+    "loss_median": 0.22957735267801344,
+    "loss_max": 0.3745038822082899,
+    "flips": 1,
+    "err_max": 0.20216148880399154,
+    "err_run": "induced_cicids_portscan_s0.json",
+    "qlead_oracle_max": 0.0025344508311688774
+  }
+}

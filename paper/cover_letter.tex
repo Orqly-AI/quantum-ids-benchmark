@@ -30,46 +30,46 @@ did not expect.
 
 \textbf{What we did.} We benchmark hybrid variational circuits and quantum-kernel SVMs against five
 tuned classical baselines on four intrusion-detection datasets under one leakage-controlled protocol,
-with a quantum-attribution audit of parameter-matched classical controls. The audit's strongest positive
-was a quantum kernel that out-ranked its classical surrogate, and it survived both false-discovery-rate
-and family-wise Holm correction. We then dissected that result at the level of the kernels themselves,
-placing quantum and classical kernels on identical data with exact Gram matrices and equal tuning
-budgets, and applying the geometric difference of Huang et al.\ as a label-free test of whether a
-classical kernel can reproduce the quantum one.
+with a quantum-attribution audit of parameter-matched classical controls. Two quantum results survived
+multiple-testing correction: a quantum kernel that out-ranked its classical surrogate under both
+false-discovery-rate and family-wise Holm correction, and a four-qubit hybrid that detected more attacks
+than a tuned Random Forest at $1\%$ false positives. We then dissected both. The kernel result we placed
+on identical data with exact Gram matrices and equal tuning budgets, probed with controls on the test set
+and with shift induced on three further datasets, and tested with the geometric difference of Huang et
+al.; the hybrid result we tested against classical twins that replace only its quantum layer. Both
+models also ran on three IBM Heron processors.
 
-\textbf{What we found.} The certified-significant advantage was produced by the classical baseline.
-Its surrogate differed from the quantum kernel in four ways besides the feature map, and once those are
-removed the gap is set entirely by the bandwidth grid searched for the classical kernel: a narrow grid
-yields an apparent quantum ROC-AUC advantage of $0.167$, a wide grid leaves $0.007$, with the classical
-kernel ahead at the $1\%$ false-positive operating point. The mechanism is a distribution shift, since
-the test set contains 17 attack types absent from training, that in-distribution cross-validation cannot
-see; on a second dataset without such a shift, standard selection is reliable and classical kernels win
-outright. The geometric difference places the IQP quantum kernel within $1.4$ to $2.4$ of a classical
-kernel built on the circuit's own phases on all four datasets, and that classical kernel reproduces it
-with no quantum state. Inducing the shift on the second dataset, by holding whole attack families out of
-its training data, recreates the failure on demand; leave-attack-types-out cross-validation repairs
-selection on NSL-KDD but not under that induced shift, so we recommend reporting kernel comparisons under
-several selection rules with the oracle bound. The projected quantum kernel is robust to finite-shot
-measurement down to 16 shots per basis. Finally we execute the projected kernel on three IBM Heron
-processors, where its measured Gram matrix correlates at $0.97$ to $0.98$ with the exact one and the
-classifier built on measured features stays within $0.01$ ROC-AUC of the exact kernel, and we run the
-quantum layer of the four-qubit hybrid, the audit's one surviving positive, on the same three devices,
-where its low-false-positive margin over a tuned Random Forest reproduces.
+\textbf{What we found.} Neither positive is quantum. The kernel advantage was produced by the classical
+baseline: once the surrogate's four confounds are removed, the gap is set by the bandwidth grid searched
+for the classical kernel, a narrow grid giving an apparent ROC-AUC advantage of $0.167$ and a wide grid
+$0.007$, because cross-validation cannot see the shift between training and test data. Without that shift
+cross-validation ranks the grid correctly ($r\ge+0.94$) and the artefact disappears; holding attack
+families out of training on three further datasets recreates it in 26 runs, including a spurious $0.17$
+quantum lead, and a label-free MMD between training and unlabelled test traffic tracks when this
+happens. The IQP kernel lies within a geometric difference of $1.4$ to $2.4$ of a classical kernel on the
+circuit's own phases on all four datasets. The hybrid's trained circuit is exactly an 81-term
+trigonometric polynomial, and a classical tanh layer in its place reproduces its low-false-positive
+result on every seed; the margin over the forest comes from the input and the neural model class and
+lies in novel attack types. On hardware the projected kernel stays within $0.01$ ROC-AUC of simulation,
+and the hybrid's detection at $1\%$ false positives is unchanged on 6{,}000 test rows per device and
+indistinguishable from its classical twin's.
 
 \textbf{Why this journal.} The contribution is a method for adjudicating claims of quantum-kernel
 advantage, demonstrated on a task where such claims are frequent. It builds on work that has appeared
 in this journal on the comparison of quantum and classical kernel functions in support vector machines
 (Abdulsalam and Ahmad, 2025) and on the training of quantum kernels (Innan et al., 2023), and on the
 broader scrutiny of quantum kernels by Schnabel and Roth, Fl\'orez-Ablan et al.\ and Huang et al. Its
-central lesson, that statistical significance is not attribution and that a distribution shift can let
-the classical baseline's tuning manufacture or erase an apparent quantum advantage, applies to any
-quantum learning benchmark evaluated on shifted data.
+central lessons, that statistical significance is not attribution, that a distribution shift can let
+the classical baseline's tuning manufacture or erase an apparent quantum advantage, and that a
+variational claim needs a classical twin of its quantum layer as its control, apply to any quantum
+learning benchmark.
 
 \textbf{Limitations we state up front.} The variational results and the noise sweep are simulated at
 eight qubits; only the projected kernel and the hybrid's quantum layer were run on hardware, as
-inference with 700 and 2{,}000 samples per device and default readout mitigation. The seed budget is
+inference with 700 and 6{,}000 samples per device and default readout mitigation. The seed budget is
 small and uneven, and we report it exactly. Shift-aware selection requires attack-type labels and can
-only anticipate novelty of a kind the training data contains, which the induced shift makes explicit.
+only anticipate novelty of a kind the training data contains, and the MMD statistic is a coarse
+warning rather than a calibrated test.
 
 \textbf{Reproducibility.} The code, configurations, fixed seeds, the scripts that reconstruct our exact
 splits, the kernel-level analysis, the raw device measurements, and the per-run result records are released at

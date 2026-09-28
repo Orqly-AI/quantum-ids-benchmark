@@ -72,4 +72,4 @@ preferred-citation:
     - type: other
       value: "arXiv:2608.18155"
       description: "arXiv identifier of the preprint"
-  notes: "Preprint on arXiv (quant-ph). The revised version (v2) adds a kernel-level analysis showing the quantum-kernel advantage to be an artefact of classical baseline tuning under distribution shift, an induced-shift experiment on UNSW-NB15, and runs of the projected kernel and of the 4-qubit hybrid's quantum layer on three IBM Heron processors."
+  notes: "Preprint on arXiv (quant-ph). The revised version (v2) shows that neither quantum result surviving the audit is quantum: the quantum-kernel advantage is an artefact of classical baseline tuning under train-to-test shift (test-set shift controls; induced shift on three datasets, 26 runs; a label-free MMD warning statistic), and the 4-qubit hybrid's low-FPR advantage is reproduced by classical twins of its quantum layer (the trained circuit is an exact 81-term trigonometric polynomial). Both models were run on three IBM Heron processors."

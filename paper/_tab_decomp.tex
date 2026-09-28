@@ -1,0 +1,26 @@
+\begin{table}[!htb]
+\centering
+\caption{Decomposing NSL-KDD's shift. The 2{,}000 training rows, the grid and the cross-validation are
+identical in every row; only the evaluation set changes. $r$ is the correlation across the 40 grid
+settings between standard-CV ROC-AUC and test ROC-AUC. Under the narrow grid ($\gamma\le3$) and the wide
+grid ($\gamma\le30$), $\Delta$AUC is the quantum projected kernel's test ROC-AUC minus the raw-feature RBF
+kernel's, each at its CV-selected setting; \emph{RBF TPR} is that RBF setting's TPR@1\%FPR. The last
+column is the shift-aware (leave-attack-types-out) CV correlation for the RBF kernel. Reweighting gives
+each attack type present in the test set its share of the training file. Generated from the result files.}
+\label{tab:decomp}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabularx}{\textwidth}{@{}Ycccccccc@{}}
+\toprule
+& & \multicolumn{3}{c}{\textbf{Standard CV $\bm{r}$}} & \multicolumn{2}{c}{\textbf{Narrow grid}} & \textbf{Wide} & \textbf{Shift-aware}\\
+\cmidrule(lr){3-5}\cmidrule(lr){6-7}
+\textbf{Test set} & \textbf{Rows} & \textbf{Quantum} & \textbf{Phase} & \textbf{RBF} & $\bm{\Delta}$\textbf{AUC} & \textbf{RBF TPR} & $\bm{\Delta}$\textbf{AUC} & \textbf{RBF $\bm{r}$}\\
+\midrule
+Official test set & 22{,}544 & $+0.83$ & $+0.24$ & $-0.16$ & $+0.167$ & 0.078 & $+0.007$ & $+0.79$\\
+Without novel types & 18{,}794 & $+0.76$ & $+0.38$ & $-0.01$ & $+0.063$ & 0.090 & $+0.008$ & $+0.60$\\
+\ldots{} reweighted mix & 18{,}794 & $+0.94$ & $+0.74$ & $-0.36$ & $+0.012$ & 0.087 & $+0.001$ & $+0.65$\\
+Held-out training rows & 20{,}000 & $+0.99$ & $+0.94$ & $+0.95$ & $-0.002$ & 0.964 & $-0.002$ & $+0.11$\\
+\bottomrule
+\end{tabularx}
+\end{table}

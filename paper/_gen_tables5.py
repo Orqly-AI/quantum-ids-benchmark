@@ -1,12 +1,12 @@
-"""Generate the induced-shift table from results/kernel_analysis/{landscape_unsw,induced_unsw_a,induced_unsw_b}.json.
+"""Generate the induced-shift summary table from results/kernel_analysis/induced_summary.json
+(written by src/induced_summary.py).
 
-Three UNSW-NB15 protocols: the official split (no unseen attack types), and two
-in which whole attack categories are removed from the training sample so that
-they appear only at test time. For each kernel: the correlation across the 40
-grid settings between standard 5-fold CV and test ROC-AUC, the test ROC-AUC of
-the CV-selected setting, the best test ROC-AUC in the grid (oracle), and the
-TPR@1%FPR of the CV-selected setting against the best in the grid. Standard-CV
-statistics do not depend on the leave-attack-types-out fold construction.
+Rows group the runs: no holdout (one per dataset), UNSW-NB15 with one attack family held out,
+UNSW-NB15 holdouts A and B over three sampling seeds, ToN-IoT and CICIDS2017 with one family held
+out. Per group: the smallest CV-to-test correlation over the three kernels (median and range over
+runs), the largest selection loss (median and maximum), the number of runs in which selection
+flips the sign of the quantum-minus-best-classical ROC-AUC gap, the largest error selection
+introduces into that gap, and the largest quantum lead at the oracle settings.
 
 Run from paper/:  python _gen_tables5.py
 """
@@ -16,65 +16,88 @@ import os
 import numpy as np
 
 R = os.path.join("..", "results", "kernel_analysis")
-load = lambda n: json.load(open(os.path.join(R, n), encoding="utf-8"))
-f3 = lambda x: f"{x:.3f}"
-label = {"Q IQP projected": "Quantum IQP projected",
-         "classical trig + IQP phases": "Phase kernel (classical)",
-         "classical RBF raw": "RBF, raw features (classical)"}
-short = {"Exploits": "Exploits", "Fuzzers": "Fuzzers", "Reconnaissance": "Recon.", "Generic": "Generic",
-         "DoS": "DoS", "Analysis": "Analysis", "Backdoor": "Backdoor"}
+S = json.load(open(os.path.join(R, "induced_summary.json"), encoding="utf-8"))
+FAM = {"Q IQP projected": "quantum", "classical trig + IQP phases": "phase", "classical RBF raw": "rbf"}
 
-sets = [("official split", load("landscape_unsw.json")),
-        ("A", load("induced_unsw_a.json")), ("B", load("induced_unsw_b.json"))]
-lines, notes = [], []
-for tag, d in sets:
-    hold = d.get("holdout") or []
-    frac = d.get("unseen_test_fraction", 0.0)
-    if hold:
-        notes.append(f"{tag}: " + ", ".join(short.get(h, h) for h in hold) + f" ({100 * frac:.0f}\\% of test rows)")
-        head = r"\multirow{3}{*}{Holdout " + tag + r" (" + f"{100 * frac:.0f}" + r"\%)}"
-    else:
-        head = r"\multirow{3}{*}{None (0\%)}"
-    for i, fam in enumerate(("Q IQP projected", "classical trig + IQP phases", "classical RBF raw")):
-        g = d["families"][fam]
-        keys = list(g)
-        s = np.array([g[k]["std_cv"] for k in keys])
-        t = np.array([g[k]["test"]["roc_auc"] for k in keys])
-        t1 = np.array([g[k]["test"]["tpr_at_1pct_fpr"] for k in keys])
-        k = keys[int(np.argmax(s))]
-        m = g[k]["test"]
-        r = float(np.corrcoef(s, t)[0, 1])
-        cell = head if i == 0 else ""
-        lines.append(f"{cell} & {label[fam]} & ${r:+.2f}$ & {f3(m['roc_auc'])} & {f3(t.max())} & "
-                     f"{f3(m['tpr_at_1pct_fpr'])} & {f3(t1.max())}" + r"\\")
-    lines.append(r"\addlinespace[3pt]")
-lines = lines[:-1]
 
-head = r"""\begin{table}[!htb]
+def per_family(g):
+    keys = list(g)
+    s = np.array([g[k]["std_cv"] for k in keys]); t = np.array([g[k]["test"]["roc_auc"] for k in keys])
+    i = int(np.argmax(s))
+    return {"r": float(np.corrcoef(s, t)[0, 1]), "pick_auc": float(t[i]), "oracle_auc": float(t.max()),
+            "loss": float(t.max() - t[i])}
+
+
+def gaps(f):
+    gp = f["quantum"]["pick_auc"] - max(f["phase"]["pick_auc"], f["rbf"]["pick_auc"])
+    go = f["quantum"]["oracle_auc"] - max(f["phase"]["oracle_auc"], f["rbf"]["oracle_auc"])
+    return gp, go
+
+
+runs = S["runs"]          # includes each dataset's no-holdout run, induced_<ds>_none_s0.json
+for r in runs:
+    r["min_r"] = min(v["r"] for v in r["families"].values())
+    r["max_loss"] = max(v["loss"] for v in r["families"].values())
+    r["gap_pick"], r["gap_oracle"] = gaps(r["families"])
+
+AB = ({"exploits", "fuzzers", "reconnaissance"}, {"generic", "dos", "analysis", "backdoor"})
+groups = [
+    ("No holdout", [r for r in runs if not r["holdout"]]),
+    ("UNSW-NB15, single family", [r for r in runs if r["dataset"] == "unsw" and len(r["holdout"]) == 1]),
+    ("UNSW-NB15, A and B, 3 seeds", [r for r in runs if r["dataset"] == "unsw"
+                                             and {h.lower() for h in r["holdout"]} in AB]),
+    ("ToN-IoT, single family", [r for r in runs if r["dataset"] == "toniot" and r["holdout"]]),
+    ("CICIDS2017, single family", [r for r in runs if r["dataset"] == "cicids" and r["holdout"]]),
+]
+lines, facts = [], {}
+for label, rs in groups:
+    mr = np.array([r["min_r"] for r in rs]); ml = np.array([r["max_loss"] for r in rs])
+    err = np.array([r["gap_pick"] - r["gap_oracle"] for r in rs])
+    flips = sum(1 for r in rs if np.sign(r["gap_pick"]) != np.sign(r["gap_oracle"]))
+    qlead = max(r["gap_oracle"] for r in rs)
+    i = int(np.argmax(np.abs(err)))
+    facts[label] = dict(n=len(rs), min_r_median=float(np.median(mr)), min_r_min=float(mr.min()),
+                        loss_median=float(np.median(ml)), loss_max=float(ml.max()), flips=flips,
+                        err_max=float(err[i]), err_run=rs[i]["file"], qlead_oracle_max=float(qlead))
+    rng = f"$[{mr.min():+.2f}, {mr.max():+.2f}]$" if len(rs) > 1 else ""
+    lines.append(f"{label} & {len(rs)} & ${np.median(mr):+.2f}$ & {rng} & {np.median(ml):.3f} & {ml.max():.3f} & "
+                 f"{flips} & ${err[i]:+.3f}$ & ${qlead:+.3f}$" + r"\\")
+    if label == "No holdout":
+        lines.append(r"\addlinespace[3pt]")
+
+c = S["correlations"]
+cap_corr = (f"Across the {S['n_holdout_runs']} runs with a holdout, the label-free squared MMD between the training "
+            f"sample and the unlabelled test sample correlates with the smallest $r$ at Spearman "
+            f"$\\rho={c['shift_mmd2_all~min_r']['spearman']:+.2f}$ (permutation $p={c['shift_mmd2_all~min_r']['p_perm']:.3f}$) "
+            f"and with the largest loss at $\\rho={c['shift_mmd2_all~max_loss']['spearman']:+.2f}$ "
+            f"($p={c['shift_mmd2_all~max_loss']['p_perm']:.3f}$).")
+tab = r"""\begin{table}[!htb]
 \centering
-\caption{Inducing novel-attack shift on UNSW-NB15. Whole attack categories are removed from the
-2{,}000-row training sample and kept in the 20{,}000-row test sample: holdout A removes """ + notes[0].split(": ")[1] + r"""; holdout B removes """ + notes[1].split(": ")[1] + r""". Each kernel is
-selected by standard 5-fold CV over the full grid ($\gamma\le30$, $C\le100$); $r$ is the correlation
-across the 40 settings between the CV score and the test ROC-AUC, and \emph{oracle} the best test ROC-AUC
-in the grid. The last two columns give TPR@1\%FPR at the CV-selected setting and the best in the grid.
-Generated from the result files.}
+\caption{Inducing shift on three datasets. Whole attack families are removed from the 2{,}000-row training
+sample and kept in the 20{,}000-row test sample; every kernel is selected by standard 5-fold CV over the
+full grid. \emph{Min $r$} is, per run, the smallest correlation over the three kernels between CV score and
+test ROC-AUC across the 40 settings (median and range over the group's runs); \emph{Loss} is the largest
+gap between a kernel's best test ROC-AUC in the grid (oracle) and its CV-selected one. \emph{Flips} counts
+runs in which the sign of the quantum-minus-best-classical ROC-AUC gap differs between the CV-selected and
+the oracle settings; \emph{Sel.\ error} is the largest difference between those two gaps, and \emph{Q lead}
+the largest quantum lead at the oracle settings. """ + cap_corr + r""" Generated from the result files.}
 \label{tab:induced}
 \scriptsize
 \renewcommand{\arraystretch}{1.15}
-\setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\textwidth}{@{}lYccccc@{}}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabularx}{\textwidth}{@{}Ycccccccc@{}}
 \toprule
-& & & \multicolumn{2}{c}{\textbf{Test ROC-AUC}} & \multicolumn{2}{c}{\textbf{TPR@1\%FPR}}\\
-\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-\textbf{Unseen types} & \textbf{Kernel} & $\bm{r}$ & \textbf{CV pick} & \textbf{Oracle} & \textbf{CV pick} & \textbf{Best}\\
+& & \multicolumn{2}{c}{\textbf{Min $\bm{r}$}} & \multicolumn{2}{c}{\textbf{Loss}} & & & \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+\textbf{Runs} & \textbf{$\bm{n}$} & \textbf{Median} & \textbf{Range} & \textbf{Median} & \textbf{Max} & \textbf{Flips} & \textbf{Sel.\ error} & \textbf{Q lead}\\
 \midrule
-"""
-tail = r"""
+""" + "\n".join(lines) + r"""
 \bottomrule
 \end{tabularx}
 \end{table}
 """
-open("_tab_induced.tex", "w", encoding="utf-8").write(head + "\n".join(lines) + tail)
+open("_tab_induced.tex", "w", encoding="utf-8").write(tab)
+json.dump(facts, open("_tab_induced_facts.json", "w"), indent=2)
 print("wrote _tab_induced.tex")
-for n in notes:
-    print("  ", n)
+for k, v in facts.items():
+    print(f"  {k:40s} {v}")

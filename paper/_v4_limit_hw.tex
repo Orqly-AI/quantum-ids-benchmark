@@ -1,0 +1,9 @@
+\textbf{Hardware.} The projected quantum kernel and the four-qubit hybrid's quantum layer were executed
+on three IBM Heron processors (Section~\ref{sec:khw}); every other quantum result, including the wider
+hybrids and the noise sweep, is simulated, and the noise sweep models NISQ effects rather than measuring
+them. The device runs used 200 training and 500 test samples for the kernel and 6{,}000 test samples per
+device for the hybrid, 128 shots per basis, and only the primitive's default readout mitigation; they
+realise inference, not training, on hardware, and the fidelity kernel, whose cost is quadratic in the
+sample count, was not run. Pooled over three subsets, the hybrid's $1\%$ threshold rests on 30 benign
+scores per device, and its confidence intervals remain wide (for the margin over the forest,
+$[0.015,0.220]$ on \texttt{ibm\_marrakesh}).

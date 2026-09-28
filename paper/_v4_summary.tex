@@ -1,0 +1,15 @@
+\subsection{Summary}\label{sec:ksum}
+No quantum advantage survives attribution in this benchmark. The audit's two positives, each significant
+after correction, were produced classically: the quantum kernel's by its surrogate's confounds and then by
+a bandwidth grid too narrow for a distribution shift that cross-validation cannot see, and the hybrid's by
+the input and the small neural pipeline around its quantum layer, which a tanh layer of the same width
+reproduces. Three findings of general use come out of the exercise. First, the selection failure is
+caused by train-to-test shift: it is absent without shift, recreated on three datasets by holding attack
+families out of training, including a spurious $0.17$ quantum lead, and tracked, coarsely, by a
+label-free MMD; no training-only rule repairs it in general, so comparisons under shift should be
+reported under several selection rules with the oracle bound. Second, both quantum models are classically
+reproducible for identifiable reasons: the IQP kernel from its own circuit phases on every dataset, by the
+geometric difference, and the hybrid's trained circuit as an exact 81-term trigonometric polynomial.
+Third, both run on current hardware without changing these conclusions: on three IBM Heron processors the
+projected kernel stays within $0.01$ ROC-AUC of simulation, and the hybrid's low-false-positive detection
+is unchanged on 6{,}000 rows per device, as is its tie with its classical twin.

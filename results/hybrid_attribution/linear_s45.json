@@ -1,0 +1,13 @@
+{
+  "model": "linear",
+  "seed": 45,
+  "train_time_s": 0.581045389175415,
+  "params_total": 30,
+  "params_middle": 0,
+  "metrics": {
+    "roc_auc": 0.9103387316817677,
+    "auprc": 0.9321405672338113,
+    "tpr_at_1pct_fpr": 0.5233382685264553,
+    "tpr_at_0.1pct_fpr": 0.10486332112522403
+  }
+}

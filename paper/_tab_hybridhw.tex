@@ -1,30 +1,31 @@
 \begin{table}[!htb]
 \centering
-\caption{The 4-qubit hybrid on hardware: NSL-KDD, 2{,}000 class-balanced test rows.
-Only the four $\langle Z_i\rangle$ that feed the trained classical head are measured; every other part of
-the model is the published one. $r$ is the Pearson correlation of the source's expectations with the
-exact statevector values. Metric columns are the hybrid's own on that source; the shot-noise row is the
-mean of 20 binomial resamplings of the exact expectations. The last column is the
-paired-bootstrap difference in TPR@1\%FPR against the tuned random forest on the same rows (positive
-favours the hybrid; two-sided $p$ in brackets). Generated from the result files.}
+\caption{The 4-qubit hybrid on hardware: NSL-KDD, 6{,}000 class-balanced test rows per device (three disjoint
+subsets of 2{,}000, one job each, 86 to 87 QPU-seconds per job). Only the four $\langle Z_i\rangle$ that
+feed the trained classical head are measured; $r$ is their correlation with the exact values. The lower
+block gives, on the same rows, the tuned random forest and the classical twins of Table~\ref{tab:attrib}
+(same seed as the model run on hardware). TPR@1\%FPR is also split into attacks of types seen in training
+and of the novel types. The last two columns are paired-bootstrap differences in TPR@1\%FPR against the
+random forest and against the tanh MLP twin (two-sided $p$ in brackets). Generated from the result files.}
 \label{tab:hybridhw}
 \scriptsize
 \renewcommand{\arraystretch}{1.15}
-\setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\textwidth}{@{}Yccccc@{}}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabularx}{\textwidth}{@{}Yccccccc@{}}
 \toprule
-& & \multicolumn{3}{c}{\textbf{Hybrid QNN}} & \\
-\cmidrule(lr){3-5}
-\textbf{Source of $\langle Z_i\rangle$} & $\bm{r}$ & \textbf{ROC-AUC} & \textbf{AUPRC} & \textbf{TPR@1\%FPR} & $\bm{\Delta}$\textbf{TPR vs RF}\\
+& & & \multicolumn{3}{c}{\textbf{TPR@1\%FPR}} & \multicolumn{2}{c}{$\bm{\Delta}$\textbf{TPR@1\%FPR vs}}\\
+\cmidrule(lr){4-6}\cmidrule(lr){7-8}
+\textbf{Source} & $\bm{r}$ & \textbf{ROC-AUC} & \textbf{All} & \textbf{Seen} & \textbf{Novel} & \textbf{Random forest} & \textbf{MLP twin}\\
 \midrule
-Exact statevector & 1.000 & 0.900 & 0.914 & 0.496 & $+0.192$ [$0.03$]\\
-Shot noise only (128 shots) &  & 0.888 & 0.909 & 0.502 & \\
-FakeFez simulation (128 shots) & 0.981 & 0.881 & 0.905 & 0.495 & \\
-\texttt{ibm\_fez} (128 shots) & 0.976 & 0.883 & 0.906 & 0.498 & $+0.194$ [$0.03$]\\
-\texttt{ibm\_kingston} (128 shots) & 0.972 & 0.882 & 0.904 & 0.498 & $+0.194$ [$0.06$]\\
-\texttt{ibm\_marrakesh} (128 shots) & 0.976 & 0.880 & 0.904 & 0.501 & $+0.197$ [$0.05$]\\
+Exact simulation & 1.000 & 0.893 & 0.513 & 0.603 & 0.300 & $+0.140$ [$0.007$] & $+0.000$ [$0.92$]\\
+\texttt{ibm\_fez} & 0.972 & 0.870 & 0.517 & 0.607 & 0.304 & $+0.144$ [$0.003$] & $+0.004$ [$1.00$]\\
+\texttt{ibm\_kingston} & 0.973 & 0.876 & 0.511 & 0.603 & 0.293 & $+0.138$ [$0.008$] & $-0.002$ [$0.56$]\\
+\texttt{ibm\_marrakesh} & 0.977 & 0.869 & 0.505 & 0.603 & 0.271 & $+0.132$ [$0.012$] & $-0.009$ [$0.47$]\\
 \addlinespace[2pt]
-Tuned random forest, same rows &  & 0.929 & 0.917 & 0.304 & \\
+Random forest, 8 features &  & 0.933 & 0.373 & 0.505 & 0.060 &  & \\
+No middle layer &  & 0.916 & 0.509 & 0.618 & 0.251 & $+0.136$ [$0.008$] & \\
+Tanh MLP twin &  & 0.867 & 0.513 & 0.626 & 0.245 & $+0.140$ [$0.002$] & \\
+Fourier twin &  & 0.880 & 0.526 & 0.617 & 0.310 & $+0.153$ [$0.001$] & \\
 \bottomrule
 \end{tabularx}
 \end{table}

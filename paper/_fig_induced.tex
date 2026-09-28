@@ -1,0 +1,40 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.82\textwidth, height=6.4cm,
+  xmin=-0.0025, xmax=0.042, ymin=-0.4, ymax=1.08,
+  scaled x ticks=false,
+  xtick={0,0.01,0.02,0.03,0.04},
+  xticklabel style={/pgf/number format/.cd,fixed,fixed zerofill,precision=2},
+  ytick={0,0.25,0.5,0.75,1.0},
+  yticklabel style={/pgf/number format/.cd,fixed,fixed zerofill,precision=2},
+  xlabel={Label-free shift: squared MMD, training sample vs.\ unlabelled test sample},
+  ylabel={Smallest CV-to-test correlation $r$},
+  tick label style={font=\small}, label style={font=\small},
+  ymajorgrids, grid style={gray!18},
+  axis line style={gray!70}, tick style={gray!70},
+  legend style={at={(0.5,-0.24)}, anchor=north, legend columns=3, draw=none, font=\small,
+    /tikz/every even column/.append style={column sep=10pt}},
+  every axis plot/.append style={only marks},
+]
+\addplot[cvviolet, mark=*, mark size=2.6pt] coordinates {(0.00328,0.8771) (0.00416,0.7557) (0.00431,0.8496) (0.02921,0.8525) (0.03840,0.8860) (0.03509,0.8314) (0.00943,0.6752) (0.01254,0.8920) (0.03157,0.6193) (0.02533,0.6620) (0.02893,0.4825) (0.03327,0.5878) (0.00738,0.8346) (0.00658,0.8496) (0.00634,0.8520)};
+\addplot[cvaqua, mark=square*, mark size=2.4pt] coordinates {(-0.00015,0.9911) (0.00910,0.9467) (-0.00020,0.9899) (-0.00001,0.9906) (-0.00027,0.9916) (0.00110,0.9922) (-0.00031,0.9941) (0.00887,0.4585) (0.00503,0.9875)};
+\addplot[cvorange, mark=triangle*, mark size=3.4pt] coordinates {(0.00606,0.0287) (0.01075,-0.0663)};
+\addplot[gray, mark=o, mark size=2.6pt, line width=0.9pt] coordinates {(0.00055,0.9934) (-0.00024,0.9933) (0.00631,0.8176)};
+\addplot[cvblue, mark=diamond*, mark size=3.6pt] coordinates {(0.03139,-0.1575)};
+\addplot[cvblue, mark=diamond, mark size=3.6pt, line width=0.9pt] coordinates {(-0.00019,0.9417)};
+\legend{UNSW-NB15 holdout, ToN-IoT holdout, CICIDS2017 holdout, No holdout, NSL-KDD official split, NSL-KDD i.i.d.\ control}
+\node[font=\scriptsize, anchor=west, align=left] at (axis cs:0.0120,-0.046)
+  {CICIDS2017, PortScan held out:\\selection creates a $0.17$ quantum lead};
+\node[font=\scriptsize, anchor=north] at (axis cs:0.0314,-0.202) {NSL-KDD official};
+\end{axis}
+\end{tikzpicture}
+\caption{Label-free shift predicts when cross-validation stops ranking kernel settings. Each point is one
+kernel landscape (three kernels, 40 settings each): attack families held out of the 2{,}000-row training
+sample on UNSW-NB15, ToN-IoT and CICIDS2017 (filled), the same datasets without a holdout (open), and
+NSL-KDD's official split and its i.i.d.\ control (diamonds). The horizontal axis needs no test labels.
+Across the 26 holdout runs, Spearman $\rho=-0.61$
+(permutation $p=0.001$). Generated from the result files.}
+\label{fig:induced}
+\end{figure}

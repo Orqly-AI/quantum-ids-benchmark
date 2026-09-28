@@ -1,0 +1,26 @@
+The same devices also run the variational model behind the audit's other surviving positive, the
+four-qubit hybrid of Table~\ref{tab:audit}. Its trained circuit (angle encoding, three strongly
+entangling layers) is rebuilt in Qiskit with the trained weights bound as constants and the four input
+angles as circuit parameters (statevector expectations agree with PennyLane to $10^{-15}$), transpiled to
+the heavy-hex coupling map (depth 84 to 92, 30 two-qubit gates), and its four $\langle Z_i\rangle$ are
+measured at 128 shots on three disjoint, seeded, class-balanced subsets of 2{,}000 test rows, one job per
+subset and device, so that every device sees the same 6{,}000 rows, 3{,}000 of them benign. The measured
+expectations pass through the trained classical head unchanged, so only the quantum layer is replaced.
+The model is retrained from the released configuration and seed before the runs; the retrained model
+reproduces the published test scores to $2\times10^{-8}$. We compare it on the same rows with the exact
+simulation, the tuned Random Forest of Table~\ref{tab:audit} and the classical twins described next, by
+paired bootstrap.
+
+\paragraph{Classical twins of the hybrid.} To attribute the hybrid's result we keep its pipeline intact
+(the four PCA features, the seeded 2{,}000-row training subsample, the $\mathrm{Linear}(4,4)$ and $\tanh$
+input layer, the $\mathrm{Linear}(4,2)$ output layer, Adam at learning rate $0.005$, 20 epochs, batches
+of 64, class-weighted cross-entropy, and seeds 42 to 46) and replace only the quantum layer. With $R_Y$
+angle encoding, every $\langle Z_j\rangle$ of the circuit is a trigonometric polynomial in the four input
+angles $a_i$ with frequencies in $\{-1,0,1\}$~\cite{schuld2021encoding}, that is, a linear combination of
+the $3^4=81$ products $\prod_i f_i(a_i)$ with $f_i\in\{1,\cos a_i,\sin a_i\}$. The \emph{Fourier twin}
+replaces the circuit by an unconstrained linear map on these 81 features, a strict superset of the
+circuit's function class; the \emph{MLP twin} by two $\tanh$ layers of width four (40 parameters against
+the circuit's 36); and a third twin removes the middle layer altogether. Fitting the 81 coefficients to a
+trained circuit by least squares tests the expansion directly. To separate the model class from the
+input, we also train the Random Forest on the hybrid's own input: its four features, on the full
+training file and on the same 2{,}000 rows.

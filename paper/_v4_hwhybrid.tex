@@ -1,0 +1,15 @@
+The device runs also test the hybrid. Its four expectations, measured at 128 shots on the same 6{,}000
+class-balanced test rows on each device (three disjoint subsets of 2{,}000, one job each), correlate with
+their exact values at $r=0.972$ to $0.977$ (Table~\ref{tab:hybridhw}). ROC-AUC falls from $0.893$ to
+between $0.869$ and $0.876$ ($p<0.001$ on every device), of which shot noise alone accounts for $0.012$ in
+simulation of the first subset, while detection at $1\%$ false positives is unchanged: $0.505$ to $0.517$
+against $0.513$ exact ($p\ge0.76$). The margin over the Random Forest on these rows, $+0.132$ to $+0.144$
+($p=0.003$ to $0.012$), therefore survives real device noise on three processors. It is also the margin
+the classical twins show on the same rows ($+0.136$ to $+0.153$), and the hardware hybrid does not differ
+from the tanh twin on any device ($-0.009$ to $+0.004$, $p\ge0.47$), so the result of
+Section~\ref{sec:kattr} holds on hardware as well. Pooling was necessary: on a single 2{,}000-row subset
+the $1\%$ threshold rests on ten benign scores, and the forest's detection varied from $0.304$ to $0.517$
+across the three subsets, its deficit to the hybrid from $0.21$ to zero. The nine jobs used 86 to 87
+QPU-seconds each, about $0.04$ QPU-seconds per sample.
+
+@@TAB_HYBRIDHW@@

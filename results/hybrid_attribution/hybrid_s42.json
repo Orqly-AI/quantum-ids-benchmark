@@ -1,0 +1,15 @@
+{
+  "model": "hybrid",
+  "seed": 42,
+  "train_time_s": 325.6233968734741,
+  "params_total": 66,
+  "params_middle": 36,
+  "metrics": {
+    "roc_auc": 0.8886216030405663,
+    "auprc": 0.9240858465680806,
+    "tpr_at_1pct_fpr": 0.522559027507208,
+    "tpr_at_0.1pct_fpr": 0.4081664458817112
+  },
+  "published_file": "nslkdd_hybrid_qnn_q4_l3_angle_s42_ovn1_hybrid_angle_q4_20260531_110946.json",
+  "max_abs_diff_vs_published": 2.2351741790771484e-08
+}

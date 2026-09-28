@@ -1,0 +1,53 @@
+\subsection{Inducing the shift on three datasets}\label{sec:kinduced}
+The contrast between the two official splits is consistent with the shift explanation but does not test
+it, because the datasets differ in more than their splits. We therefore induce shift: whole attack
+families are removed from the 2{,}000-row training sample and left in the 20{,}000-row test sample, and
+the protocol of Table~\ref{tab:twosplits} is repeated (Section~\ref{sec:kdiag}). On UNSW-NB15, ToN-IoT
+and CICIDS2017 each family is held out in turn (20 runs), and on UNSW-NB15 two multi-family holdouts are
+repeated over three sampling seeds: holdout A removes Exploits, Fuzzers and Reconnaissance ($25\%$ of the
+test rows), holdout B Generic, DoS, Analysis and Backdoor ($29\%$). Table~\ref{tab:induced} summarises
+the 26 runs and Figure~\ref{fig:induced} shows each of them.
+
+Shift is sufficient to recreate the failure, and its size tracks how badly. Without a holdout, standard
+CV tracks test performance on all three datasets (the smallest $r$ over the three kernels is $+0.82$ to
+$+0.99$) and loses at most $0.019$ ROC-AUC against the best setting in the grid. With families held out,
+the smallest $r$ falls to $+0.46$ on ToN-IoT, $+0.48$ on UNSW-NB15 and $-0.07$ on CICIDS2017, and
+selection losses reach $0.061$ for single UNSW-NB15 families, $0.112$ under holdout B and $0.375$ on
+CICIDS2017. The label-free squared MMD between the training sample and the unlabelled test sample orders
+the runs: it correlates with the smallest $r$ at Spearman $\rho=-0.61$ (permutation $p=0.001$) and with
+the largest loss at $\rho=+0.45$ ($p=0.020$); its class-conditional version for the attack rows, which
+needs labels, reaches $\rho=-0.77$ and $+0.66$ ($p<0.001$). It is a coarse signal rather than a test:
+CICIDS2017 with DDoS held out fails ($r=+0.03$) at a squared MMD of $0.006$, while the holdout-A runs pass
+($r\ge+0.83$) at $0.029$ to $0.038$.
+
+What the failure does to a quantum-versus-classical comparison is what matters here. In 5 of the 26 runs
+selection reverses the sign of the quantum-minus-best-classical ROC-AUC gap. The largest case recreates
+the NSL-KDD artefact on a second dataset: with PortScan held out of CICIDS2017's training sample, the
+CV-selected quantum kernel leads the best CV-selected classical kernel by $0.174$ ROC-AUC, while at each
+kernel's best setting in the grid it trails by $0.028$. Across all 26 runs the quantum kernel never leads
+by more than $0.003$ at the oracle settings. Nor is the outcome stable across training samples: under
+holdout B the kernel that selection penalises most changes with the sampling seed (the RBF kernel loses
+$0.108$, $0.023$ and $0.101$ over the three seeds, the phase kernel $0.016$, $0.084$ and $0.112$), and
+the quantum kernel's lead at $1\%$ false positives on the first seed ($0.301$ against $0.263$ for the RBF
+kernel) does not recur on the other two ($0.440$ against $0.664$, and $0.425$ against $0.508$).
+
+Shift-aware selection does not repair the induced failures. Under holdout B (first seed),
+leave-attack-types-out CV, with a single usable fold, correlates with the RBF kernel's test ROC-AUC at $r=+0.43$ and chooses a worse
+setting than standard CV ($0.751$ against $0.794$): its folds can only hold out attack types the training
+sample contains, and a shift towards those is not the shift towards Generic and DoS that the test set
+presents. On NSL-KDD the seventeen novel types are variants within the same four attack families as the
+seen ones, which is why holding out types imitates the official split there. The result is not an
+artefact of the fold construction either. GroupKFold, used throughout, leaves three usable folds on
+NSL-KDD and one on UNSW-NB15; a construction that makes all five folds usable gives $r=+0.54$ instead of
+$+0.79$ for the RBF kernel on NSL-KDD and $r=-0.38$ under holdout B, and on the unshifted UNSW-NB15 split
+it selects an over-smooth RBF setting (test ROC-AUC $0.859$ against $0.938$ under standard CV).
+Shift-aware selection is a choice of target rather than a free improvement: it buys robustness to the
+kinds of novelty the training data can imitate, at a cost when there is no novelty, and it cannot
+anticipate novelty of a kind the training data has never seen. A kernel comparison under distribution
+shift should therefore be reported under more than one selection rule, with the oracle bound alongside
+and a label-free shift statistic such as the MMD, so that a reader can see how much of a claimed
+difference is selection.
+
+@@TAB_INDUCED@@
+
+@@FIG_INDUCED@@

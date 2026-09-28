@@ -1,0 +1,18 @@
+\paragraph{Shift controls.} Three controls change only the evaluation set of the NSL-KDD comparison, so
+that the training rows, the grid and the cross-validation stay fixed (Section~\ref{sec:kcv}): the
+official test set without the 17 attack types absent from the training file; that set importance-weighted
+so that each attack type, and the benign class, carries its share of the training file; and 20{,}000
+held-out rows of the training file, which share its distribution.
+
+\paragraph{Induced shift.} To test whether shift causes the selection failure rather than merely
+accompanying it, we remove whole attack families from a seeded, stratified 2{,}000-row training sample
+while leaving them in the 20{,}000-row test sample, on the three datasets whose labels name the attack
+family (Section~\ref{sec:kinduced}): every family in turn on UNSW-NB15 (nine), NF-ToN-IoT-v2 (nine) and
+CICIDS2017 (two), and two multi-family holdouts on UNSW-NB15 over three sampling seeds. For every run we
+also compute the unbiased squared maximum mean discrepancy~\cite{gretton2012kernel} between the training
+sample and the test sample on the raw features (RBF kernel, median-heuristic bandwidth, at most 2{,}000
+rows of each), which needs no test labels. Re-running a published landscape this way reproduces it to
+within $10^{-3}$, the SVM solver's tolerance under a different number of BLAS threads. As a sensitivity
+check on the shift-aware rule we also report a second fold construction, which splits benign rows evenly
+across folds and assigns attack types largest-first to the fold holding the fewest attack rows, so that
+every fold contains both classes.

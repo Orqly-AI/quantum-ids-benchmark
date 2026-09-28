@@ -54,12 +54,13 @@ TITLES = [
     "Figure 3: classical vs quantum F1 bars",
     "Figure 4: qubit-count ablation",
     "Figure 5: kernel bandwidth landscape",
+    "Figure 6: label-free shift vs CV reliability",
 ]
 
 src = open("manuscript.tex", encoding="utf-8").read()
 
 blocks = re.findall(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", src, re.DOTALL)
-assert len(blocks) == 5, f"expected 5 tikzpictures in manuscript.tex, found {len(blocks)}"
+assert len(blocks) == 6, f"expected 6 tikzpictures in manuscript.tex, found {len(blocks)}"
 
 out = [PREAMBLE]
 for i, (title, blk) in enumerate(zip(TITLES, blocks), start=1):

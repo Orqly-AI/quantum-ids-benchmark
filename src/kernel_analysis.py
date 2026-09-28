@@ -512,16 +512,77 @@ def _shift_folds(attack_names, k=5, seed=42, scheme=None):
     return out
 
 
-def landscape(n_qubits=8, n_train=2000):
+def _mmd2(A, B, gamma, m=2000, seed=0):
+    """Unbiased squared MMD with an RBF kernel on at most m rows of each sample."""
+    rng = np.random.RandomState(seed)
+    A = A[rng.choice(len(A), min(m, len(A)), replace=False)]
+    B = B[rng.choice(len(B), min(m, len(B)), replace=False)]
+    Kaa, Kbb, Kab = rbf(A, A, gamma), rbf(B, B, gamma), rbf(A, B, gamma)
+    na, nb = len(A), len(B)
+    return float((Kaa.sum() - np.trace(Kaa)) / (na * (na - 1)) + (Kbb.sum() - np.trace(Kbb)) / (nb * (nb - 1))
+                 - 2 * Kab.mean())
+
+
+def _shift_stats(Xq, yq, Xe, ye):
+    """Train-vs-test distribution shift on the raw features. mmd2_all needs no labels
+    (a practitioner can compute it from unlabelled test traffic); the class-wise
+    versions use test labels and are reported for interpretation only. The RBF
+    bandwidth is the median heuristic on the pooled training sample."""
+    from scipy.spatial.distance import pdist
+    d2 = pdist(Xq[:1000], "sqeuclidean")
+    g = float(1.0 / np.median(d2[d2 > 0]))
+    return {"gamma_median": g,
+            "mmd2_all": _mmd2(Xq, Xe, g),
+            "mmd2_attack": _mmd2(Xq[yq == 1], Xe[ye == 1], g),
+            "mmd2_benign": _mmd2(Xq[yq == 0], Xe[ye == 0], g)}
+
+
+def weighted_metrics(y, s, w):
+    """score_metrics with per-row weights (importance-weighted evaluation)."""
+    from sklearn.metrics import roc_curve
+    fpr, tpr, _ = roc_curve(y, s, sample_weight=w)
+    at = lambda f: float(tpr[0] if f <= fpr[0] else tpr[-1] if f >= fpr[-1] else np.interp(f, fpr, tpr))
+    return {"roc_auc": float(roc_auc_score(y, s, sample_weight=w)),
+            "auprc": float(average_precision_score(y, s, sample_weight=w)),
+            "tpr_at_1pct_fpr": at(0.01), "tpr_at_0.1pct_fpr": at(0.001)}
+
+
+def landscape(n_qubits=8, n_train=2000, seen_only=False, test_mode=None, n_iid=20000):
+    """test_mode (NSL-KDD controls on the evaluation set; the 2,000 training rows never change):
+      official         the official test set (default)
+      seen             drop test rows whose attack type never occurs in the training file
+      seen_reweighted  'seen', importance-weighted so each attack type (and benign) carries
+                       its training-file share: removes the attack-mix shift as well
+      iid              20,000 random rows of the training file outside the 2,000: no shift
+    seen_only=True is the older spelling of test_mode='seen'."""
+    test_mode = test_mode or ("seen" if seen_only else "official")
     from sklearn.model_selection import StratifiedKFold
     from sklearn.svm import SVC
     from data import load_meta
     Xtr, ytr, Xte, yte = load_nslkdd(n_qubits)
-    _, ym, _, _, meta = load_meta("nslkdd", n_qubits, "pca", False, "minmax", 42)
+    _, ym, _, ymt, meta = load_meta("nslkdd", n_qubits, "pca", False, "minmax", 42)
     names = np.array(meta["class_names"])[np.asarray(ym[:n_train])]
     Xq, yq = np.asarray(Xtr[:n_train], float), np.asarray(ytr[:n_train])
     Xte, yte = np.asarray(Xte, float), np.asarray(yte)
     assert np.all((names != "normal").astype(int) == yq), "label misalignment"
+    removed, w = 0, None
+    all_names = np.array(meta["class_names"])
+    if test_mode in ("seen", "seen_reweighted"):
+        keep = np.isin(all_names[ymt], np.unique(all_names[ym]))
+        removed = int((~keep).sum())
+        Xte, yte, tnames = Xte[keep], yte[keep], all_names[ymt][keep]
+        if test_mode == "seen_reweighted":
+            tr_share = {t: c / len(ym) for t, c in zip(*np.unique(all_names[ym], return_counts=True))}
+            te_types, te_counts = np.unique(tnames, return_counts=True)
+            te_share = dict(zip(te_types, te_counts / len(tnames)))
+            z = sum(tr_share[t] for t in te_types)          # renormalise over types present in test
+            w = np.array([tr_share[t] / z / te_share[t] for t in tnames])
+    elif test_mode == "iid":
+        pool = np.arange(n_train, len(Xtr))
+        pick = np.sort(np.random.RandomState(0).choice(pool, n_iid, replace=False))
+        Xte, yte = np.asarray(Xtr[pick], float), np.asarray(ytr[pick])
+        removed = -1
+    evalm = (lambda s_: score_metrics(yte, s_)) if w is None else (lambda s_: weighted_metrics(yte, s_, w))
 
     std_folds = list(StratifiedKFold(5, shuffle=True, random_state=42)
                      .split(np.zeros(n_train), yq))
@@ -545,9 +606,13 @@ def landscape(n_qubits=8, n_train=2000):
     def sweep(Ktr, Kte, C):
         s = SVC(kernel="precomputed", C=C).fit(Ktr, yq).decision_function(Kte)
         return {"std_cv": cv(Ktr, std_folds, C), "shift_cv": cv(Ktr, shift_folds, C),
-                "test": score_metrics(yte, s)}
+                "test": evalm(s)}
 
-    out = {"n_shift_folds": len(shift_folds), "gammas": WIDE_GAMMAS, "Cs": CS, "families": {}}
+    out = {"n_shift_folds": len(shift_folds), "gammas": WIDE_GAMMAS, "Cs": CS, "families": {},
+           "test_mode": test_mode, "seen_only": test_mode.startswith("seen"),
+           "test_rows_removed": removed, "n_test": int(len(yte)),
+           "weight_range": [float(w.min()), float(w.max())] if w is not None else None,
+           "shift_stats": _shift_stats(Xq, yq, Xte, yte)}
     for fam, (A, B) in fams.items():
         grid = {}
         for g in WIDE_GAMMAS:
@@ -698,6 +763,7 @@ def landscape_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0, hold
            "holdout": list(holdout),
            "unseen_test_fraction": float(np.mean(np.isin(names_all[ymt[ite]], list(holdout)))) if holdout else 0.0,
            "unseen_test_types": sorted(set(names_all[ymt]) - set(names_all[ym])),
+           "seed": seed, "shift_stats": _shift_stats(Xq, yq, Xe, ye),
            "gammas": WIDE_GAMMAS, "Cs": CS, "families": {}}
     for fam, (A, B) in fams.items():
         grid = {}
@@ -756,7 +822,11 @@ def selected_within_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("part", choices=["validate", "reproduce", "fair", "geometry", "concentration", "shots", "dequant", "geometry_trig", "landscape", "selected", "selected_within", "landscape_unsw", "selected_unsw", "induced_unsw_a", "induced_unsw_b"])
+    ap.add_argument("part", choices=["validate", "reproduce", "fair", "geometry", "concentration", "shots", "dequant", "geometry_trig", "landscape", "selected", "selected_within", "landscape_unsw", "selected_unsw", "induced_unsw_a", "induced_unsw_b", "induced", "landscape_nsl_seen", "landscape_nsl_seen_rw", "landscape_nsl_iid"])
+    ap.add_argument("--ds", default="unsw", help="dataset for the 'induced' mode")
+    ap.add_argument("--holdout", default="none",
+                    help="comma-separated attack categories kept out of training ('none' = no holdout)")
+    ap.add_argument("--seed", type=int, default=0, help="train/test sampling seed for the 'induced' mode")
     ap.add_argument("--folds", choices=["grouped", "balanced"], default="grouped",
                     help="leave-attack-types-out fold construction (balanced -> *_bal.json)")
     a = ap.parse_args()
@@ -765,6 +835,15 @@ if __name__ == "__main__":
     os.makedirs(RESULTS, exist_ok=True)
     out = {"validate": validate, "reproduce": reproduce, "fair": fair, "geometry": geometry, "concentration": concentration, "shots": shots, "dequant": dequant, "geometry_trig": geometry_trig, "landscape": landscape, "selected": selected, "selected_within": selected_within, "landscape_unsw": lambda: landscape_ds("unsw"), "selected_unsw": lambda: selected_within_ds("unsw"),
            "induced_unsw_a": lambda: landscape_ds("unsw", holdout=("Exploits", "Fuzzers", "Reconnaissance")),
-           "induced_unsw_b": lambda: landscape_ds("unsw", holdout=("Generic", "DoS", "Analysis", "Backdoor"))}[a.part]()
+           "induced_unsw_b": lambda: landscape_ds("unsw", holdout=("Generic", "DoS", "Analysis", "Backdoor")),
+           "induced": lambda: landscape_ds(a.ds, seed=a.seed,
+                                           holdout=() if a.holdout == "none" else tuple(a.holdout.split(","))),
+           "landscape_nsl_seen": lambda: landscape(seen_only=True),
+           "landscape_nsl_seen_rw": lambda: landscape(test_mode="seen_reweighted"),
+           "landscape_nsl_iid": lambda: landscape(test_mode="iid")}[a.part]()
     print(json.dumps(out, indent=2))
-    json.dump(out, open(os.path.join(RESULTS, f"{a.part}{SUFFIX}.json"), "w"), indent=2)
+    name = a.part
+    if a.part == "induced":
+        tag = "none" if a.holdout == "none" else "+".join(h.lower() for h in a.holdout.split(","))
+        name = f"induced_{a.ds}_{tag}_s{a.seed}"
+    json.dump(out, open(os.path.join(RESULTS, f"{name}{SUFFIX}.json"), "w"), indent=2)

@@ -1,0 +1,13 @@
+{
+  "model": "rf_f8_sub",
+  "seed": 43,
+  "n_features": 8,
+  "n_train": 2000,
+  "train_time_s": 0.2784843444824219,
+  "metrics": {
+    "roc_auc": 0.9448245280582657,
+    "auprc": 0.9545144031411226,
+    "tpr_at_1pct_fpr": 0.4893747564871815,
+    "tpr_at_0.1pct_fpr": 0.3612376295488195
+  }
+}

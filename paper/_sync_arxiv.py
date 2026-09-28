@@ -29,6 +29,7 @@ FIGS = [
     ("Best classical (same-budget)",         r"\textwidth",      3),
     ("Qubit-count ablation",                 r"0.92\textwidth",  4),
     ("Kernel performance across the RBF bandwidth", r"\textwidth", 5),
+    ("Label-free shift predicts when cross-validation", r"0.82\textwidth", 6),
 ]
 FIGS = [(anchor, rf"\includegraphics[width={w}]{{Fig{n}.{ext}}}")
         for anchor, w, n in FIGS]
@@ -55,10 +56,10 @@ def rewrite_figure(match):
 out, n_fig = re.subn(r"\\begin\{figure\}.*?\\end\{figure\}", rewrite_figure,
                      src, flags=re.DOTALL)
 
-assert n_fig == 5, f"expected 5 figure environments, found {n_fig}"
-assert len(seen) == 5 and len(set(seen)) == 5, f"anchor mismatch: {seen}"
-assert out.count("\\includegraphics") == 5, \
-    f"expected 5 includegraphics, got {out.count(chr(92) + 'includegraphics')}"
+assert n_fig == 6, f"expected 6 figure environments, found {n_fig}"
+assert len(seen) == 6 and len(set(seen)) == 6, f"anchor mismatch: {seen}"
+assert out.count("\\includegraphics") == 6, \
+    f"expected 6 includegraphics, got {out.count(chr(92) + 'includegraphics')}"
 assert "tikzpicture" not in out, "a tikzpicture survived the rewrite"
 # the tables must come through untouched
 assert out.count("\\begin{tabular}") == src.count("\\begin{tabular}")

@@ -1,0 +1,13 @@
+{
+  "model": "mlp",
+  "seed": 44,
+  "train_time_s": 0.7778129577636719,
+  "params_total": 70,
+  "params_middle": 40,
+  "metrics": {
+    "roc_auc": 0.8969097954014477,
+    "auprc": 0.9270903107420794,
+    "tpr_at_1pct_fpr": 0.5153120860282085,
+    "tpr_at_0.1pct_fpr": 0.2195675991584197
+  }
+}

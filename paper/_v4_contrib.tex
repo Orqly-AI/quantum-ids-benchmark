@@ -1,0 +1,21 @@
+\item \textbf{A dissection of the audit's two surviving positives.} Placing quantum and classical kernels
+on identical data with exact Gram matrices and equal tuning, we show that a quantum-kernel advantage
+surviving both FDR and Holm correction is produced by the classical baseline's bandwidth search, because
+in-distribution cross-validation cannot see NSL-KDD's train-to-test shift; controls on the test set
+alone show that cross-validation is reliable without the shift and apportion the artefact between novel
+attack types and a changed attack mix. For the audit's other positive, a four-qubit hybrid's advantage at
+$1\%$ false positives, we build classical twins that replace only the quantum layer, show that the
+trained circuit is exactly an 81-term trigonometric polynomial, and find that a tanh layer of the same
+width reproduces the result, whose margin over the Random Forest lies entirely in novel attack types.
+\item \textbf{An induced-shift protocol across three datasets and a label-free warning statistic.}
+Holding attack families out of training on UNSW-NB15, ToN-IoT and CICIDS2017 (26 runs) recreates the
+selection failure, including a spurious $0.17$ quantum lead on CICIDS2017, while at its best setting the
+quantum kernel never leads by more than $0.003$. The squared MMD between training and unlabelled test
+traffic tracks how badly cross-validation fails. Leave-attack-types-out cross-validation repairs
+selection on NSL-KDD but not under induced shift, so we recommend reporting kernel comparisons under
+several selection rules with the oracle bound. The geometric difference of Huang et al., on all four
+datasets, shows the IQP kernel to be reproducible by a classical kernel on its own circuit phases.
+\item \textbf{Hardware validation of both models.} The projected kernel and the hybrid's quantum layer
+run on three IBM Heron processors: the kernel's classifier stays within $0.01$ ROC-AUC of simulation,
+and the hybrid's low-false-positive detection is unchanged on 6{,}000 test rows per device and
+indistinguishable from its classical twin's on the same rows.

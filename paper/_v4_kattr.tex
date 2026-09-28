@@ -1,0 +1,34 @@
+\subsection{The variational positive is classical}\label{sec:kattr}
+The audit's second surviving positive is the four-qubit hybrid's higher detection than the tuned Random
+Forest at $1\%$ false positives on NSL-KDD (Section~\ref{sec:op}). The Random Forest was the strongest
+classical model on that metric, but it is not a control for the hybrid: it is a different model class,
+it sees eight features rather than four, and it trains on the whole training file rather than on the
+hybrid's 2{,}000 rows. Table~\ref{tab:attrib} holds all of that fixed except the quantum layer
+(Section~\ref{sec:kdiag}), and adds the Random Forest on the hybrid's own input.
+
+The trained circuit is classical in a precise sense. Fitting the 81-term trigonometric expansion to the
+circuit trained with seed 42 reproduces its four expectations to $2\times10^{-15}$ on held-out angles, and
+the classical model built from those coefficients reproduces the hybrid's test scores to $4\times10^{-7}$,
+the precision of single-precision arithmetic, with identical metrics. Entanglement is not idle, since
+without the 16 four-way products the error rises to $0.044$, but every term it contributes can be written
+down. Trained from scratch in the same pipeline, the classical twins also match what the hybrid learns
+where it matters. Over five seeds the hybrid detects $0.515\pm0.007$ of attacks at $1\%$ false positives,
+the tanh twin $0.511\pm0.006$, the Fourier twin $0.506\pm0.016$ and the network with no middle layer at
+all $0.506\pm0.010$, against $0.467$ for the published Random Forest. The hybrid never differs
+significantly from the tanh twin (0 of 5 seeds) and leads the other two twins on 2 of 5 seeds each, by at
+most $0.021$. On ROC-AUC the network without a middle layer is ahead of the hybrid ($0.914$ against
+$0.899$).
+
+The margin over the published forest therefore has classical parts, and the Random Forest controls size
+them. About half is the input: the same forest on the hybrid's four features detects $0.491$, and the
+hybrid's lead over it shrinks to $0.023$ to $0.030$, significant on one of three seeds. Most of the rest is
+the model class, which a tanh layer supplies ($0.511$), and the quantum layer adds $0.004$ over that layer,
+within noise. The split by attack type shows where the neural models differ. On attacks of types present
+in training every model detects $0.60$ to $0.65$ at $1\%$ false positives; on the 3{,}750 attacks of the
+novel types the neural models detect $0.24$ to $0.25$ and the forest at most $0.15$, whatever input it is
+given. The one variational result that survived the audit is the behaviour of a small, class-weighted
+neural network on four principal components, which extrapolates to novel attacks at a strict alarm
+budget better than a tree ensemble, and the quantum layer adds nothing to it that a tanh layer of the
+same width does not.
+
+@@TAB_ATTRIB@@

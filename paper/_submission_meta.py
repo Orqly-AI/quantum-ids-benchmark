@@ -30,12 +30,13 @@ def _plain_math(m):
     """$...$ -> plain text: keep digits/letters, spell out the few macros used."""
     t = m.group(1)
     t = t.replace(r"\times", "x").replace(r"\%", "%").replace(r"\ge", ">=").replace(r"\le", "<=")
+    t = t.replace(r"\rho", "rho").replace("{,}", ",")
     t = re.sub(r"(?<=[A-Za-z])=(?=[0-9])", " = ", t)
     return t
 
 
 a = re.sub(r"\$([^$]*)\$", _plain_math, a)
-a = a.replace(r"et al.\ ", "et al. ").replace(r"\ ", " ").replace(r"\%", "%").replace("~", " ")
+a = a.replace(r"et al.\ ", "et al. ").replace(r"\ ", " ").replace(r"\%", "%").replace("~", " ").replace("{,}", ",")
 a = " ".join(a.split())
 leftover_math = re.findall(r"[\\${}].{0,20}", a)
 assert not leftover_math, "LaTeX left in abstract: " + repr(leftover_math)
