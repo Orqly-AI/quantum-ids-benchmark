@@ -37,7 +37,8 @@ def _plain_math(m):
 a = re.sub(r"\$([^$]*)\$", _plain_math, a)
 a = a.replace(r"et al.\ ", "et al. ").replace(r"\ ", " ").replace(r"\%", "%").replace("~", " ")
 a = " ".join(a.split())
-assert not re.search(r"[\\${}]", a), f"LaTeX left in abstract: {re.findall(r'[\\\\${}].{0,20}', a)}"
+leftover_math = re.findall(r"[\\${}].{0,20}", a)
+assert not leftover_math, "LaTeX left in abstract: " + repr(leftover_math)
 
 # ---- keywords ----
 kws = [" ".join(x.split()) for x in block("keyword").split(r"\sep")]
