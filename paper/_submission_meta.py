@@ -24,13 +24,20 @@ title = " ".join(m.group(1).split())
 a = block("abstract")
 a = re.sub(r"\\emph\{(.*?)\}", r"\1", a)
 a = re.sub(r"\\textbf\{(.*?)\}", r"\1", a)
-a = a.replace(r"$0.1\%/1\%$", "0.1%/1%")
-a = a.replace(r"$8$ to $14\times$", "8 to 14x")
-a = a.replace(r"$1\%$", "1%")
-a = a.replace(r"$p=0.005$", "p = 0.005")
-a = a.replace(r"$q=0.030$", "q = 0.030")
-a = a.replace(r"\%", "%")
+
+
+def _plain_math(m):
+    """$...$ -> plain text: keep digits/letters, spell out the few macros used."""
+    t = m.group(1)
+    t = t.replace(r"\times", "x").replace(r"\%", "%").replace(r"\ge", ">=").replace(r"\le", "<=")
+    t = re.sub(r"(?<=[A-Za-z])=(?=[0-9])", " = ", t)
+    return t
+
+
+a = re.sub(r"\$([^$]*)\$", _plain_math, a)
+a = a.replace(r"et al.\ ", "et al. ").replace(r"\ ", " ").replace(r"\%", "%").replace("~", " ")
 a = " ".join(a.split())
+assert not re.search(r"[\\${}]", a), f"LaTeX left in abstract: {re.findall(r'[\\\\${}].{0,20}', a)}"
 
 # ---- keywords ----
 kws = [" ".join(x.split()) for x in block("keyword").split(r"\sep")]
