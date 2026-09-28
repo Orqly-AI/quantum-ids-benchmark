@@ -50,8 +50,8 @@ CROSS-LIST
 TITLE
 {title}
 
-AUTHORS (arXiv comma-separated form, submission order; unchanged from v1)
-Syeda Anshrah Gillani, Mirza Samad Ahmed Baig, Shahid Munir Shah, Asher Ali, Hamzah Siddiqui
+AUTHORS (arXiv comma-separated form, submission order; v2 adds Abdul Akbar Khan and Muhammad Omer Khan)
+Syeda Anshrah Gillani, Mirza Samad Ahmed Baig, Shahid Munir Shah, Abdul Akbar Khan, Muhammad Omer Khan, Asher Ali, Hamzah Siddiqui
 
 COMMENTS
 {n_pages} pages, {n_fig} figures, {n_tab} tables. v2: adds a kernel-level analysis of the

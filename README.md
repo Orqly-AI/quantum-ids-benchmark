@@ -203,7 +203,7 @@ If you use this benchmark or harness, please cite the paper
 ```bibtex
 @misc{gillani2026quantumadvantagefaircalibration,
       title={How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for Network Intrusion Detection},
-      author={Syeda Anshrah Gillani and Mirza Samad Ahmed Baig and Shahid Munir Shah and Asher Ali and Hamzah Siddiqui},
+      author={Syeda Anshrah Gillani and Mirza Samad Ahmed Baig and Shahid Munir Shah and Abdul Akbar Khan and Muhammad Omer Khan and Asher Ali and Hamzah Siddiqui},
       year={2026},
       eprint={2608.18155},
       archivePrefix={arXiv},
