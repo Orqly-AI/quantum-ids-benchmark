@@ -1,0 +1,158 @@
+{
+  "2": {
+    "iqp fidelity": {
+      "offdiag_mean": 0.3215410015297463,
+      "offdiag_var": 0.09886036293435373,
+      "offdiag_std": 0.3144206782868355,
+      "test_roc_auc": 0.7573636465164745
+    },
+    "iqp projected": {
+      "offdiag_mean": 0.2267136519953991,
+      "offdiag_var": 0.0799382469005068,
+      "offdiag_std": 0.28273352631144893,
+      "test_roc_auc": 0.777413859817428
+    },
+    "angle fidelity": {
+      "offdiag_mean": 0.47672837451901323,
+      "offdiag_var": 0.1634842515441289,
+      "offdiag_std": 0.40433185818598183,
+      "test_roc_auc": 0.7359399322942146
+    },
+    "angle projected": {
+      "offdiag_mean": 0.3476757286635998,
+      "offdiag_var": 0.1623564238110049,
+      "offdiag_std": 0.40293476371616893,
+      "test_roc_auc": 0.7449772071096417
+    }
+  },
+  "4": {
+    "iqp fidelity": {
+      "offdiag_mean": 0.18546569559857182,
+      "offdiag_var": 0.081034503427169,
+      "offdiag_std": 0.28466559930411156,
+      "test_roc_auc": 0.8440022511719134
+    },
+    "iqp projected": {
+      "offdiag_mean": 0.16766733772182177,
+      "offdiag_var": 0.07763553706276456,
+      "offdiag_std": 0.2786315435530668,
+      "test_roc_auc": 0.9063500028343008
+    },
+    "angle fidelity": {
+      "offdiag_mean": 0.33552305254975556,
+      "offdiag_var": 0.1326968201881197,
+      "offdiag_std": 0.3642757474607934,
+      "test_roc_auc": 0.7337512592302242
+    },
+    "angle projected": {
+      "offdiag_mean": 0.20750680046360798,
+      "offdiag_var": 0.12051156974145025,
+      "offdiag_std": 0.3471477635553054,
+      "test_roc_auc": 0.9067259607453169
+    }
+  },
+  "6": {
+    "iqp fidelity": {
+      "offdiag_mean": 0.098986610345132,
+      "offdiag_var": 0.05286167160684632,
+      "offdiag_std": 0.22991666230799002,
+      "test_roc_auc": 0.9392788018597743
+    },
+    "iqp projected": {
+      "offdiag_mean": 0.0844496022631696,
+      "offdiag_var": 0.04301177363844879,
+      "offdiag_std": 0.2073928003534568,
+      "test_roc_auc": 0.9410061431315992
+    },
+    "angle fidelity": {
+      "offdiag_mean": 0.26588961731739913,
+      "offdiag_var": 0.10428876833433633,
+      "offdiag_std": 0.32293771587465026,
+      "test_roc_auc": 0.7764172003603643
+    },
+    "angle projected": {
+      "offdiag_mean": 0.1388242410575619,
+      "offdiag_var": 0.08572923741528618,
+      "offdiag_std": 0.2927955556617726,
+      "test_roc_auc": 0.822147871840052
+    }
+  },
+  "8": {
+    "iqp fidelity": {
+      "offdiag_mean": 0.06630492623497705,
+      "offdiag_var": 0.043067902140740966,
+      "offdiag_std": 0.20752807554820377,
+      "test_roc_auc": 0.9357568218497446
+    },
+    "iqp projected": {
+      "offdiag_mean": 0.04972691349319231,
+      "offdiag_var": 0.031218051599229642,
+      "offdiag_std": 0.17668630846568062,
+      "test_roc_auc": 0.9437818060672672
+    },
+    "angle fidelity": {
+      "offdiag_mean": 0.22161704808259702,
+      "offdiag_var": 0.09041322297401212,
+      "offdiag_std": 0.3006879162420933,
+      "test_roc_auc": 0.8395574161548699
+    },
+    "angle projected": {
+      "offdiag_mean": 0.10867236273052454,
+      "offdiag_var": 0.07152917156428504,
+      "offdiag_std": 0.26744938131221213,
+      "test_roc_auc": 0.9143588226412317
+    }
+  },
+  "10": {
+    "iqp fidelity": {
+      "offdiag_mean": 0.06104429061487729,
+      "offdiag_var": 0.04260642311334048,
+      "offdiag_std": 0.20641323386193164,
+      "test_roc_auc": 0.9472732392699255
+    },
+    "iqp projected": {
+      "offdiag_mean": 0.05285476495146857,
+      "offdiag_var": 0.03407517457297868,
+      "offdiag_std": 0.18459462227534873,
+      "test_roc_auc": 0.9459899767273158
+    },
+    "angle fidelity": {
+      "offdiag_mean": 0.22214440528335694,
+      "offdiag_var": 0.09471552857941792,
+      "offdiag_std": 0.307758880585789,
+      "test_roc_auc": 0.8050170438487572
+    },
+    "angle projected": {
+      "offdiag_mean": 0.11332829199443749,
+      "offdiag_var": 0.07552269743741881,
+      "offdiag_std": 0.2748139323932082,
+      "test_roc_auc": 0.9073467099403235
+    }
+  },
+  "12": {
+    "iqp fidelity": {
+      "offdiag_mean": 0.047269169567220846,
+      "offdiag_var": 0.03237316195688105,
+      "offdiag_std": 0.17992543443571576,
+      "test_roc_auc": 0.9212096892523811
+    },
+    "iqp projected": {
+      "offdiag_mean": 0.03787422913555446,
+      "offdiag_var": 0.024111080383627016,
+      "offdiag_std": 0.15527743037424022,
+      "test_roc_auc": 0.9266792556347329
+    },
+    "angle fidelity": {
+      "offdiag_mean": 0.20539752696789282,
+      "offdiag_var": 0.08438054910305309,
+      "offdiag_std": 0.2904833026234952,
+      "test_roc_auc": 0.7820915975017704
+    },
+    "angle projected": {
+      "offdiag_mean": 0.09475368047854604,
+      "offdiag_var": 0.06223621681509402,
+      "offdiag_std": 0.24947187579984645,
+      "test_roc_auc": 0.9148760773455991
+    }
+  }
+}

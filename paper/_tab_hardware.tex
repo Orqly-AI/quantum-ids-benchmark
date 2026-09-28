@@ -1,0 +1,25 @@
+\begin{table}[t]
+\centering
+\caption{Hardware validation of the IQP projected kernel on NSL-KDD (200 training and
+500 test samples, the latter class-balanced). Agreement columns are Pearson correlations
+of the source's Pauli features and of its Gram matrix (off-diagonal) with the exact statevector values.
+Metric columns are for the projected-kernel SVM trained and tested on that source's own features
+($\gamma=1$, $C=1$). Generated from the result files.}
+\label{tab:hardware}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}Yccccc@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{Agreement with exact}} & \multicolumn{3}{c}{\textbf{Projected-kernel SVM}}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-6}
+\textbf{Feature source} & \textbf{Feat.\ $r$} & \textbf{Gram $r$} & \textbf{ROC-AUC} & \textbf{AUPRC} & \textbf{TPR@1\%FPR}\\
+\midrule
+Exact statevector & 1.000 & 1.000 & 0.944 & 0.941 & 0.396\\
+Noisy simulation (FakeFez, 256 shots) & 0.984 & 0.990 & 0.941 & 0.938 & 0.420\\
+\texttt{ibm\_fez} (128 shots) & 0.920 & 0.977 & 0.935 & 0.935 & 0.404\\
+\texttt{ibm\_kingston} (128 shots) & 0.941 & 0.971 & 0.935 & 0.930 & 0.404\\
+\texttt{ibm\_marrakesh} (128 shots) & 0.966 & 0.984 & 0.942 & 0.939 & 0.408\\
+\bottomrule
+\end{tabularx}
+\end{table}

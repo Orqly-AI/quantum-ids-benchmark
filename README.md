@@ -12,19 +12,31 @@ design, operating-point/calibration metrics, statistical significance, a NISQ no
 sweep, and a **quantum-attribution audit** that decomposes any measured gain into
 its classical and genuinely-quantum components.
 
-**Preprint:** [arXiv:2608.18155](https://arxiv.org/abs/2608.18155)
-**Under review at:** Quantum Machine Intelligence (Springer).
+**Preprint:** [arXiv:2608.18155](https://arxiv.org/abs/2608.18155) (v1; v2 with the kernel-level
+analysis of Section 7 is being prepared, together with a journal submission).
 
 ## TL;DR — headline result
 
 Tuned classical models (Random Forest, XGBoost) **match or exceed the quantum models
 on aggregate detection on every dataset**, and the attribution audit traces the
 apparent quantum gain to classical preprocessing/regularisation rather than quantum
-effects. Two exceptions survive false-discovery-rate correction: the quantum-kernel SVM
-**out-ranks its direct classical surrogate** (a random-feature kernel) on AUPRC and ROC-AUC
-(q = 0.011 / 0.018), which is the study's most robust positive; and a small 4-qubit hybrid
-**out-detects the best classical baseline at the 1% false-positive operating point** on the
-distribution-shifted NSL-KDD task (p = 0.005, q = 0.030).
+effects. The audit's strongest positive, a quantum-kernel SVM that out-ranked its classical
+surrogate under both FDR and Holm correction, **turned out to be an artefact of the classical
+baseline's tuning**: on identical data with exact kernels, a bandwidth grid capped at gamma <= 3
+yields a spurious ROC-AUC advantage of 0.167, a grid to gamma <= 30 leaves 0.007 with the
+classical kernel ahead at 1% FPR. The cause is NSL-KDD's shift to 17 unseen attack types, which
+in-distribution cross-validation cannot see (`src/kernel_analysis.py`, paper Section 7).
+Leave-attack-types-out CV restores reliable selection; on UNSW-NB15, which has no unseen attack
+types, standard selection works and classical kernels win outright. A classical kernel on the
+circuit's own phases reproduces the IQP quantum kernel (geometric difference 1.4 to 2.4) on all four
+datasets. One narrower result remains: a 4-qubit hybrid out-detects the best classical baseline at
+the 1% false-positive point on NSL-KDD (p = 0.005, BH q = 0.030; survives FDR, not Holm).
+
+**Real hardware.** The projected quantum kernel was executed on three IBM Heron processors
+(`ibm_fez`, `ibm_kingston`, `ibm_marrakesh`; 200 train + 500 test samples, 128 shots per basis, one
+job of ~90 QPU-seconds each). Measured Gram matrices correlate with the exact ones at r = 0.97 to 0.98
+and the classifier built on measured features stays within 0.01 ROC-AUC of the exact kernel
+(`src/kernel_hardware.py`, raw expectations in `results/kernel_analysis/hardware_*.npz`).
 
 | Dataset | Best classical F1 (same-budget) | Best quantum F1 | Verdict |
 |---|---|---|---|
@@ -47,6 +59,16 @@ python src/run_baselines.py --dataset nslkdd --view both --seeds 42 43 44 45 46
 python src/aggregate.py        # -> results/summary.csv, summary_agg.csv, summary.tex
 python src/figures.py --out figures/
 python src/attribution.py --config configs/attribution_audit.yaml --results-dir results
+
+# kernel-level analysis (paper Section 7): each part writes results/kernel_analysis/<part>.json
+python src/kernel_analysis.py validate      # engine vs the QSVM circuits (agrees to 1e-15)
+python src/kernel_analysis.py fair          # surrogate confounds removed, equal tuning
+python src/kernel_analysis.py landscape     # bandwidth grid, standard vs shift-aware CV
+python src/kernel_analysis.py geometry_trig # geometric difference, all four datasets
+python src/kernel_analysis.py shots         # finite-shot robustness
+python src/kernel_hardware.py dryrun        # noisy simulation of a Heron device (free)
+python src/kernel_hardware.py run --confirm # real IBM Quantum device (needs an account; costs QPU time)
+cd paper && python _gen_tables.py && python _gen_tables2.py && python _gen_tables3.py  # tables from JSON
 ```
 
 ## Hardware

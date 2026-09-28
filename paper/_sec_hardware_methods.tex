@@ -1,0 +1,13 @@
+\paragraph{Hardware execution.} Because the projected kernel needs only single-qubit expectations, the
+feature map can be run on a real device as one parameterised eight-qubit circuit with 24 observables,
+executed once per sample: linear in the number of samples, unlike the $O(N^{2})$ fidelity kernel. We
+build the identical IQP circuit in Qiskit (its statevector expectations agree with the PennyLane feature
+map to $10^{-15}$), transpile it to the device's native gate set (depth 119, 28 two-qubit gates on the
+heavy-hex coupling map), and evaluate $\langle X_i\rangle,\langle Y_i\rangle,\langle Z_i\rangle$ with the
+Estimator primitive at 128 shots per measurement basis, with the primitive's default readout-error
+mitigation and no other error mitigation. The 200 training rows are the first 200 of the NSL-KDD training
+file and the 500 test rows are a seeded, class-balanced sample of the official test set. All 700 samples
+are submitted as a single job. We compare the measured features and the resulting Gram matrix with their
+exact statevector values by Pearson correlation, and train and test the projected-kernel SVM on the
+measured features alone. As a control we first run the same pipeline on a noisy local simulation of the
+device built from its calibration data.

@@ -1,0 +1,174 @@
+{
+  "nslkdd": {
+    "N": 800,
+    "sqrt_N": 28.284271247461902,
+    "lambda": 0.01,
+    "kernels": {
+      "IQP projected": {
+        "s_quantum": 235.1563977620393,
+        "RBF raw": {
+          "g_min": 8.407767164462877,
+          "best_gamma": 3.0,
+          "s_classical": 481.24136191961827
+        },
+        "trig [sin,cos]": {
+          "g_min": 8.327298898405921,
+          "best_gamma": 3.0,
+          "s_classical": 480.4819221331768
+        },
+        "trig + IQP phases": {
+          "g_min": 2.2699334596717176,
+          "best_gamma": 1.0,
+          "s_classical": 235.82899971136578
+        }
+      },
+      "IQP fidelity": {
+        "s_quantum": 272.919900184646,
+        "RBF raw": {
+          "g_min": 4.911253590811987,
+          "best_gamma": 3.0,
+          "s_classical": 481.24136191961827
+        },
+        "trig [sin,cos]": {
+          "g_min": 4.883918182713041,
+          "best_gamma": 3.0,
+          "s_classical": 480.4819221331768
+        },
+        "trig + IQP phases": {
+          "g_min": 1.773233040474715,
+          "best_gamma": 1.0,
+          "s_classical": 235.82899971136578
+        }
+      }
+    }
+  },
+  "unsw": {
+    "N": 800,
+    "sqrt_N": 28.284271247461902,
+    "lambda": 0.01,
+    "kernels": {
+      "IQP projected": {
+        "s_quantum": 1256.2903224892857,
+        "RBF raw": {
+          "g_min": 12.21054696304067,
+          "best_gamma": 3.0,
+          "s_classical": 781.7029238744531
+        },
+        "trig [sin,cos]": {
+          "g_min": 12.104199824124684,
+          "best_gamma": 3.0,
+          "s_classical": 787.6973379698295
+        },
+        "trig + IQP phases": {
+          "g_min": 2.4368437748660687,
+          "best_gamma": 1.0,
+          "s_classical": 1298.7687875093534
+        }
+      },
+      "IQP fidelity": {
+        "s_quantum": 987.9305339852845,
+        "RBF raw": {
+          "g_min": 9.522179166235697,
+          "best_gamma": 3.0,
+          "s_classical": 781.7029238744531
+        },
+        "trig [sin,cos]": {
+          "g_min": 9.343339986131278,
+          "best_gamma": 3.0,
+          "s_classical": 787.6973379698295
+        },
+        "trig + IQP phases": {
+          "g_min": 1.5010774771174937,
+          "best_gamma": 1.0,
+          "s_classical": 1298.7687875093534
+        }
+      }
+    }
+  },
+  "cicids": {
+    "N": 800,
+    "sqrt_N": 28.284271247461902,
+    "lambda": 0.01,
+    "kernels": {
+      "IQP projected": {
+        "s_quantum": 374.75341901152495,
+        "RBF raw": {
+          "g_min": 8.646915865920715,
+          "best_gamma": 3.0,
+          "s_classical": 776.508923074351
+        },
+        "trig [sin,cos]": {
+          "g_min": 8.484311570088545,
+          "best_gamma": 3.0,
+          "s_classical": 772.199307914242
+        },
+        "trig + IQP phases": {
+          "g_min": 1.9543294567446987,
+          "best_gamma": 1.0,
+          "s_classical": 361.3843548802495
+        }
+      },
+      "IQP fidelity": {
+        "s_quantum": 394.47708871867593,
+        "RBF raw": {
+          "g_min": 7.0361464224535295,
+          "best_gamma": 3.0,
+          "s_classical": 776.508923074351
+        },
+        "trig [sin,cos]": {
+          "g_min": 6.863503730408404,
+          "best_gamma": 3.0,
+          "s_classical": 772.199307914242
+        },
+        "trig + IQP phases": {
+          "g_min": 1.5431417714326556,
+          "best_gamma": 1.0,
+          "s_classical": 361.3843548802495
+        }
+      }
+    }
+  },
+  "toniot": {
+    "N": 800,
+    "sqrt_N": 28.284271247461902,
+    "lambda": 0.01,
+    "kernels": {
+      "IQP projected": {
+        "s_quantum": 1006.0106413072555,
+        "RBF raw": {
+          "g_min": 9.246988473607406,
+          "best_gamma": 3.0,
+          "s_classical": 2102.9854235607772
+        },
+        "trig [sin,cos]": {
+          "g_min": 9.073390400505433,
+          "best_gamma": 3.0,
+          "s_classical": 2114.042103325469
+        },
+        "trig + IQP phases": {
+          "g_min": 2.225333058381334,
+          "best_gamma": 1.0,
+          "s_classical": 908.1924005757094
+        }
+      },
+      "IQP fidelity": {
+        "s_quantum": 1149.1625561227065,
+        "RBF raw": {
+          "g_min": 7.835031327069963,
+          "best_gamma": 3.0,
+          "s_classical": 2102.9854235607772
+        },
+        "trig [sin,cos]": {
+          "g_min": 7.641811993749533,
+          "best_gamma": 3.0,
+          "s_classical": 2114.042103325469
+        },
+        "trig + IQP phases": {
+          "g_min": 1.3882703697763272,
+          "best_gamma": 1.0,
+          "s_classical": 908.1924005757094
+        }
+      }
+    }
+  }
+}

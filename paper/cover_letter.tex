@@ -9,66 +9,70 @@
 \pagestyle{empty}
 \begin{document}
 
-\textbf{To:} The Editors, \emph{Quantum Machine Intelligence}\\
-\textbf{Re:} Submission of original research article\\
-\textbf{Topic:} Quantum Computing for AI
+\textbf{To:} The Editors-in-Chief, \emph{Quantum Information Processing}\\
+\textbf{Re:} Submission of an original research article
 
 \bigskip
-Dear Editors,
+Dear Professors Pathak and Weinstein,
 
 We are pleased to submit our manuscript, \textbf{``How Quantum Is the Advantage? A Fair,
 Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for
-Network Intrusion Detection,''} for consideration as an original research article in
-\emph{Quantum Machine Intelligence}.
+Network Intrusion Detection,''} for consideration as an original article in \emph{Quantum
+Information Processing}.
 
-\textbf{The question.} Applied quantum machine learning reports near-perfect accuracies across
-many application domains, network intrusion detection among them, with figures in the 97 to
-99.9\% range. The field's more careful studies have begun to question those numbers, showing that
-well-tuned classical models remain competitive on tabular data and that apparent quantum gains may
-be artefacts of the classical dimensionality reduction and implicit regularisation that every
-hybrid pipeline contains. What the literature lacks is not another accuracy record but a
-\emph{method} for deciding, for a given result, how much of the measured advantage is actually
-attributable to the quantum component. That is what this paper supplies.
+\textbf{The question.} Quantum kernel methods are among the most widely deployed quantum machine
+learning algorithms, and network intrusion detection is one of the application domains in which
+near-perfect accuracy is most often reported for them. Whether such results reflect the quantum
+feature map, or the classical processing that surrounds it, is a question of quantum information
+science rather than of security: it asks when a quantum kernel provides an advantage that a classical
+kernel cannot. We answer it for a realistic learning task, with a reproducible protocol and a result we
+did not expect.
 
-\textbf{What we contribute.} The methodological core is a \textbf{quantum-attribution audit}: for
-every quantum model we construct a parameter-matched classical control sharing the identical
-classical front-end; for every quantum kernel we construct a random-feature kernel as its explicit
-classical surrogate; and we run a regularisation sweep to test whether comparable regularisation
-closes any observed gap. Differences are reported per variant and metric with significance testing
-and Benjamini-Hochberg control of the false-discovery rate across the whole comparison family. The
-audit is general: it applies to any claim of quantum advantage in a hybrid learning pipeline, and
-we demonstrate it on a benchmark of two quantum model families (hybrid variational circuits and
-quantum-kernel SVMs) against five honestly-tuned classical baselines, across four standard
-datasets, under one leakage-controlled protocol with an equal-budget feature view, imbalance- and
-calibration-aware metrics, and a simulated NISQ noise sweep.
+\textbf{What we did.} We benchmark hybrid variational circuits and quantum-kernel SVMs against five
+tuned classical baselines on four intrusion-detection datasets under one leakage-controlled protocol,
+with a quantum-attribution audit of parameter-matched classical controls. The audit's strongest positive
+was a quantum kernel that out-ranked its classical surrogate, and it survived both false-discovery-rate
+and family-wise Holm correction. We then dissected that result at the level of the kernels themselves,
+placing quantum and classical kernels on identical data with exact Gram matrices and equal tuning
+budgets, and applying the geometric difference of Huang et al.\ as a label-free test of whether a
+classical kernel can reproduce the quantum one.
 
-\textbf{What we find.} Tuned classical models match or exceed the quantum models on aggregate
-detection on every dataset, and the audit attributes this to classical preprocessing and
-regularisation rather than to quantum effects. Two advantages survive FDR control. The
-quantum-kernel SVM significantly out-ranks its direct classical surrogate on AUPRC ($q=0.011$) and
-ROC-AUC ($q=0.018$); because the random-feature kernel is the explicit classical analogue of the
-quantum feature map, this is the sharpest isolation of a genuinely quantum contribution in the
-study, and it is the one result that also survives the more conservative family-wise Holm
-correction. Separately, a small four-qubit hybrid out-detects the best classical baseline at the
-1\% false-positive operating point on a distribution-shifted task ($p=0.005$, $q=0.030$); we report
-plainly that this one does not survive Holm.
+\textbf{What we found.} The certified-significant advantage was produced by the classical baseline.
+Its surrogate differed from the quantum kernel in four ways besides the feature map, and once those are
+removed the gap is set entirely by the bandwidth grid searched for the classical kernel: a narrow grid
+yields an apparent quantum ROC-AUC advantage of $0.167$, a wide grid leaves $0.007$, with the classical
+kernel ahead at the $1\%$ false-positive operating point. The mechanism is a distribution shift, since
+the test set contains 17 attack types absent from training, that in-distribution cross-validation cannot
+see; on a second dataset without such a shift, standard selection is reliable and classical kernels win
+outright. The geometric difference places the IQP quantum kernel within $1.4$ to $2.4$ of a classical
+kernel built on the circuit's own phases on all four datasets, and that classical kernel reproduces it
+with no quantum state. We also show that leave-attack-types-out cross-validation restores reliable model
+selection under the shift, and that the projected quantum kernel is robust to finite-shot measurement
+down to 16 shots per basis. Finally we execute the projected kernel on three IBM Heron processors,
+where its measured Gram matrix correlates at $0.97$ to $0.98$ with the exact one and the classifier built
+on measured features stays within $0.01$ ROC-AUC of the exact kernel, so the object we analyse is
+realisable at current noise levels.
 
-\textbf{Fit for the journal.} The work sits in the journal's Quantum Computing for AI perspective
-and speaks directly to its stated emphasis on benchmarking and empirical evaluation. It is
-addressed to readers who want to know whether reported quantum advantages hold up under matched
-classical controls, which is a question for this readership rather than for an applications venue.
-We also believe the audit is reusable well beyond intrusion detection.
+\textbf{Why this journal.} The contribution is a method for adjudicating claims of quantum-kernel
+advantage, demonstrated on a task where such claims are frequent. It builds on work that has appeared
+in this journal on the comparison of quantum and classical kernel functions in support vector machines
+(Abdulsalam and Ahmad, 2025) and on the training of quantum kernels (Innan et al., 2023), and on the
+broader scrutiny of quantum kernels by Schnabel and Roth, Fl\'orez-Ablan et al.\ and Huang et al. Its
+central lesson, that statistical significance is not attribution and that a distribution shift can let
+the classical baseline's tuning manufacture or erase an apparent quantum advantage, applies to any
+quantum learning benchmark evaluated on shifted data.
 
-\textbf{Limitations we state up front.} All quantum results are simulated; we have no QPU access
-and treat the simulated numbers as an optimistic bound. Our seed budget is small and uneven (five
-seeds for the classical baselines on one dataset, three elsewhere and for all quantum runs, two for
-the noise sweep), which we report explicitly and which is why the operating-point claims rest on a
-paired bootstrap rather than on seed-level tests. The attribution audit is decomposed on the most
-discriminative dataset. We prefer to surface these limits than have them inferred.
+\textbf{Limitations we state up front.} The variational results and the noise sweep are simulated at
+eight qubits; only the projected kernel was run on hardware, with 700 samples per device and default
+readout mitigation. The seed budget is small and uneven, and we report it exactly. Shift-aware selection requires attack-type labels, which were
+informative on one dataset and not on the other.
 
-\textbf{Reproducibility.} The code, configurations, fixed seeds, the scripts that reconstruct our
-exact splits, and the per-run result records are released publicly; every reported number is
-regenerable from the released harness.
+\textbf{Reproducibility.} The code, configurations, fixed seeds, the scripts that reconstruct our exact
+splits, the kernel-level analysis, the raw device measurements, and the per-run result records are released at
+\url{https://github.com/Orqly-AI/quantum-ids-benchmark}; every table in the kernel analysis is
+generated directly from the result files. An earlier version of the benchmark, without the kernel-level
+analysis, is available as a preprint (arXiv:2608.18155); the kernel-level analysis is new to this
+submission.
 
 This manuscript is original, has not been published previously, and is not under consideration
 elsewhere. All authors have approved the submission and declare no competing interests.

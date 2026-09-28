@@ -68,6 +68,72 @@ D.~Chaudhary, S.~Rajasegarar, S.~R. Pokhrel,
 \newblock \href {http://arxiv.org/abs/2603.22365} {\path{arXiv:2603.22365}}.
 \newline\urlprefix\url{https://arxiv.org/abs/2603.22365}
 
+\bibitem{schnabel2025scrutiny}
+J.~Schnabel, M.~Roth, Quantum kernel methods under scrutiny: a benchmarking
+  study, Quantum Machine Intelligence 7 (2025) 58.
+\newblock \href {https://doi.org/10.1007/s42484-025-00273-5}
+  {\path{doi:10.1007/s42484-025-00273-5}}.
+
+\bibitem{florezablan2025similarity}
+R.~Fl{\'o}rez-Ablan, M.~Roth, J.~Schnabel, On the similarity of bandwidth-tuned
+  quantum kernels and classical kernels, Quantum Science and Technology 10~(3)
+  (2025) 035051.
+\newblock \href {https://doi.org/10.1088/2058-9565/ade7ad}
+  {\path{doi:10.1088/2058-9565/ade7ad}}.
+
+\bibitem{shaydulin2022bandwidth}
+R.~Shaydulin, S.~M. Wild, Importance of kernel bandwidth in quantum machine
+  learning, Physical Review A 106 (2022) 042407.
+\newblock \href {https://doi.org/10.1103/PhysRevA.106.042407}
+  {\path{doi:10.1103/PhysRevA.106.042407}}.
+
+\bibitem{kakavand2026benchmarking}
+S.~Kakavand, C.~Strohmeyer, M.~Schlotter, Benchmarking quantum kernel support
+  vector machines against classical baselines on tabular data: A rigorous
+  empirical study with hardware validation (2026).
+\newblock \href {http://arxiv.org/abs/2604.18837} {\path{arXiv:2604.18837}}.
+
+\bibitem{abdulsalam2025comparative}
+G.~Abdulsalam, I.~Ahmad, Comparative investigation of quantum and classical
+  kernel functions applied in support vector machine algorithms, Quantum
+  Information Processing 24~(4) (2025) 109.
+\newblock \href {https://doi.org/10.1007/s11128-025-04728-3}
+  {\path{doi:10.1007/s11128-025-04728-3}}.
+
+\bibitem{innan2023variational}
+N.~Innan, M.~A.~Z. Khan, B.~Panda, M.~Bennai, Enhancing quantum support vector
+  machines through variational kernel training, Quantum Information Processing
+  22~(10) (2023) 374.
+\newblock \href {https://doi.org/10.1007/s11128-023-04138-3}
+  {\path{doi:10.1007/s11128-023-04138-3}}.
+
+\bibitem{huang2021power}
+H.-Y. Huang, M.~Broughton, M.~Mohseni, R.~Babbush, S.~Boixo, H.~Neven, J.~R.
+  McClean, Power of data in quantum machine learning, Nature Communications 12
+  (2021) 2631.
+\newblock \href {https://doi.org/10.1038/s41467-021-22539-9}
+  {\path{doi:10.1038/s41467-021-22539-9}}.
+
+\bibitem{cotrupi2025practical}
+M.~L. Cotrupi, B.~R. Callahan, Towards practical quantum kernels for network
+  intrusion detection, in: Proceedings of the AAAI Symposium Series, Vol.~7,
+  2025, pp. 339--342.
+\newblock \href {https://doi.org/10.1609/aaaiss.v7i1.36903}
+  {\path{doi:10.1609/aaaiss.v7i1.36903}}.
+
+\bibitem{thanasilp2024concentration}
+S.~Thanasilp, S.~Wang, M.~Cerezo, Z.~Holmes, Exponential concentration in
+  quantum kernel methods, Nature Communications 15 (2024) 5200.
+\newblock \href {https://doi.org/10.1038/s41467-024-49287-w}
+  {\path{doi:10.1038/s41467-024-49287-w}}.
+
+\bibitem{havlicek2019supervised}
+V.~Havl{\'i}{\v{c}}ek, A.~D. C{\'o}rcoles, K.~Temme, A.~W. Harrow, A.~Kandala,
+  J.~M. Chow, J.~M. Gambetta, Supervised learning with quantum-enhanced feature
+  spaces, Nature 567 (2019) 209--212.
+\newblock \href {https://doi.org/10.1038/s41586-019-0980-2}
+  {\path{doi:10.1038/s41586-019-0980-2}}.
+
 \bibitem{nslkdd2009}
 M.~Tavallaee, E.~Bagheri, W.~Lu, A.~A. Ghorbani, A detailed analysis of the
   {KDD} {CUP} 99 data set, in: IEEE Symposium on Computational Intelligence for

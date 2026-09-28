@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{Finite-shot robustness of the published IQP projected QSVM on NSL-KDD. $M$ shots per basis in
+each of the X, Y and Z settings; mean and standard deviation over 5 sampling seeds. Generated from the
+result files.}
+\label{tab:shots}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}rrccc@{}}
+\toprule
+\textbf{Shots / basis} & \textbf{Shots / sample} & \textbf{ROC-AUC} & \textbf{AUPRC} & \textbf{TPR@1\%FPR}\\
+\midrule
+16 & 48 & $0.941\pm0.002$ & $0.956\pm0.002$ & $0.486\pm0.011$\\
+64 & 192 & $0.945\pm0.002$ & $0.960\pm0.001$ & $0.489\pm0.009$\\
+256 & 768 & $0.943\pm0.004$ & $0.957\pm0.002$ & $0.473\pm0.003$\\
+1{,}024 & 3{,}072 & $0.943\pm0.002$ & $0.956\pm0.001$ & $0.469\pm0.002$\\
+4{,}096 & 12{,}288 & $0.947\pm0.001$ & $0.957\pm0.001$ & $0.470\pm0.001$\\
+\addlinespace[2pt]
+exact & $\infty$ & $0.945$ & $0.957$ & $0.470$\\
+\bottomrule
+\end{tabular}
+\end{table}

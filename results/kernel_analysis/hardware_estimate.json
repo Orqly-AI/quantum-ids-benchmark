@@ -1,0 +1,10 @@
+{
+  "samples": 700,
+  "measurement_settings_per_sample": 3,
+  "circuit_executions": 2100,
+  "shots_per_setting": 256,
+  "total_shots": 537600,
+  "rough_qpu_seconds_at_1k_shots_per_s": 537.6,
+  "rough_qpu_seconds_at_4k_shots_per_s": 134.4,
+  "note": "Estimator may batch further; treat as an upper-bound order of magnitude"
+}

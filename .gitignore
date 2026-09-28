@@ -43,3 +43,22 @@ paper/**/*.aux
 paper/**/*.out
 paper/**/*.log
 paper/**/*.blg
+
+# The paper build pipeline is part of the released artefact (tables are generated from JSON)
+!paper/_gen_tables*.py
+!paper/_sync_figs.py
+!paper/_sync_arxiv.py
+!paper/_submission_meta.py
+!paper/_assemble_kernel.py
+!paper/_assemble_hardware.py
+!paper/_build_all.sh
+!paper/_render_png.sh
+!paper/_check_build.sh
+!paper/_strip_comments.py
+!paper/_clean_bib.py
+!paper/_bibaudit.py
+!paper/_bibresolve.py
+!paper/_citecheck.py
+
+# editing backups
+paper/*.bak_*

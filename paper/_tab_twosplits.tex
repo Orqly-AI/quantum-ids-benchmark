@@ -1,0 +1,25 @@
+\begin{table}[t]
+\centering
+\caption{Kernels on the two datasets with an official train/test split, each selected by standard
+5-fold CV over the full grid ($\gamma\le30$, $C\le100$). \emph{Worst} is the lowest test ROC-AUC over all
+40 settings; $r$ is the correlation, across those settings, between the CV score and the test ROC-AUC.
+NSL-KDD's test set contains 17 attack types absent from training; UNSW-NB15's contains none. Generated
+from the result files.}
+\label{tab:twosplits}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}lYccccc@{}}
+\toprule
+\textbf{Dataset} & \textbf{Kernel} & \textbf{Test AUC} & \textbf{AUPRC} & \textbf{TPR@1\%FPR} & \textbf{Worst} & $\bm{r}$\\
+\midrule
+\multirow{3}{*}{NSL-KDD} & Quantum IQP projected & 0.948 & 0.957 & 0.442 & 0.893 & $+0.83$\\
+ & Phase kernel (classical) & 0.938 & 0.946 & 0.441 & 0.818 & $+0.24$\\
+ & RBF, raw features (classical) & 0.940 & 0.953 & 0.455 & 0.740 & $-0.16$\\
+\addlinespace[3pt]
+\multirow{3}{*}{UNSW-NB15} & Quantum IQP projected & 0.930 & 0.943 & 0.457 & 0.697 & $+0.82$\\
+ & Phase kernel (classical) & 0.956 & 0.968 & 0.751 & 0.787 & $+0.83$\\
+ & RBF, raw features (classical) & 0.938 & 0.951 & 0.514 & 0.789 & $+0.83$\\
+\bottomrule
+\end{tabularx}
+\end{table}

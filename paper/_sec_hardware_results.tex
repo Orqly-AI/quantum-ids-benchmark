@@ -1,0 +1,24 @@
+\subsection{On real hardware}\label{sec:khw}
+Table~\ref{tab:hardware} reports the projected kernel executed on three IBM Heron processors,
+\texttt{ibm\_fez}, \texttt{ibm\_kingston} and \texttt{ibm\_marrakesh}, on the same 200 training and 500
+test samples, each as a single job of 89 to 91 QPU-seconds (Section~\ref{sec:kdiag}). The measured Pauli
+features correlate with their exact values at $r=0.92$ to $0.97$ (RMSE $0.10$ to $0.15$), and the Gram
+matrices built from them at $r=0.97$ to $0.98$; on \texttt{ibm\_fez} the Gram correlation of $0.977$
+matches the $r\ge0.976$ that Kakavand et al.~\cite{kakavand2026benchmarking} report for the same device.
+The classifier trained and tested on measured features alone reaches ROC-AUC $0.935$, $0.935$ and $0.942$
+against $0.944$ for the exact kernel: a deficit of $0.009$ on \texttt{ibm\_fez} (95\% CI $[0.000,0.018]$,
+$p=0.049$) and on \texttt{ibm\_kingston} ($[0.002,0.018]$, $p=0.017$), and none on \texttt{ibm\_marrakesh}
+($[-0.002,0.007]$, $p=0.35$). AUPRC shows a significant deficit only on \texttt{ibm\_kingston} ($0.011$,
+$p=0.002$), and at the $1\%$ false-positive operating point no device differs from the exact kernel
+(measured $0.404$ to $0.408$ against $0.396$, $p\ge0.62$). The mechanism anticipated in
+Section~\ref{sec:kshots} holds on hardware: per-feature noise well above the shot-noise floor is largely
+absorbed by the RBF over 24 features.
+
+Two caveats apply. The devices were noisier at the feature level than the calibration-based noise model
+of the dry run predicted (test RMSE $0.15$ on \texttt{ibm\_fez} against $0.07$ in simulation), so noise
+models of this kind should not be taken as substitutes for device runs. And hardware validity is not
+advantage: the same measured features are, by Section~\ref{sec:kgeom}, reproducible by a classical kernel
+on the circuit's phases. What the device runs establish is that the object we analysed is realisable at
+current noise levels, at a cost of about $0.13$ QPU-seconds per sample.
+
+@@TAB_HARDWARE@@

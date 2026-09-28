@@ -1,0 +1,10 @@
+{
+  "iqp": {
+    "max_abs_err_pauli": 5.551115123125783e-16,
+    "max_abs_err_fidelity": 1.5543122344752192e-15
+  },
+  "angle": {
+    "max_abs_err_pauli": 9.992007221626409e-16,
+    "max_abs_err_fidelity": 1.3322676295501878e-15
+  }
+}

@@ -1,0 +1,116 @@
+\section{Kernel-Level Analysis: How Quantum Is the Kernel Advantage?}\label{sec:kernel}
+The audit's most robust positive was the quantum-kernel SVM out-ranking its random-feature surrogate
+(Section~\ref{sec:audit-results}), the one comparison to survive both FDR and family-wise Holm
+correction. That control, however, differed from the QSVM in four ways besides the feature map: it was
+trained on 1{,}200 rather than 2{,}000 rows, it approximated its kernel with 512 Nystr\"om components,
+it used a linear rather than a kernel SVM, and its bandwidth $\gamma=1$ was applied untuned to raw
+features on a different scale. This section removes each difference in turn, examines how the result
+depends on hyperparameter selection, tests it on a second official split, and asks whether what remains
+requires the quantum state. The diagnostics are those of Section~\ref{sec:kdiag}.
+
+\subsection{The surrogate gap is set by the classical bandwidth search}\label{sec:kgap}
+Table~\ref{tab:fair} places every kernel on the identical 2{,}000 NSL-KDD training rows, with exact Gram
+matrices and one kernel SVM solver. Removing the first three confounds, with the bandwidth still fixed at
+$\gamma=1$, narrows the published ROC-AUC gap from $0.127$ to $0.085$. Hyperparameter selection then
+decides the outcome. With the bandwidth searched over $\gamma\le3$, cross-validation picks $\gamma=0.3$ for
+the raw-feature RBF kernel, whose test ROC-AUC falls to $0.783$: an apparent quantum advantage of $0.167$
+(95\% CI $[0.161,0.173]$). With the same cross-validation over $\gamma\le30$ it picks $\gamma=30$, and the RBF
+kernel reaches $0.940$. The quantum kernel then leads by only $0.007$ in ROC-AUC ($[0.006,0.009]$) and
+\emph{trails} at the operating point, where the classical kernel detects $0.455$ of attacks at $1\%$ false
+positives against $0.442$ ($\Delta=-0.013$, $[-0.020,-0.005]$, $p=0.002$). The advantage the audit reported
+is therefore not a property of the kernels. It appears or disappears with the width of the classical
+baseline's search grid, a special case of the bandwidth sensitivity documented for quantum kernels by
+Shaydulin and Wild~\cite{shaydulin2022bandwidth}, here acting on the \emph{classical} side of the
+comparison.
+
+@@TAB_FAIR@@
+
+\subsection{Cross-validation cannot see the novel-attack shift}\label{sec:kcv}
+Figure~\ref{fig:landscape} shows why the grid matters so much. Within the training distribution every
+kernel scores between $0.95$ and $0.99$ at every bandwidth for $C=1$, so the cross-validation surface is nearly flat
+and its maximum is close to arbitrary. On the official test set, whose 17 attack types never occur in
+training, the raw-feature RBF kernel is U-shaped in $\gamma$: strong at very wide and very narrow
+bandwidths (up to $0.945$), and weakest at intermediate ones ($0.740$ at worst across the grid), which is exactly where a
+grid capped at $\gamma=3$ leads cross-validation. Across the 40 settings of the grid the RBF kernel's
+standard CV score is uncorrelated with its test ROC-AUC ($r=-0.16$).
+
+This motivates \emph{shift-aware model selection}: leave-attack-types-out cross-validation, in which each
+attack type lives in exactly one fold, so every validation fold contains attack types its training fold
+never saw. It reproduces the condition of the official split using training data alone. Its score
+correlates with test ROC-AUC at $r=+0.79$ for the RBF kernel, and it selects robust settings for every
+kernel family, with test ROC-AUC between $0.939$ and $0.947$ (Table~\ref{tab:fair}). Under this rule the
+quantum projected kernel also reaches the highest operating-point detection we observe,
+$\tpr$@$1\%\fpr=0.499$, above the RBF kernel's $0.466$ ($\Delta=+0.033$, $[0.021,0.067]$, $p<0.001$). We do
+not read this as a quantum advantage, because its sign depends on the selection rule: under standard CV
+the same comparison favours the classical kernel by $0.013$. Having now evaluated three selection rules,
+reporting only the one on which quantum wins would be precisely the researcher degree of freedom this
+paper warns against.
+
+@@FIG_LANDSCAPE@@
+
+\subsection{A second official split}\label{sec:kunsw}
+If the collapse of standard CV is caused by novel attack types, it should vanish on a dataset whose test
+set has none. UNSW-NB15 is the only other benchmark here with an official split, and every one of its
+nine attack categories occurs in both training and test. We repeat the protocol on a seeded, stratified
+sample of 2{,}000 training rows and 20{,}000 test rows; the training file is sorted by class, so its first
+rows are all benign and cannot be used. Table~\ref{tab:twosplits} confirms the prediction: on UNSW-NB15
+standard CV tracks test performance for every kernel ($r=+0.82$ to $+0.83$). The result for the quantum
+kernel, however, reverses. Selected by the same rule, it is significantly worse than both classical kernels
+on every metric: the classical phase kernel of Section~\ref{sec:kgeom} reaches test ROC-AUC $0.956$ against
+$0.930$ ($\Delta=-0.026$, $[-0.028,-0.024]$) and detects $0.751$ of attacks at $1\%$ false positives against
+$0.457$ ($\Delta=-0.294$, $[-0.318,-0.263]$), and even the raw-feature RBF kernel is ahead ($\Delta\tpr=-0.057$,
+$[-0.087,-0.022]$, $p=0.005$). The one property that had favoured the quantum kernel on NSL-KDD, fewer poor
+hyperparameter settings (worst test ROC-AUC $0.893$ against $0.740$), does not survive either: on
+UNSW-NB15 its worst setting is the lowest of the three ($0.697$ against $0.787$ and $0.789$). We therefore do
+not claim it as a property of quantum kernels. Shift-aware CV is not informative on UNSW-NB15, where the
+dominance of a single attack category leaves only one usable fold, and we report no result from it there.
+
+@@TAB_TWOSPLITS@@
+
+\subsection{Geometry: the IQP kernel is close to its own classical phases}\label{sec:kgeom}
+Table~\ref{tab:geom} gives the geometric difference on all four datasets, which requires no labels and no
+hyperparameter selection. The angle-encoded fidelity kernel is reproduced by an RBF kernel to $g=1.06$ to
+$1.07$ on every dataset, so by the bound of Huang et al.~\cite{huang2021power} it can hold no prediction
+advantage over that classical kernel for any labelling. This is expected: under angle encoding every qubit
+remains in a product state, and the kernel factorises into a product of cosines. The IQP kernels, which
+use entangling ZZ gates, are genuinely far from standard kernels: against every RBF bandwidth and against
+plain trigonometric features, $g$ ranges from $4.9$ to $12.2$. The same IQP kernels, however, lie within
+$g=1.4$ to $2.4$ of a purely classical kernel built on the phases the ZZ feature map
+writes~\cite{havlicek2019supervised}, on all four datasets, and their label-dependent model complexities
+agree: on NSL-KDD the quantum projected kernel has $s_K=235$ and the classical phase kernel $s_K=236$, against
+$481$ for the best raw-feature RBF. The empirical results are consistent with this geometry. On NSL-KDD the
+phase kernel matches the quantum kernel at the operating point under a narrow grid ($0.446$ against
+$0.444$, $p=0.89$) and under standard CV over the full grid ($0.441$ against $0.442$, $p=0.90$), and on
+UNSW-NB15 it outperforms it. Whatever the IQP kernel contributes lives in the phases of its circuit, not
+in the quantum state, and a classical kernel that uses those phases obtains it at a small fraction of the
+cost.
+
+@@TAB_GEOM@@
+
+\subsection{Concentration and finite shots}\label{sec:kshots}
+Kernel values concentrate as width grows, but mildly at these sizes. From 2 to 12 qubits the mean
+off-diagonal IQP fidelity falls from $0.32$ to $0.047$, yet its variance falls only from $0.099$ to $0.032$
+and flattens between 8 and 10 qubits, far from the exponential regime of Thanasilp
+et al.~\cite{thanasilp2024concentration}. The kernels' test ROC-AUC peaks at 8 to 10 qubits ($0.944$ to
+$0.946$ for the projected kernel) and dips only to $0.927$ at 12. Concentration therefore does not explain
+the decline of the variational hybrid with width (Figure~\ref{fig:ablation}), which points instead to the
+trainability and capacity of the variational model.
+
+The projected kernel is robust to measurement noise (Table~\ref{tab:shots}). With 16 shots in each of three
+measurement bases, 48 shots per sample in total, test ROC-AUC falls from $0.945$ to $0.941$, and AUPRC and
+$\tpr$@$1\%\fpr$ do not move beyond their run-to-run spread; by 64 shots the result is indistinguishable
+from the exact kernel. This follows from the construction: the projected kernel needs only single-qubit
+expectations, each estimated with variance at most $1/M$, which the RBF then smooths, whereas a fidelity
+kernel must resolve small global overlaps. The study models sampling noise only; gate and readout error on
+the kernel circuit remain untested.
+
+@@TAB_SHOTS@@
+
+\subsection{Summary}\label{sec:ksum}
+Once kernels are compared on identical data with equal and adequate tuning, no quantum-kernel advantage
+survives the choice of selection rule or of dataset. The audit's strongest positive was produced by its
+own classical surrogate: first by four confounds, then by a bandwidth grid too narrow for a distribution
+shift that in-distribution cross-validation cannot see. Two findings of general use come out of the
+exercise. Leave-attack-types-out cross-validation restores reliable model selection under novel-attack
+shift, and the geometric difference identifies, without labels, when a quantum kernel is classically
+reproducible, which here it is from its own circuit phases on every dataset.

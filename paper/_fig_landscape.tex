@@ -1,0 +1,55 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=2 by 1, horizontal sep=0.5cm, y descriptions at=edge left},
+  scale only axis, width=4.95cm, height=4.6cm,
+  xmode=log, xmin=0.0007, xmax=45,
+  xminorticks=false,
+  ymin=0.76, ymax=1.005,
+  xtick={0.001,0.01,0.1,1,10},
+  xticklabels={$10^{-3}$,$10^{-2}$,$10^{-1}$,$1$,$10$},
+  ytick={0.8,0.85,0.9,0.95,1.0},
+  yticklabel style={/pgf/number format/.cd,fixed,fixed zerofill,precision=2},
+  xlabel={Bandwidth $\gamma$},
+  tick label style={font=\small}, label style={font=\small}, title style={font=\small},
+  ymajorgrids, grid style={gray!18},
+  axis line style={gray!70}, tick style={gray!70},
+  every axis plot/.append style={line width=1.3pt, mark size=2.2pt},
+]
+\nextgroupplot[title={(a) In-distribution CV}, ylabel={ROC-AUC}]
+\addplot[cvviolet, mark=*] coordinates
+  {(0.001,0.9528)(0.003,0.9626)(0.01,0.9670)(0.03,0.9730)(0.1,0.9811)(0.3,0.9846)(1,0.9907)(3,0.9926)(10,0.9933)(30,0.9926)};
+\addplot[cvaqua, dashed, mark=square*, mark options={solid}] coordinates
+  {(0.001,0.9844)(0.003,0.9855)(0.01,0.9865)(0.03,0.9917)(0.1,0.9917)(0.3,0.9935)(1,0.9932)(3,0.9940)(10,0.9940)(30,0.9930)};
+\addplot[cvblue, densely dotted, mark=triangle*, mark options={solid}] coordinates
+  {(0.001,0.9773)(0.003,0.9833)(0.01,0.9824)(0.03,0.9873)(0.1,0.9883)(0.3,0.9846)(1,0.9878)(3,0.9923)(10,0.9927)(30,0.9936)};
+\addplot[cvorange, dash dot, mark=none] coordinates {(0.0007,0.9924)(45,0.9924)};
+
+\nextgroupplot[title={(b) Shifted test set},
+  legend style={at={(-0.05,-0.28)}, anchor=north, legend columns=2, draw=none,
+    font=\small, /tikz/every even column/.append style={column sep=16pt}}]
+\addplot[cvviolet, mark=*] coordinates
+  {(0.001,0.9053)(0.003,0.8968)(0.01,0.9008)(0.03,0.9113)(0.1,0.9246)(0.3,0.9282)(1,0.9453)(3,0.9467)(10,0.9475)(30,0.9413)};
+\addplot[cvaqua, dashed, mark=square*, mark options={solid}] coordinates
+  {(0.001,0.9066)(0.003,0.8844)(0.01,0.8664)(0.03,0.8843)(0.1,0.9087)(0.3,0.9463)(1,0.9470)(3,0.9410)(10,0.9363)(30,0.9344)};
+\addplot[cvblue, densely dotted, mark=triangle*, mark options={solid}] coordinates
+  {(0.001,0.9451)(0.003,0.9342)(0.01,0.9342)(0.03,0.9042)(0.1,0.8457)(0.3,0.7836)(1,0.8605)(3,0.9191)(10,0.9431)(30,0.9403)};
+\addplot[cvorange, dash dot, mark=none] coordinates {(0.0007,0.9471)(45,0.9471)};
+\draw[black, line width=0.9pt] (axis cs:0.3,0.7836) circle (5.5pt);
+\legend{Quantum IQP projected, Classical phase kernel,
+        Classical RBF (raw features), Quantum IQP fidelity}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Kernel performance across the RBF bandwidth on NSL-KDD ($C=1$, first 2{,}000 training rows).
+(a) Within the training distribution every kernel scores $0.95$ to $0.99$ at every bandwidth, so
+cross-validation cannot tell good settings from bad ones. (b) On the official test set, whose 17
+attack types never occur in training, the raw-feature RBF kernel collapses at intermediate bandwidths
+while recovering at both extremes. Standard CV over a grid capped at $\gamma=3$ selects $\gamma=0.3$
+($C=100$), test ROC-AUC $0.783$, at the circled dip; with the grid extended to $\gamma=30$ it selects
+$\gamma=30$ ($C=1$), test ROC-AUC $0.940$. The classical phase kernel uses the ZZ feature map's phases with
+no quantum state; the IQP fidelity kernel has no bandwidth and is drawn as a constant. On this dataset the
+quantum projected kernel never falls below $0.893$ across the full grid, against $0.740$ for the
+raw-feature RBF; on UNSW-NB15 the order reverses (Section~\ref{sec:kunsw}).}
+\label{fig:landscape}
+\end{figure}

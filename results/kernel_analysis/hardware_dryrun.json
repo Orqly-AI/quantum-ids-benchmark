@@ -1,0 +1,35 @@
+{
+  "backend": "FakeFez (local noisy simulation)",
+  "n_train": 200,
+  "n_test": 500,
+  "shots": 256,
+  "wall_seconds": 537.6974813938141,
+  "feature_agreement": {
+    "pearson_r_train": 0.9857581157815114,
+    "pearson_r_test": 0.9844044486435417,
+    "rmse_train": 0.07002111005023419,
+    "rmse_test": 0.06870669519773653
+  },
+  "gram_agreement": {
+    "pearson_r_offdiag": 0.9902848727024104,
+    "max_abs_err": 0.35192937037769945
+  },
+  "hardware_train_hardware_test": {
+    "roc_auc": 0.9412,
+    "auprc": 0.9377245331787457,
+    "tpr_at_1pct_fpr": 0.42,
+    "tpr_at_0.1pct_fpr": 0.368
+  },
+  "exact_train_exact_test": {
+    "roc_auc": 0.9439599999999999,
+    "auprc": 0.9410609999428357,
+    "tpr_at_1pct_fpr": 0.396,
+    "tpr_at_0.1pct_fpr": 0.36
+  },
+  "exact_train_hardware_test": {
+    "roc_auc": 0.9456319999999999,
+    "auprc": 0.9421678603167788,
+    "tpr_at_1pct_fpr": 0.404,
+    "tpr_at_0.1pct_fpr": 0.368
+  }
+}

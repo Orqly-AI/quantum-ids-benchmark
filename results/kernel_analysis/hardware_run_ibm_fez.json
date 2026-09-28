@@ -1,0 +1,40 @@
+{
+  "backend": "ibm_fez",
+  "job_ids": [
+    "datbttlvr3kc73el8d20"
+  ],
+  "n_train": 200,
+  "n_test": 500,
+  "shots": 128,
+  "wall_seconds": 113.30604314804077,
+  "raw_file": "hardware_ibm_fez_20260928_222628.npz",
+  "feature_agreement": {
+    "pearson_r_train": 0.9350853099644157,
+    "pearson_r_test": 0.9204978387276523,
+    "rmse_train": 0.13718615451395028,
+    "rmse_test": 0.14514708406184726
+  },
+  "gram_agreement": {
+    "pearson_r_offdiag": 0.977349392832605,
+    "max_abs_err": 0.46353910975607576
+  },
+  "hardware_train_hardware_test": {
+    "roc_auc": 0.9351680000000001,
+    "auprc": 0.9353670931158746,
+    "tpr_at_1pct_fpr": 0.404,
+    "tpr_at_0.1pct_fpr": 0.392
+  },
+  "exact_train_exact_test": {
+    "roc_auc": 0.9439599999999999,
+    "auprc": 0.9410609999428357,
+    "tpr_at_1pct_fpr": 0.396,
+    "tpr_at_0.1pct_fpr": 0.36
+  },
+  "exact_train_hardware_test": {
+    "roc_auc": 0.940016,
+    "auprc": 0.9396100188456497,
+    "tpr_at_1pct_fpr": 0.428,
+    "tpr_at_0.1pct_fpr": 0.364
+  },
+  "qpu_seconds": 89
+}

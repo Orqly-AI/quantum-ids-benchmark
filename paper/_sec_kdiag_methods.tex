@@ -1,0 +1,46 @@
+\subsection{Kernel-level diagnostics}\label{sec:kdiag}
+The audit above compares models. To explain \emph{why} a quantum kernel does or does not help, we also
+analyse the kernels themselves. Every quantum kernel studied here is noiseless, so we simulate each
+feature-map state $|\phi(x)\rangle$ once and form every Gram matrix from the stored statevectors: the
+fidelity kernel as $|\Psi_A\Psi_B^{\dagger}|^{2}$, and the projected kernel from each qubit's reduced
+density matrix. This costs $O(N)$ circuit simulations instead of $O(N^{2})$, agrees with the circuits
+used for the QSVM to within $10^{-15}$ on every entry, and reproduces the published QSVM test metrics to
+four decimal places.
+
+\paragraph{Fair surrogates.} We compare quantum and classical kernels on the identical first 2{,}000
+NSL-KDD training rows, with exact Gram matrices and the same kernel SVM solver throughout. The bandwidth $\gamma$ and
+$C\in\{0.1,1,10,100\}$ are selected on the training rows only, with the same grid for quantum and
+classical kernels, so neither side receives more tuning than the other. We use two bandwidth grids,
+because the choice matters: a narrow one of seven values from $0.003$ to $3$, and a wide one of ten
+values from $0.001$ to $30$, both logarithmically spaced. Selection is either standard 5-fold
+stratified cross-validation or the shift-aware variant described in Section~\ref{sec:kcv}.
+
+\paragraph{Geometric difference and model complexity.} Following Huang et al.~\cite{huang2021power}, for
+kernels normalised to $\operatorname{Tr}K=N$ we compute
+\[
+g(K_C\Vert K_Q)=\sqrt{\Bigl\Vert\sqrt{K_Q}\,\sqrt{K_C}\,(K_C+\lambda I)^{-2}\sqrt{K_C}\,\sqrt{K_Q}\Bigr\Vert_{\infty}},
+\]
+which tends to $\sqrt{\Vert\sqrt{K_Q}K_C^{-1}\sqrt{K_Q}\Vert_{\infty}}$ as $\lambda\to 0$. A small $g$
+certifies that the classical kernel can learn any function the quantum kernel can learn from comparable
+data, for \emph{any} labelling of the inputs, whereas a prediction advantage requires $g$ to approach
+$\sqrt{N}$. We take the minimum of $g$ over each classical kernel family and bandwidth, at $N=800$ and
+$\lambda=10^{-2}$. Rank-deficient kernels, such as the linear kernel on eight features, are excluded:
+their regularised inverse vanishes on the null space, which makes $g$ spuriously small. We also report
+the label-dependent model complexity $s_K=\Vert\sqrt{K}(K+\lambda I)^{-1}y\Vert^{2}$ with $y\in\{\pm1\}$,
+which tends to $y^{\top}K^{-1}y$ as $\lambda\to 0$.
+
+\paragraph{Concentration.} We measure the mean and variance of the off-diagonal kernel entries as the
+qubit count grows from 2 to 12. Exponential concentration~\cite{thanasilp2024concentration} would drive
+this variance to zero exponentially in the number of qubits.
+
+\paragraph{Finite shots.} Each Pauli expectation $\mu$ in the projected kernel is replaced by the mean of
+$M$ outcomes in $\{\pm1\}$ drawn with $P(+1)=(1+\mu)/2$, which is what hardware returns from $M$ shots in
+each of the three measurement bases, and the SVM is retrained on the resulting noisy features.
+
+\paragraph{Classical phase kernels.} Under angle encoding every qubit remains in a product state, so its
+Pauli features are exactly $(\sin x_i, 0, \cos x_i)$ and the ``quantum'' projected kernel is an RBF kernel
+on classical trigonometric features. We therefore also test RBF kernels on
+$\varphi(x)=(\sin x_i,\cos x_i)_{i}$, and on $\varphi$ augmented with the phases that the ZZ feature
+map~\cite{havlicek2019supervised} writes into the state, namely $\sin$ and $\cos$ of $2x_i$ and of
+$2(\pi-x_i)(\pi-x_{i+1})$. This isolates whether an advantage requires the quantum state itself, or only
+the phases it encodes.

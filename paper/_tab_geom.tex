@@ -1,0 +1,28 @@
+\begin{table}[t]
+\centering
+\caption{Geometric difference $g(K_C\Vert K_Q)$, minimised over classical bandwidth
+($N=800$, $\lambda=10^{-2}$, $\sqrt{N}\approx 28.3$). A small $g$ means the
+classical kernel can learn anything the quantum kernel can. The last column gives the angle-encoded
+fidelity kernel against its best RBF. Rank-deficient kernels are excluded. Generated from the result
+files.}
+\label{tab:geom}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+& & \multicolumn{3}{c}{\textbf{Classical family, vs IQP kernel}} & \textbf{Angle fidelity}\\
+\cmidrule(lr){3-5}\cmidrule(lr){6-6}
+\textbf{Dataset} & \textbf{IQP kernel} & \textbf{RBF raw} & \textbf{Trig} & \textbf{Phase kernel} & \textbf{vs RBF}\\
+\midrule
+NSL-KDD & projected & 8.41 & 8.33 & \textbf{2.27} & \multirow{2}{*}{1.07}\\
+ & fidelity & 4.91 & 4.88 & \textbf{1.77} & \\
+UNSW-NB15 & projected & 12.21 & 12.10 & \textbf{2.44} & \multirow{2}{*}{1.07}\\
+ & fidelity & 9.52 & 9.34 & \textbf{1.50} & \\
+CICIDS2017 & projected & 8.65 & 8.48 & \textbf{1.95} & \multirow{2}{*}{1.06}\\
+ & fidelity & 7.04 & 6.86 & \textbf{1.54} & \\
+NF-ToN-IoT-v2 & projected & 9.25 & 9.07 & \textbf{2.23} & \multirow{2}{*}{1.07}\\
+ & fidelity & 7.84 & 7.64 & \textbf{1.39} & \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,6 @@
+\textbf{Hardware.} The projected quantum kernel was executed on three IBM Heron processors
+(Section~\ref{sec:khw}); every other quantum result, including the variational hybrids and the noise
+sweep, is simulated, and the noise sweep models NISQ effects rather than measuring them. The device runs
+used 200 training and 500 test samples, 128 shots per basis, and only the primitive's default readout
+mitigation; they realise the kernel, not a full QSVM training loop, on hardware, and the fidelity kernel,
+whose cost is quadratic in the sample count, was not run.

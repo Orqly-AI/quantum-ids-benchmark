@@ -1,0 +1,37 @@
+\begin{table}[t]
+\centering
+\caption{Kernels on identical data (first 2{,}000 NSL-KDD training rows; official test set of
+22{,}544 rows containing 17 attack types absent from training). Exact Gram matrices and one kernel SVM
+solver throughout. \emph{Score} is the selection criterion's own value: in-distribution 5-fold CV AUC,
+or leave-attack-types-out CV AUC for shift-aware rows. The phase kernel is an RBF kernel on
+$(\sin x_i,\cos x_i)$ plus the ZZ feature map's phases, with no quantum state. Fixed rows use
+$\gamma=1$, $C=1$. Generated from the result files.}
+\label{tab:fair}
+\scriptsize
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}Ylccccc@{}}
+\toprule
+\textbf{Kernel} & \textbf{Feat.} & \textbf{Selection} & \textbf{Score} & \textbf{Test AUC} & \textbf{AUPRC} & \textbf{TPR@1\%FPR}\\
+\midrule
+\multicolumn{7}{@{}l}{\emph{Quantum}}\\
+IQP projected, published & 24 & fixed & n/a & 0.945 & 0.957 & 0.470\\
+IQP projected & 24 & CV, $\gamma\le3$ & 0.993 & 0.950 & 0.959 & 0.444\\
+IQP projected & 24 & CV, $\gamma\le30$ & 0.994 & 0.948 & 0.957 & 0.442\\
+IQP projected & 24 & shift-aware CV & 0.941 & 0.945 & 0.962 & 0.499\\
+IQP fidelity & 256 & CV, $C$ only & 0.992 & 0.947 & 0.955 & 0.458\\
+\addlinespace[2pt]
+\multicolumn{7}{@{}l}{\emph{Classical, no quantum state}}\\
+Random features, 1{,}200 rows, published & 512 & fixed & n/a & 0.818 & 0.885 & 0.352\\
+Random features, 2{,}000 rows & 512 & fixed & n/a & 0.830 & 0.878 & 0.053\\
+RBF, raw features & 8 & fixed & n/a & 0.861 & 0.892 & 0.045\\
+RBF, raw features & 8 & CV, $\gamma\le3$ & 0.993 & 0.783 & 0.864 & 0.078\\
+RBF, raw features & 8 & CV, $\gamma\le30$ & 0.994 & 0.940 & 0.953 & 0.455\\
+RBF, raw features & 8 & shift-aware CV & 0.948 & 0.939 & 0.951 & 0.466\\
+Trig $(\sin x_i,\cos x_i)$ only & 16 & CV, $\gamma\le3$ & 0.993 & 0.811 & 0.878 & 0.077\\
+Phase kernel & 46 & CV, $\gamma\le3$ & 0.995 & 0.941 & 0.952 & 0.446\\
+Phase kernel & 46 & CV, $\gamma\le30$ & 0.995 & 0.938 & 0.946 & 0.441\\
+Phase kernel & 46 & shift-aware CV & 0.951 & 0.947 & 0.959 & 0.469\\
+\bottomrule
+\end{tabularx}
+\end{table}
