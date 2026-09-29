@@ -1,0 +1,19 @@
+A quantum-kernel advantage that survives both false-discovery-rate and family-wise correction can be
+produced entirely by the tuning of the classical baseline. We show this on network intrusion detection,
+where quantum machine learning routinely reports near-perfect accuracy. Benchmarking hybrid variational
+circuits and quantum-kernel SVMs against five tuned classical baselines on four NIDS datasets under one
+leakage-controlled protocol, with a quantum-attribution audit, we find that tuned classical models match
+or exceed the quantum models on aggregate detection on every dataset, yet two quantum results survive
+correction. The first, a quantum kernel out-ranking its classical surrogate, is produced by the classical
+baseline's bandwidth selection: under NSL-KDD's train-to-test shift, cross-validation is anticorrelated
+with the classical kernel's test performance on every one of @@NSAMPLES@@ training samples, so spurious
+advantages of up to $0.17$ ROC-AUC appear under narrow and wide grids alike, while at each kernel's best
+setting the quantum kernel never leads by more than $0.01$. Without shift, cross-validation ranks the grid
+correctly ($r\ge+0.94$). Holding attack families out of training on three further datasets, in 26 runs,
+recreates the failure, and a label-free MMD between training and unlabelled test traffic tracks it
+(Spearman $\rho=-0.61$). The second, a four-qubit hybrid detecting more attacks than a tuned Random
+Forest at $1\%$ false positives, is classical too: its trained circuit is exactly an 81-term trigonometric
+polynomial, a classical tanh layer in the same pipeline matches it on every seed, and the margin lies in
+novel attack types. On three IBM Heron processors the projected kernel stays within $0.01$ ROC-AUC of
+simulation and the hybrid's low-false-positive detection is unchanged on 6{,}000 test rows per device.
+Significance is not attribution. Code, seeds, splits and raw device measurements are released.

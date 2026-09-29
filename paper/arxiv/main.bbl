@@ -121,6 +121,33 @@ M.~L. Cotrupi, B.~R. Callahan, Towards practical quantum kernels for network
 \newblock \href {https://doi.org/10.1609/aaaiss.v7i1.36903}
   {\path{doi:10.1609/aaaiss.v7i1.36903}}.
 
+\bibitem{bowles2024better}
+J.~Bowles, S.~Ahmed, M.~Schuld, \href{https://arxiv.org/abs/2403.07059}{Better
+  than classical? {The} subtle art of benchmarking quantum machine learning
+  models}, arXiv preprint (2024).
+\newblock \href {http://arxiv.org/abs/2403.07059} {\path{arXiv:2403.07059}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2403.07059}
+
+\bibitem{schuld2021encoding}
+M.~Schuld, R.~Sweke, J.~J. Meyer, Effect of data encoding on the expressive
+  power of variational quantum-machine-learning models, Physical Review A
+  103~(3) (2021) 032430.
+\newblock \href {https://doi.org/10.1103/PhysRevA.103.032430}
+  {\path{doi:10.1103/PhysRevA.103.032430}}.
+
+\bibitem{schreiber2023surrogates}
+F.~J. Schreiber, J.~Eisert, J.~J. Meyer, Classical surrogates for quantum
+  learning models, Physical Review Letters 131~(10) (2023) 100803.
+\newblock \href {https://doi.org/10.1103/PhysRevLett.131.100803}
+  {\path{doi:10.1103/PhysRevLett.131.100803}}.
+
+\bibitem{landman2023classically}
+J.~Landman, S.~Thabet, C.~Dalyac, H.~Mhiri, E.~Kashefi,
+  \href{https://arxiv.org/abs/2210.13200}{Classically approximating variational
+  quantum machine learning with random {Fourier} features}, in: International
+  Conference on Learning Representations (ICLR), 2023.
+\newline\urlprefix\url{https://arxiv.org/abs/2210.13200}
+
 \bibitem{gretton2012kernel}
 A.~Gretton, K.~M. Borgwardt, M.~J. Rasch, B.~Sch{\"o}lkopf, A.~Smola, A kernel
   two-sample test, Journal of Machine Learning Research 13 (2012) 723--773.
@@ -130,13 +157,6 @@ S.~Thanasilp, S.~Wang, M.~Cerezo, Z.~Holmes, Exponential concentration in
   quantum kernel methods, Nature Communications 15 (2024) 5200.
 \newblock \href {https://doi.org/10.1038/s41467-024-49287-w}
   {\path{doi:10.1038/s41467-024-49287-w}}.
-
-\bibitem{schuld2021encoding}
-M.~Schuld, R.~Sweke, J.~J. Meyer, Effect of data encoding on the expressive
-  power of variational quantum-machine-learning models, Physical Review A
-  103~(3) (2021) 032430.
-\newblock \href {https://doi.org/10.1103/PhysRevA.103.032430}
-  {\path{doi:10.1103/PhysRevA.103.032430}}.
 
 \bibitem{havlicek2019supervised}
 V.~Havl{\'i}{\v{c}}ek, A.~D. C{\'o}rcoles, K.~Temme, A.~W. Harrow, A.~Kandala,

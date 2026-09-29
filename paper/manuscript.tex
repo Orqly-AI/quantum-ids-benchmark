@@ -76,29 +76,28 @@ contributors and contributed equally to this work.}
 
 \begin{abstract}
 A quantum-kernel advantage that survives both false-discovery-rate and family-wise correction can be
-produced entirely by the tuning of the classical baseline. We show this on network intrusion detection,
-where quantum machine learning routinely reports near-perfect accuracy. Benchmarking hybrid variational
-circuits and quantum-kernel SVMs against five tuned classical baselines on four NIDS datasets under one
-leakage-controlled protocol, with a quantum-attribution audit, we find that tuned classical models match
-or exceed the quantum models on aggregate detection on every dataset, yet two quantum results survive
-correction. The first, a quantum kernel out-ranking its classical surrogate, is set by the classical
-bandwidth grid: NSL-KDD's train-to-test shift reshapes the test landscape where cross-validation cannot
-see, so a narrow grid yields a spurious ROC-AUC advantage of $0.167$ while a wide grid leaves $0.007$.
-Without shift, cross-validation ranks the grid correctly for every kernel ($r\ge+0.94$). Holding attack
-families out of training on three further datasets, in 26 runs, recreates the failure, including a
-spurious $0.17$ quantum lead, and a label-free MMD between training and unlabelled test traffic tracks it
-(Spearman $\rho=-0.61$). The second, a four-qubit hybrid detecting more attacks than a tuned Random Forest at $1\%$
-false positives, is classical too: its trained circuit is exactly an 81-term trigonometric polynomial,
-a classical tanh layer in the same pipeline matches it on every seed, and the margin lies in novel attack
-types. On three IBM Heron processors the projected kernel stays within $0.01$ ROC-AUC of simulation and
-the hybrid's low-false-positive detection is unchanged on 6{,}000 test rows per device. Significance is
-not attribution. Code, seeds, splits and raw device measurements are released.
+produced entirely by the tuning of the classical baseline. Benchmarking hybrid variational circuits and
+quantum-kernel SVMs against five tuned classical baselines on four network intrusion detection datasets under one leakage-controlled protocol, with a quantum-attribution audit, we find that
+tuned classical models match or exceed the quantum models on every dataset, yet two quantum results
+survive correction. The first, a quantum kernel out-ranking its classical surrogate, is produced by the
+classical baseline's bandwidth selection: under NSL-KDD's train-to-test shift, cross-validation is
+anticorrelated with the classical kernel's test performance on all 11 training samples we drew, so
+spurious advantages of up to $0.17$ ROC-AUC appear under narrow and wide grids alike, while at each
+kernel's best setting the quantum kernel never leads by more than $0.01$. Without shift, cross-validation
+ranks the grid correctly. Holding attack families out of training on three further datasets (26 runs)
+recreates the failure, and a label-free MMD between training and unlabelled test traffic tracks it
+(Spearman $\rho=-0.61$). The second, a four-qubit hybrid detecting more attacks than a tuned Random Forest
+at $1\%$ false positives, is classical too: its trained circuit is exactly an 81-term trigonometric
+polynomial, and a classical tanh layer in the same pipeline matches it on every seed. On three IBM Heron
+processors the projected kernel stays within $0.01$ ROC-AUC of simulation and the hybrid's
+low-false-positive detection is unchanged. Significance is not attribution. Code, seeds, splits and raw
+device measurements are released.
 \end{abstract}
 
 \begin{keyword}
-quantum machine learning \sep network intrusion detection \sep hybrid
-quantum-classical neural networks \sep quantum support vector machine \sep NISQ
-\sep reproducible benchmark \sep class imbalance \sep model calibration
+quantum machine learning \sep quantum kernels \sep dequantisation \sep distribution shift
+\sep network intrusion detection \sep hybrid quantum-classical neural networks \sep NISQ hardware
+\sep reproducible benchmark
 \end{keyword}
 
 \end{frontmatter}
@@ -168,8 +167,9 @@ regularisation sweep decompose any observed gain into its quantum and classical 
 direct constructive test of the Bellante et al.\ critique in the practical NISQ regime.
 \item \textbf{A dissection of the audit's two surviving positives.} Placing quantum and classical kernels
 on identical data with exact Gram matrices and equal tuning, we show that a quantum-kernel advantage
-surviving both FDR and Holm correction is produced by the classical baseline's bandwidth search, because
-in-distribution cross-validation cannot see NSL-KDD's train-to-test shift; controls on the test set
+surviving both FDR and Holm correction is produced by the classical baseline's bandwidth selection, because cross-validation cannot see NSL-KDD's train-to-test shift: on every one of
+11 training samples it is anticorrelated with the classical kernel's test performance, so widening
+the grid is no remedy, and the library-default SVM falls in the same trap. Controls on the test set
 alone show that cross-validation is reliable without the shift and apportion the artefact between novel
 attack types and a changed attack mix. For the audit's other positive, a four-qubit hybrid's advantage at
 $1\%$ false positives, we build classical twins that replace only the quantum layer, show that the
@@ -243,10 +243,15 @@ quantum SVMs, across eleven tabular classification and regression datasets, and 
 et al.~\cite{innan2023variational} train the quantum kernel variationally to improve QSVM accuracy.
 Huang et al.~\cite{huang2021power} supply a label-free criterion, the geometric difference, for when a
 quantum kernel can outperform a classical one at all.
-To our knowledge none of these studies examines the novel-attack shift between training and test data
-that defines NIDS evaluation. Within intrusion detection, Cotrupi and Callahan~\cite{cotrupi2025practical}
-run quantum kernels on hardware for four attack types, reporting an average accuracy of 85\%. We extend
-this line to that shift, and show how it interacts with the tuning of the classical baseline.
+To our knowledge none of these studies examines the shift between training and test data that defines
+NIDS evaluation. Within intrusion detection, Cotrupi and Callahan~\cite{cotrupi2025practical}
+run quantum kernels on hardware for four attack types, reporting an average accuracy of 85\%. We extend this line to that shift, and show how it interacts with the tuning of the classical baseline.
+For variational models, Bowles et al.~\cite{bowles2024better} find across 160 datasets that out-of-the-box
+classical models outperform quantum classifiers and that removing entanglement often costs nothing, and
+classical surrogates of trained variational circuits have been built from their Fourier
+structure~\cite{schuld2021encoding,schreiber2023surrogates,landman2023classically}. We use such a
+surrogate as an attribution control: to test, inside the identical pipeline, whether a result that
+survived multiple-testing correction needs its quantum layer, and whether it survives on hardware.
 
 \paragraph{Datasets and evaluation practice.}
 Most studies use one or two datasets (NSL-KDD/KDD99 the dated-but-default choice); genuine
@@ -526,7 +531,8 @@ angle encoding, every $\langle Z_j\rangle$ of the circuit is a trigonometric pol
 angles $a_i$ with frequencies in $\{-1,0,1\}$~\cite{schuld2021encoding}, that is, a linear combination of
 the $3^4=81$ products $\prod_i f_i(a_i)$ with $f_i\in\{1,\cos a_i,\sin a_i\}$. The \emph{Fourier twin}
 replaces the circuit by an unconstrained linear map on these 81 features, a strict superset of the
-circuit's function class; the \emph{MLP twin} by two $\tanh$ layers of width four (40 parameters against
+circuit's function class and a classical surrogate in the sense of Schreiber et
+al.~\cite{schreiber2023surrogates}, here trained from scratch rather than fitted to the trained circuit; the \emph{MLP twin} by two $\tanh$ layers of width four (40 parameters against
 the circuit's 36); and a third twin removes the middle layer altogether. Fitting the 81 coefficients to a
 trained circuit by least squares tests the expansion directly. To separate the model class from the
 input, we also train the Random Forest on the hybrid's own input: its four features, on the full
@@ -857,8 +863,9 @@ the raw-feature RBF kernel, whose test ROC-AUC falls to $0.783$: an apparent qua
 kernel reaches $0.940$. The quantum kernel then leads by only $0.007$ in ROC-AUC ($[0.006,0.009]$) and
 \emph{trails} at the operating point, where the classical kernel detects $0.455$ of attacks at $1\%$ false
 positives against $0.442$ ($\Delta=-0.013$, $[-0.020,-0.005]$, $p=0.002$). The advantage the audit reported
-is therefore not a property of the kernels. It appears or disappears with the width of the classical
-baseline's search grid, a special case of the bandwidth sensitivity documented for quantum kernels by
+is therefore not a property of the kernels. On these rows it appears or disappears with the width of the classical baseline's search grid; on other
+training samples it appears under wide grids too, wherever cross-validation's choice happens to fall
+(Section~\ref{sec:kcv}). It is a special case of the bandwidth sensitivity documented for quantum kernels by
 Shaydulin and Wild~\cite{shaydulin2022bandwidth}, here acting on the \emph{classical} side of the
 comparison. Schnabel and Roth~\cite{schnabel2025scrutiny} likewise find bandwidth and regularisation to
 dominate quantum-kernel performance; what is new here is that a distribution shift makes the classical
@@ -967,6 +974,66 @@ not read this as a quantum advantage, because its sign depends on the selection 
 the same comparison favours the classical kernel by $0.013$. Having now evaluated three selection rules,
 reporting only the one on which quantum wins would be precisely the researcher degree of freedom this
 paper warns against.
+
+Nor is the artefact a property of the published training rows. Table~\ref{tab:samples} repeats the
+comparison on ten further training samples, drawn at random and stratified by attack type, of 1{,}000,
+2{,}000 and 4{,}000 rows. On all eleven samples the RBF kernel's standard-CV score is anticorrelated with
+its test ROC-AUC ($r=-0.31$ to $-0.07$), so the setting that cross-validation selects is close to
+arbitrary with respect to the test set. The narrow grid yields a spurious quantum advantage of at least
+$0.05$ ROC-AUC on six samples, and the wide grid on four, up to $0.142$, with quantum leads at $1\%$ false
+positives of up to $0.43$: wherever the selection falls into the dip at $\gamma=0.1$ to $1$, whatever the
+width of the grid. The wide grid's rescue in Section~\ref{sec:kgap} is specific to the published rows, and
+more training data does not remove the effect (the two 4{,}000-row samples give $0.054$ and $0.070$ on the
+narrow grid). Two things hold on every sample. Shift-aware cross-validation, whose score correlates
+positively with test ROC-AUC on all of them ($r=+0.23$ to $+0.84$), keeps the gap at or below $0.066$
+(median $0.014$), and at each kernel's best setting in the grid the quantum kernel never leads by more than
+$0.010$ (median $0.004$). The comparison therefore has a stable answer, a tie, which standard selection
+under shift misses by up to $0.17$ ROC-AUC in the quantum kernel's favour.
+
+\begin{table}[!htb]
+\centering
+\caption{The surrogate artefact across training samples on NSL-KDD. Every row repeats the kernel comparison
+of Table~\ref{tab:fair} on a different training sample, the published first 2{,}000 rows or a seeded sample
+of the stated size stratified by attack type, and tests on the official test set. Each $\Delta$ is the
+quantum projected kernel's test ROC-AUC (or TPR@1\%FPR) minus the raw-feature RBF kernel's, each at its own
+setting chosen by standard CV over the narrow grid ($\gamma\le3$), standard CV over the wide grid
+($\gamma\le30$), shift-aware CV over the wide grid, or the best test ROC-AUC in the wide grid (oracle). $r$
+is the correlation across the 40 settings between the RBF kernel's CV score and its test ROC-AUC, for
+standard and shift-aware CV. Generated from the result files.}
+\label{tab:samples}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabularx}{\textwidth}{@{}lYccccccc@{}}
+\toprule
+& & \multicolumn{2}{c}{\textbf{Narrow, std.\ CV}} & \textbf{Wide, std.} & \textbf{Wide, shift} & \textbf{Oracle} & \multicolumn{2}{c}{\textbf{RBF $\bm{r}$}}\\
+\cmidrule(lr){3-4}\cmidrule(lr){8-9}
+\textbf{Rows} & \textbf{Sample} & $\bm{\Delta}$\textbf{AUC} & $\bm{\Delta}$\textbf{TPR} & $\bm{\Delta}$\textbf{AUC} & $\bm{\Delta}$\textbf{AUC} & $\bm{\Delta}$\textbf{AUC} & \textbf{Std.} & \textbf{Shift}\\
+\midrule
+1{,}000 & random, seed 1 & $+0.008$ & $-0.020$ & $+0.005$ & $+0.007$ & $-0.006$ & $-0.24$ & $+0.46$\\
+1{,}000 & random, seed 2 & $+0.142$ & $+0.181$ & $+0.142$ & $+0.005$ & $-0.001$ & $-0.19$ & $+0.23$\\
+1{,}000 & random, seed 3 & $+0.016$ & $-0.023$ & $+0.010$ & $+0.041$ & $-0.001$ & $-0.25$ & $+0.77$\\
+\addlinespace[2pt]
+2{,}000 & first rows (published) & $+0.167$ & $+0.367$ & $+0.007$ & $+0.006$ & $+0.005$ & $-0.16$ & $+0.79$\\
+2{,}000 & random, seed 1 & $+0.010$ & $+0.016$ & $+0.010$ & $+0.006$ & $+0.001$ & $-0.31$ & $+0.64$\\
+2{,}000 & random, seed 2 & $+0.088$ & $+0.322$ & $+0.088$ & $+0.014$ & $+0.007$ & $-0.24$ & $+0.56$\\
+2{,}000 & random, seed 3 & $+0.020$ & $-0.008$ & $+0.008$ & $+0.011$ & $-0.000$ & $-0.25$ & $+0.84$\\
+2{,}000 & random, seed 4 & $+0.027$ & $+0.016$ & $+0.012$ & $+0.066$ & $+0.007$ & $-0.23$ & $+0.54$\\
+2{,}000 & random, seed 5 & $+0.087$ & $+0.336$ & $+0.087$ & $+0.024$ & $+0.010$ & $-0.18$ & $+0.83$\\
+\addlinespace[2pt]
+4{,}000 & random, seed 1 & $+0.054$ & $+0.429$ & $+0.054$ & $+0.015$ & $+0.005$ & $-0.24$ & $+0.68$\\
+4{,}000 & random, seed 2 & $+0.070$ & $+0.351$ & $+0.011$ & $+0.017$ & $+0.004$ & $-0.07$ & $+0.77$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The same dip catches the most common classical baseline in practice. Scikit-learn's default RBF-SVM sets
+$\gamma=1/(d\,\mathrm{Var}\,X)$, which is $0.22$ on the published training rows, inside the dip: with its
+default $C=1$ it reaches test ROC-AUC $0.807$ and detects $0.053$ of attacks at $1\%$ false positives,
+against $0.948$ and $0.442$ for the cross-validated quantum kernel. A comparison of a tuned quantum kernel
+with the library default would therefore report a quantum advantage of $0.14$ ROC-AUC without any grid
+at all. On UNSW-NB15, where tuned classical kernels beat the quantum one (Section~\ref{sec:kunsw}), the
+default still trails it ($0.871$ against $0.930$).
 
 \begin{figure}[t]
 \centering
@@ -1298,8 +1365,10 @@ where it matters. Over five seeds the hybrid detects $0.515\pm0.007$ of attacks 
 the tanh twin $0.511\pm0.006$, the Fourier twin $0.506\pm0.016$ and the network with no middle layer at
 all $0.506\pm0.010$, against $0.467$ for the published Random Forest. The hybrid never differs
 significantly from the tanh twin (0 of 5 seeds) and leads the other two twins on 2 of 5 seeds each, by at
-most $0.021$. On ROC-AUC the network without a middle layer is ahead of the hybrid ($0.914$ against
-$0.899$).
+most $0.021$. On ROC-AUC the network without a middle layer is ahead of the hybrid ($0.914$ against $0.899$). This
+matches the benchmark of Bowles et al., in which removing entanglement from quantum classifiers often
+cost nothing~\cite{bowles2024better}; here removing the circuit altogether costs $0.009$ at the operating
+point and gains $0.015$ ROC-AUC.
 
 The margin over the published forest therefore has classical parts, and the Random Forest controls size
 them. About half is the input: the same forest on the hybrid's four features detects $0.491$, and the
@@ -1444,11 +1513,11 @@ Fourier twin &  & 0.880 & 0.526 & 0.617 & 0.310 & $+0.153$ [$0.001$] & \\
 
 \subsection{Summary}\label{sec:ksum}
 No quantum advantage survives attribution in this benchmark. The audit's two positives, each significant
-after correction, were produced classically: the quantum kernel's by its surrogate's confounds and then by
-a bandwidth grid too narrow for a distribution shift that cross-validation cannot see, and the hybrid's by
+after correction, were produced classically: the quantum kernel's by its surrogate's confounds and then by bandwidth selection that the distribution
+shift leaves blind, and the hybrid's by
 the input and the small neural pipeline around its quantum layer, which a tanh layer of the same width
-reproduces. Three findings of general use come out of the exercise. First, the selection failure is
-caused by train-to-test shift: it is absent without shift, recreated on three datasets by holding attack
+reproduces. Three findings of general use come out of the exercise. First, the selection failure is caused by train-to-test shift: it is absent without shift, present on
+every NSL-KDD training sample we drew, recreated on three datasets by holding attack
 families out of training, including a spurious $0.17$ quantum lead, and tracked, coarsely, by a
 label-free MMD; no training-only rule repairs it in general, so comparisons under shift should be
 reported under several selection rules with the oracle bound. Second, both quantum models are classically
@@ -1470,8 +1539,8 @@ concession~\cite{bhatnagar2026mqe} while supplying the decomposition their work 
 
 The kernel-level analysis settles the exception we had expected to be the most robust. The quantum
 kernel's advantage over its classical surrogate survived both FDR and family-wise correction, yet it was
-not quantum: it came from four confounds in the surrogate and then from the width of the classical
-bandwidth grid (Section~\ref{sec:kernel}). This is a cautionary result for the field, not only for this
+not quantum: it came from four confounds in the surrogate and then from the classical bandwidth selection, which the
+shift leaves blind (Section~\ref{sec:kernel}). This is a cautionary result for the field, not only for this
 paper. Statistical robustness does not establish attribution, and under the distribution shift that makes
 NIDS evaluation meaningful, the classical baseline's hyperparameter search can manufacture or erase an
 apparent quantum advantage. A QML-IDS claim evaluated under distribution shift should report how its classical baselines were tuned,
@@ -1534,7 +1603,8 @@ statistic is a coarse, correlational signal from 26 runs, not a calibrated test;
 reweighting of Table~\ref{tab:decomp} treats each attack type's test rows as representative of that type.
 The classical twins attribute the four-qubit, angle-encoded hybrid only: wider or data-re-uploading
 circuits have larger trigonometric spectra, and the exact expansion grows as $3^n$. The NSL-KDD QSVM, as in the original pipeline, trains on the first 2{,}000 rows of the
-official training file, so that model has a single realisation rather than three independent seeds.
+official training file, so that model has a single realisation rather than three independent seeds; Table~\ref{tab:samples}
+repeats the kernel comparison on random training samples of 1{,}000 to 4{,}000 rows.
 \textbf{Scope.} Binary detection under benign distribution shift and imbalance; adversarial evasion and the
 unsupervised/online/federated settings are out of scope.
 
@@ -1546,7 +1616,7 @@ well-tuned classical models match or exceed the quantum models on aggregate dete
 audit attributes this to classical preprocessing and regularisation rather than quantum effects,
 confirming and generalising the Bellante et al.\ critique. Neither of the audit's two positives survived attribution. The quantum kernel that out-ranked its
 classical surrogate under both false-discovery-rate and family-wise correction was produced by the
-surrogate's confounds and by the classical bandwidth grid, under a train-to-test shift that standard
+surrogate's confounds and by the classical bandwidth selection, under a train-to-test shift that standard
 cross-validation cannot see and that, induced on three further datasets, manufactures quantum leads of
 the same size; a classical kernel on the circuit's own phases reproduces the quantum kernel on all four
 datasets. The four-qubit hybrid's advantage at a strict alarm budget belongs to its input and its neural

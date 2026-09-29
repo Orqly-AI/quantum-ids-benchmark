@@ -23,9 +23,13 @@ survived multiple-testing correction; **neither survives attribution** (paper Se
 
 **1. The quantum-kernel advantage is an artefact of classical tuning under shift.** The audit's
 strongest positive, a quantum-kernel SVM that out-ranked its classical surrogate under both FDR and
-Holm correction, is set by the classical bandwidth grid: on identical data with exact kernels, a grid
-capped at gamma <= 3 yields a spurious ROC-AUC advantage of 0.167, a grid to gamma <= 30 leaves 0.007.
-Cross-validation cannot see NSL-KDD's train-to-test shift. Test-set controls show the mechanism:
+Holm correction, is set by the classical bandwidth selection: on identical data with exact kernels
+and the published training rows, a grid capped at gamma <= 3 yields a spurious ROC-AUC advantage of
+0.167 and a grid to gamma <= 30 leaves 0.007, but on 10 further random training samples (1,000 to
+4,000 rows) CV is anticorrelated with the RBF kernel's test AUC on every one and the wide grid also
+yields spurious leads of up to 0.142; at each kernel's best setting the quantum kernel never leads by
+more than 0.010. scikit-learn's default `SVC()` lands in the same dip (test AUC 0.807 against 0.948
+for the tuned quantum kernel). Cross-validation cannot see NSL-KDD's train-to-test shift. Test-set controls show the mechanism:
 on held-out training rows (no shift) CV ranks the grid correctly (r >= +0.94) and the artefact vanishes;
 removing the 17 novel attack types shrinks it to 0.063, reweighting to the training attack mix to 0.012.
 Holding attack families out of training on UNSW-NB15, ToN-IoT and CICIDS2017 (26 runs) recreates the
@@ -82,6 +86,9 @@ python src/kernel_analysis.py landscape     # bandwidth grid, standard vs shift-
 python src/kernel_analysis.py landscape_nsl_seen      # test-set shift controls: novel types removed,
 python src/kernel_analysis.py landscape_nsl_seen_rw   #   ... and attack mix reweighted,
 python src/kernel_analysis.py landscape_nsl_iid       #   ... and held-out training rows (no shift)
+python src/nsl_shift_stats.py              # shift statistics of the official split (Figure 6)
+python src/kernel_analysis.py landscape_sample --n-train 2000 --seed 1   # random training samples
+python src/default_svc.py                  # scikit-learn's default SVC() on the same protocol
 python src/kernel_analysis.py induced --ds unsw --holdout Generic --seed 0   # one induced-shift run
 python src/induced_summary.py               # all induced_<ds>_<holdout>_s<seed>.json -> induced_summary.json
 python src/kernel_analysis.py landscape --folds balanced   # alternative shift-aware folds -> *_bal.json

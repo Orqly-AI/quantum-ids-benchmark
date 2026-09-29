@@ -1,0 +1,16 @@
+Nor is the artefact a property of the published training rows. Table~\ref{tab:samples} repeats the
+comparison on ten further training samples, drawn at random and stratified by attack type, of 1{,}000,
+2{,}000 and 4{,}000 rows. On all eleven samples the RBF kernel's standard-CV score is anticorrelated with
+its test ROC-AUC ($r=-0.31$ to $-0.07$), so the setting that cross-validation selects is close to
+arbitrary with respect to the test set. The narrow grid yields a spurious quantum advantage of at least
+$0.05$ ROC-AUC on six samples, and the wide grid on four, up to $0.142$, with quantum leads at $1\%$ false
+positives of up to $0.43$: wherever the selection falls into the dip at $\gamma=0.1$ to $1$, whatever the
+width of the grid. The wide grid's rescue in Section~\ref{sec:kgap} is specific to the published rows, and
+more training data does not remove the effect (the two 4{,}000-row samples give $0.054$ and $0.070$ on the
+narrow grid). Two things hold on every sample. Shift-aware cross-validation, whose score correlates
+positively with test ROC-AUC on all of them ($r=+0.23$ to $+0.84$), keeps the gap at or below $0.066$
+(median $0.014$), and at each kernel's best setting in the grid the quantum kernel never leads by more than
+$0.010$ (median $0.004$). The comparison therefore has a stable answer, a tie, which standard selection
+under shift misses by up to $0.17$ ROC-AUC in the quantum kernel's favour.
+
+@@TAB_SAMPLES@@

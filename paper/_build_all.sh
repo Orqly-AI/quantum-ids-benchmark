@@ -13,7 +13,8 @@ cd "$(dirname "$0")"
 
 echo "== 0/6  generated tables and Figure 6 from the result files"
 python _gen_tables4.py >/dev/null && python _gen_tables5.py >/dev/null && python _gen_tables6.py >/dev/null \
-  && python _gen_tables7.py >/dev/null && python _gen_tables8.py >/dev/null && python _gen_fig6.py >/dev/null
+  && python _gen_tables7.py >/dev/null && python _gen_tables8.py >/dev/null && python _gen_tables9.py >/dev/null \
+  && python _gen_fig6.py >/dev/null
 python _refresh_tables.py | sed 's/^/   /'
 
 echo "== 1/6  master manuscript"

@@ -40,9 +40,12 @@ al.; the hybrid result we tested against classical twins that replace only its q
 models also ran on three IBM Heron processors.
 
 \textbf{What we found.} Neither positive is quantum. The kernel advantage was produced by the classical
-baseline: once the surrogate's four confounds are removed, the gap is set by the bandwidth grid searched
-for the classical kernel, a narrow grid giving an apparent ROC-AUC advantage of $0.167$ and a wide grid
-$0.007$, because cross-validation cannot see the shift between training and test data. Without that shift
+baseline: once the surrogate's four confounds are removed, the gap is set by the classical kernel's bandwidth
+selection, because cross-validation cannot see the shift between training and test data. On all 11
+training samples we drew, cross-validation is anticorrelated with the classical kernel's test
+performance, and spurious quantum advantages of up to $0.17$ ROC-AUC appear under narrow and wide grids
+alike, while at each kernel's best setting the quantum kernel never leads by more than $0.01$;
+scikit-learn's default SVM falls in the same trap. Without that shift
 cross-validation ranks the grid correctly ($r\ge+0.94$) and the artefact disappears; holding attack
 families out of training on three further datasets recreates it in 26 runs, including a spurious $0.17$
 quantum lead, and a label-free MMD between training and unlabelled test traffic tracks when this

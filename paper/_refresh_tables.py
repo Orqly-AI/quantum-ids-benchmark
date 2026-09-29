@@ -6,7 +6,7 @@ running the generator and then this script. Labels absent from the manuscript ar
 
 Run from paper/:  python _gen_tables5.py && ... && python _gen_fig6.py && python _refresh_tables.py
 """
-PAIRS = {"tab:decomp": "_tab_decomp.tex", "tab:induced": "_tab_induced.tex", "fig:induced": "_fig_induced.tex",
+PAIRS = {"tab:decomp": "_tab_decomp.tex", "tab:samples": "_tab_samples.tex", "tab:induced": "_tab_induced.tex", "fig:induced": "_fig_induced.tex",
          "tab:attrib": "_tab_attrib.tex", "tab:hybridhw": "_tab_hybridhw.tex", "tab:hardware": "_tab_hardware.tex"}
 s = open("manuscript.tex", encoding="utf-8").read()
 for label, path in PAIRS.items():

@@ -1,0 +1,36 @@
+\begin{table}[!htb]
+\centering
+\caption{The surrogate artefact across training samples on NSL-KDD. Every row repeats the kernel comparison
+of Table~\ref{tab:fair} on a different training sample, the published first 2{,}000 rows or a seeded sample
+of the stated size stratified by attack type, and tests on the official test set. Each $\Delta$ is the
+quantum projected kernel's test ROC-AUC (or TPR@1\%FPR) minus the raw-feature RBF kernel's, each at its own
+setting chosen by standard CV over the narrow grid ($\gamma\le3$), standard CV over the wide grid
+($\gamma\le30$), shift-aware CV over the wide grid, or the best test ROC-AUC in the wide grid (oracle). $r$
+is the correlation across the 40 settings between the RBF kernel's CV score and its test ROC-AUC, for
+standard and shift-aware CV. Generated from the result files.}
+\label{tab:samples}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabularx}{\textwidth}{@{}lYccccccc@{}}
+\toprule
+& & \multicolumn{2}{c}{\textbf{Narrow, std.\ CV}} & \textbf{Wide, std.} & \textbf{Wide, shift} & \textbf{Oracle} & \multicolumn{2}{c}{\textbf{RBF $\bm{r}$}}\\
+\cmidrule(lr){3-4}\cmidrule(lr){8-9}
+\textbf{Rows} & \textbf{Sample} & $\bm{\Delta}$\textbf{AUC} & $\bm{\Delta}$\textbf{TPR} & $\bm{\Delta}$\textbf{AUC} & $\bm{\Delta}$\textbf{AUC} & $\bm{\Delta}$\textbf{AUC} & \textbf{Std.} & \textbf{Shift}\\
+\midrule
+1{,}000 & random, seed 1 & $+0.008$ & $-0.020$ & $+0.005$ & $+0.007$ & $-0.006$ & $-0.24$ & $+0.46$\\
+1{,}000 & random, seed 2 & $+0.142$ & $+0.181$ & $+0.142$ & $+0.005$ & $-0.001$ & $-0.19$ & $+0.23$\\
+1{,}000 & random, seed 3 & $+0.016$ & $-0.023$ & $+0.010$ & $+0.041$ & $-0.001$ & $-0.25$ & $+0.77$\\
+\addlinespace[2pt]
+2{,}000 & first rows (published) & $+0.167$ & $+0.367$ & $+0.007$ & $+0.006$ & $+0.005$ & $-0.16$ & $+0.79$\\
+2{,}000 & random, seed 1 & $+0.010$ & $+0.016$ & $+0.010$ & $+0.006$ & $+0.001$ & $-0.31$ & $+0.64$\\
+2{,}000 & random, seed 2 & $+0.088$ & $+0.322$ & $+0.088$ & $+0.014$ & $+0.007$ & $-0.24$ & $+0.56$\\
+2{,}000 & random, seed 3 & $+0.020$ & $-0.008$ & $+0.008$ & $+0.011$ & $-0.000$ & $-0.25$ & $+0.84$\\
+2{,}000 & random, seed 4 & $+0.027$ & $+0.016$ & $+0.012$ & $+0.066$ & $+0.007$ & $-0.23$ & $+0.54$\\
+2{,}000 & random, seed 5 & $+0.087$ & $+0.336$ & $+0.087$ & $+0.024$ & $+0.010$ & $-0.18$ & $+0.83$\\
+\addlinespace[2pt]
+4{,}000 & random, seed 1 & $+0.054$ & $+0.429$ & $+0.054$ & $+0.015$ & $+0.005$ & $-0.24$ & $+0.68$\\
+4{,}000 & random, seed 2 & $+0.070$ & $+0.351$ & $+0.011$ & $+0.017$ & $+0.004$ & $-0.07$ & $+0.77$\\
+\bottomrule
+\end{tabularx}
+\end{table}

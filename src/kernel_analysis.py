@@ -547,22 +547,31 @@ def weighted_metrics(y, s, w):
             "tpr_at_1pct_fpr": at(0.01), "tpr_at_0.1pct_fpr": at(0.001)}
 
 
-def landscape(n_qubits=8, n_train=2000, seen_only=False, test_mode=None, n_iid=20000):
+def landscape(n_qubits=8, n_train=2000, seen_only=False, test_mode=None, n_iid=20000, sample_seed=None):
     """test_mode (NSL-KDD controls on the evaluation set; the 2,000 training rows never change):
       official         the official test set (default)
       seen             drop test rows whose attack type never occurs in the training file
       seen_reweighted  'seen', importance-weighted so each attack type (and benign) carries
                        its training-file share: removes the attack-mix shift as well
       iid              20,000 random rows of the training file outside the 2,000: no shift
-    seen_only=True is the older spelling of test_mode='seen'."""
+    seen_only=True is the older spelling of test_mode='seen'.
+    sample_seed: None trains on the first n_train rows of the training file, as the published QSVM
+    does; an integer draws n_train rows by a seeded sample stratified by attack type instead."""
     test_mode = test_mode or ("seen" if seen_only else "official")
     from sklearn.model_selection import StratifiedKFold
     from sklearn.svm import SVC
     from data import load_meta
     Xtr, ytr, Xte, yte = load_nslkdd(n_qubits)
     _, ym, _, ymt, meta = load_meta("nslkdd", n_qubits, "pca", False, "minmax", 42)
-    names = np.array(meta["class_names"])[np.asarray(ym[:n_train])]
-    Xq, yq = np.asarray(Xtr[:n_train], float), np.asarray(ytr[:n_train])
+    if sample_seed is None:
+        idx = np.arange(n_train)
+    else:
+        from sklearn.model_selection import train_test_split
+        idx, _ = train_test_split(np.arange(len(ytr)), train_size=n_train, stratify=np.asarray(ym),
+                                  random_state=sample_seed)
+        idx = np.sort(idx)
+    names = np.array(meta["class_names"])[np.asarray(ym)[idx]]
+    Xq, yq = np.asarray(Xtr[idx], float), np.asarray(ytr[idx])
     Xte, yte = np.asarray(Xte, float), np.asarray(yte)
     assert np.all((names != "normal").astype(int) == yq), "label misalignment"
     removed, w = 0, None
@@ -578,7 +587,7 @@ def landscape(n_qubits=8, n_train=2000, seen_only=False, test_mode=None, n_iid=2
             z = sum(tr_share[t] for t in te_types)          # renormalise over types present in test
             w = np.array([tr_share[t] / z / te_share[t] for t in tnames])
     elif test_mode == "iid":
-        pool = np.arange(n_train, len(Xtr))
+        pool = np.setdiff1d(np.arange(len(Xtr)), idx)
         pick = np.sort(np.random.RandomState(0).choice(pool, n_iid, replace=False))
         Xte, yte = np.asarray(Xtr[pick], float), np.asarray(ytr[pick])
         removed = -1
@@ -609,6 +618,7 @@ def landscape(n_qubits=8, n_train=2000, seen_only=False, test_mode=None, n_iid=2
                 "test": evalm(s)}
 
     out = {"n_shift_folds": len(shift_folds), "gammas": WIDE_GAMMAS, "Cs": CS, "families": {},
+           "n_train": int(n_train), "sample_seed": sample_seed,
            "test_mode": test_mode, "seen_only": test_mode.startswith("seen"),
            "test_rows_removed": removed, "n_test": int(len(yte)),
            "weight_range": [float(w.min()), float(w.max())] if w is not None else None,
@@ -822,7 +832,8 @@ def selected_within_ds(ds="unsw", n_qubits=8, n_train=2000, n_test=20000, seed=0
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("part", choices=["validate", "reproduce", "fair", "geometry", "concentration", "shots", "dequant", "geometry_trig", "landscape", "selected", "selected_within", "landscape_unsw", "selected_unsw", "induced_unsw_a", "induced_unsw_b", "induced", "landscape_nsl_seen", "landscape_nsl_seen_rw", "landscape_nsl_iid"])
+    ap.add_argument("part", choices=["validate", "reproduce", "fair", "geometry", "concentration", "shots", "dequant", "geometry_trig", "landscape", "selected", "selected_within", "landscape_unsw", "selected_unsw", "induced_unsw_a", "induced_unsw_b", "induced", "landscape_nsl_seen", "landscape_nsl_seen_rw", "landscape_nsl_iid", "landscape_sample"])
+    ap.add_argument("--n-train", type=int, default=2000, help="training rows for 'landscape_sample'")
     ap.add_argument("--ds", default="unsw", help="dataset for the 'induced' mode")
     ap.add_argument("--holdout", default="none",
                     help="comma-separated attack categories kept out of training ('none' = no holdout)")
@@ -840,10 +851,13 @@ if __name__ == "__main__":
                                            holdout=() if a.holdout == "none" else tuple(a.holdout.split(","))),
            "landscape_nsl_seen": lambda: landscape(seen_only=True),
            "landscape_nsl_seen_rw": lambda: landscape(test_mode="seen_reweighted"),
-           "landscape_nsl_iid": lambda: landscape(test_mode="iid")}[a.part]()
+           "landscape_nsl_iid": lambda: landscape(test_mode="iid"),
+           "landscape_sample": lambda: landscape(n_train=a.n_train, sample_seed=a.seed)}[a.part]()
     print(json.dumps(out, indent=2))
     name = a.part
     if a.part == "induced":
         tag = "none" if a.holdout == "none" else "+".join(h.lower() for h in a.holdout.split(","))
         name = f"induced_{a.ds}_{tag}_s{a.seed}"
+    elif a.part == "landscape_sample":
+        name = f"landscape_sample_n{a.n_train}_s{a.seed}"
     json.dump(out, open(os.path.join(RESULTS, f"{name}{SUFFIX}.json"), "w"), indent=2)

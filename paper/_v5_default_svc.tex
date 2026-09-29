@@ -1,0 +1,7 @@
+The same dip catches the most common classical baseline in practice. Scikit-learn's default RBF-SVM sets
+$\gamma=1/(d\,\mathrm{Var}\,X)$, which is $0.22$ on the published training rows, inside the dip: with its
+default $C=1$ it reaches test ROC-AUC $0.807$ and detects $0.053$ of attacks at $1\%$ false positives,
+against $0.948$ and $0.442$ for the cross-validated quantum kernel. A comparison of a tuned quantum kernel
+with the library default would therefore report a quantum advantage of $0.14$ ROC-AUC without any grid
+at all. On UNSW-NB15, where tuned classical kernels beat the quantum one (Section~\ref{sec:kunsw}), the
+default still trails it ($0.871$ against $0.930$).
