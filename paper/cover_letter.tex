@@ -47,7 +47,7 @@ alike, while at each kernel's best setting the quantum kernel never leads by mor
 scikit-learn's default SVM falls in the same trap. Without that shift
 cross-validation ranks the grid correctly ($r\ge+0.94$) and the artefact disappears; holding attack
 families out of training on three further datasets recreates it in 26 runs, including a spurious $0.17$
-quantum lead, and a label-free MMD between training and unlabelled test traffic tracks when this
+quantum lead on CICIDS2017, and a label-free MMD between training and unlabelled test traffic tracks when this
 happens. The IQP kernel lies within a geometric difference of $1.4$ to $2.4$ of a classical kernel on the
 circuit's own phases on all four datasets. The hybrid's trained circuit is exactly an 81-term
 trigonometric polynomial, and a classical tanh layer in its place reproduces its low-false-positive
@@ -56,8 +56,8 @@ lies in novel attack types. On hardware the projected kernel stays within $0.01$
 and the hybrid's detection at $1\%$ false positives is unchanged on 6{,}000 test rows per device and
 indistinguishable from its classical twin's.
 
-\textbf{Why this journal.} The contribution is a method for adjudicating claims of quantum-kernel
-advantage, demonstrated on a task where such claims are frequent. It builds on work that has appeared
+\textbf{Why this journal.} The contribution is a method for adjudicating claims of quantum advantage in machine learning, for
+kernels and variational circuits alike, demonstrated on a task where such claims are frequent. It builds on work that has appeared
 in this journal on the comparison of quantum and classical kernel functions in support vector machines
 (Abdulsalam and Ahmad, 2025) and on the training of quantum kernels (Innan et al., 2023), and on the
 broader scrutiny of quantum kernels by Schnabel and Roth, Fl\'orez-Ablan et al.\ and Huang et al. Its
@@ -76,9 +76,9 @@ warning rather than a calibrated test.
 \textbf{Reproducibility.} The code, configurations, fixed seeds, the scripts that reconstruct our exact
 splits, the kernel-level analysis, the raw device measurements, and the per-run result records are released at
 \url{https://github.com/Orqly-AI/quantum-ids-benchmark}; every table in the kernel analysis is
-generated directly from the result files. An earlier version of the benchmark, without the kernel-level
-analysis, is available as a preprint (arXiv:2608.18155); the kernel-level analysis is new to this
-submission.
+generated directly from the result files. An earlier version of the benchmark is available as a preprint under a previous title (arXiv:2608.18155);
+the kernel- and model-level analysis, the induced-shift study, the classical twins and the hardware runs
+are new to this submission.
 
 This manuscript is original, has not been published previously, and is not under consideration
 elsewhere. All authors have approved the submission and declare no competing interests.
