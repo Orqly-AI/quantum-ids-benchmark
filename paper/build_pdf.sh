@@ -22,7 +22,7 @@ source ~/miniconda3/etc/profile.d/conda.sh
 conda activate qml
 cd "/mnt/c/Research work 2/quantum-ids/paper"
 
-TITLE="How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for Network Intrusion Detection"
+TITLE="Significance Is Not Attribution: The Quantum Machine Learning Advantages That Survive Correction in Network Intrusion Detection Are Classical"
 
 echo ">> 1/4  Markdown -> LaTeX (preserving \\cite, math, tables)"
 # +raw_tex keeps the inline \cite{...}; we strip the manual author block lines so

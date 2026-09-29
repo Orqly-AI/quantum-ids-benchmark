@@ -1,4 +1,6 @@
-# How Quantum Is the Advantage?
+# Significance Is Not Attribution
+
+*The quantum machine learning advantages that survive correction in network intrusion detection are classical.*
 
 [![arXiv](https://img.shields.io/badge/arXiv-2608.18155-b31b1b.svg)](https://arxiv.org/abs/2608.18155)
 
@@ -226,7 +228,7 @@ If you use this benchmark or harness, please cite the paper
 
 ```bibtex
 @misc{gillani2026quantumadvantagefaircalibration,
-      title={How Quantum Is the Advantage? A Fair, Calibration- and Noise-Aware Benchmark and Attribution Audit of Quantum Machine Learning for Network Intrusion Detection},
+      title={Significance Is Not Attribution: The Quantum Machine Learning Advantages That Survive Correction in Network Intrusion Detection Are Classical},
       author={Syeda Anshrah Gillani and Mirza Samad Ahmed Baig and Shahid Munir Shah and Abdul Akbar Khan and Muhammad Omer Khan and Asher Ali and Hamzah Siddiqui},
       year={2026},
       eprint={2608.18155},
