@@ -1,0 +1,18 @@
+In quantum machine learning, a statistically significant gain is routinely read as a quantum advantage. We
+test that reading on network intrusion detection, benchmarking hybrid variational circuits and
+quantum-kernel SVMs against five tuned classical baselines on four datasets under one leakage-controlled
+protocol. Tuned classical models match or exceed the quantum models on aggregate detection on every dataset, and the two quantum
+results surviving multiple-testing correction are both classical. First, a quantum kernel out-ranking
+its classical surrogate under false-discovery-rate and family-wise correction is produced by the
+surrogate's bandwidth selection. Under NSL-KDD's train-to-test shift, cross-validation is anticorrelated
+with the classical kernel's test performance on all 11 training samples drawn, so spurious quantum leads
+of up to $0.17$ ROC-AUC arise with narrow and wide grids alike, and against scikit-learn's default SVM,
+while at each kernel's best setting the quantum kernel never leads by more than $0.01$. Test-set controls
+show that cross-validation is reliable without shift, and an induced-shift protocol we introduce
+recreates the failure on three further datasets in 26 runs, where a label-free MMD between training and
+unlabelled test traffic tracks it (Spearman $\rho=-0.61$). Second, a four-qubit hybrid's higher detection
+than a tuned Random Forest at $1\%$ false positives is reproduced by a classical twin that replaces only
+its quantum layer: the trained circuit is exactly an 81-term trigonometric polynomial, and a tanh layer
+matches it on every seed. Both conclusions hold on three IBM Heron processors. We release the benchmark,
+shift controls, induced-shift protocol and classical-twin test. Significance is not
+attribution.
